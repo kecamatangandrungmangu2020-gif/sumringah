@@ -571,7 +571,7 @@ export function KematianForm({ isAdmin = false }: { isAdmin?: boolean }) {
                 disabled={isSubmitting}
               />
               <GoogleFileUploader
-                label="Surat Pengantar RT/RW"
+                label="Surat Pengantar KEPALA Kecamatan"
                 fieldName="pengantarRt"
                 onFileSelect={handleFileSelect}
                 isRequired={false}

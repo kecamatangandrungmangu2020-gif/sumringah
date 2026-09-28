@@ -292,7 +292,7 @@ export function BelumMenikahForm({ isAdmin = false }: { isAdmin?: boolean }) {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 pt-4">
               <GoogleFileUploader label="Foto KTP" fieldName="ktp" onFileSelect={handleFileSelect} isRequired={!isAdmin} disabled={isSubmitting} />
               <GoogleFileUploader label="Foto KK" fieldName="kk" onFileSelect={handleFileSelect} disabled={isSubmitting} />
-              <GoogleFileUploader label="Surat Pengantar RT/RW" fieldName="pengantarRt" onFileSelect={handleFileSelect} isRequired={false} disabled={isSubmitting} />
+              <GoogleFileUploader label="Surat Pengantar KEPALA Kecamatan" fieldName="pengantarRt" onFileSelect={handleFileSelect} isRequired={false} disabled={isSubmitting} />
             </div>
           </div>
         </FormSection>

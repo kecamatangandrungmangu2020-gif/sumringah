@@ -45,7 +45,7 @@ export function TrackTicket() {
           title: 'Telah Diproses',
           variant: 'default',
           icon: <CheckCircle className="h-4 w-4 text-green-500" />,
-          description: 'Surat pengajuan Anda telah selesai diproses dan sudah bisa diambil ke Pelayanan Desa Karanganyar pada pukul 07.00 WIB s.d 16.00 WIB (Senin s.d Jumat). Terima Kasih.'
+          description: 'Surat pengajuan Anda telah selesai diproses dan sudah bisa diambil ke Pelayanan Kecamatan Gandrungmangu pada pukul 07.00 WIB s.d 16.00 WIB (Senin s.d Jumat). Terima Kasih.'
         };
       case 'pending':
       case 'processing':
@@ -55,7 +55,7 @@ export function TrackTicket() {
           title: 'Sedang Diproses',
           variant: 'default',
           icon: <Loader2 className="h-4 w-4 text-yellow-500 animate-spin" />,
-          description: 'Pengajuan Anda sedang dalam proses peninjauan oleh administrasi desa. Silakan cek kembali secara berkala.'
+          description: 'Pengajuan Anda sedang dalam proses peninjauan oleh administrasi Kecamatan. Silakan cek kembali secara berkala.'
         };
       case 'rejected':
       case 'ditolak':
@@ -63,7 +63,7 @@ export function TrackTicket() {
           title: 'Ditolak',
           variant: 'destructive',
           icon: <XCircle className="h-4 w-4" />,
-          description: 'Maaf, pengajuan Anda ditolak. Silakan hubungi kantor desa untuk informasi lebih lanjut.'
+          description: 'Maaf, pengajuan Anda ditolak. Silakan hubungi kantor Kecamatan untuk informasi lebih lanjut.'
         };
       default:
         return {

@@ -14,6 +14,8 @@ import {
   Plus,
   Upload,
   Download,
+  FileSpreadsheet,
+  CreditCard,
   AlertTriangle
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -46,32 +48,24 @@ import * as XLSX from "xlsx"
 import { cn } from "@/lib/utils"
 
 const CATEGORIES = [
-  "Pemerintah Desa",
-  "BPD",
-  "RT/RW",
-  "Kader",
-  "KPM",
-  "Karang Taruna",
-  "Linmas",
-  "Pengurus BUMDes",
-  "Pengurus KDMP",
-  "Guru Ngaji",
-  "Guru TK & Paud"
+  "Karyawan Kecamatan",
+  "SKRETARIS Kecamatan",
+  "KEPALA Kecamatan"
 ];
 
-// Helper: Weighting for Pemerintah Desa hierarchy
+// Helper: Weighting for Karyawan Kecamatan hierarchy
 const getRankWeight = (jabatan: string) => {
   const j = jabatan.toUpperCase();
-  if (j.includes("KEPALA DESA")) return 1;
-  if (j.includes("SEKRETARIS DESA")) return 2;
+  if (j.includes("KEPALA Kecamatan")) return 1;
+  if (j.includes("SEKRETARIS Kecamatan")) return 2;
   if (j.includes("KASI") || j.includes("KEPALA SEKSI")) return 3;
   if (j.includes("KAUR") || j.includes("KEPALA URUSAN")) return 4;
-  if (j.includes("KEPALA DUSUN") || j.includes("KADUS")) return 5;
+  if (j.includes("KASI KESRA") || j.includes("KADUS")) return 5;
   if (j.includes("STAF")) return 6;
   return 100;
 };
 
-// Helper: Weighting for RT/RW sorting
+// Helper: Weighting for KEPALA Kecamatan sorting
 // Urutan: Ketua RW 01 -> RT 01 RW 01 -> RT 02 RW 01 -> Ketua RW 02 -> RT 01 RW 02...
 const getRtRwWeight = (jabatan: string) => {
   const j = jabatan.toUpperCase();
@@ -97,13 +91,6 @@ const getRtRwWeight = (jabatan: string) => {
   return weight;
 };
 
-// Helper: Weighting for Kader/Posyandu sorting
-const getKaderWeight = (jabatan: string) => {
-  const j = jabatan.toUpperCase();
-  const posyanduMatch = j.match(/RAHAYU\s*(\d+)/);
-  return posyanduMatch ? parseInt(posyanduMatch[1]) : 999;
-};
-
 export default function ProfilePage() {
   const db = useFirestore()
   const { user } = useUser()
@@ -115,7 +102,7 @@ export default function ProfilePage() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
-  const [activeTab, setActiveTab] = useState("Pemerintah Desa");
+  const [activeTab, setActiveTab] = useState("Karyawan Kecamatan");
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -123,6 +110,7 @@ export default function ProfilePage() {
   const [showDeleteAllConfirm, setShowDeleteAllConfirm] = useState(false);
 
   const [newName, setNewName] = useState("");
+  const [newNip, setNewNip] = useState("");
   const [newJabatan, setNewJabatan] = useState("");
   const [editingOfficial, setEditingOfficial] = useState<any>(null);
   const [deletingOfficial, setDeletingOfficial] = useState<any>(null);
@@ -133,7 +121,8 @@ export default function ProfilePage() {
 
     const filtered = officials.filter(o =>
       (o.name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
-      (o.jabatan?.toLowerCase() || '').includes(searchTerm.toLowerCase())
+      (o.jabatan?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+      (o.nip?.toLowerCase() || '').includes(searchTerm.toLowerCase())
     );
 
     return filtered.sort((a, b) => {
@@ -142,17 +131,13 @@ export default function ProfilePage() {
 
       const cat = a.category;
 
-      if (cat === "Pemerintah Desa") {
+      if (cat === "Karyawan Kecamatan") {
         const wA = getRankWeight(a.jabatan);
         const wB = getRankWeight(b.jabatan);
         if (wA !== wB) return wA - wB;
-      } else if (cat === "RT/RW") {
+      } else if (cat === "KEPALA Kecamatan") {
         const wA = getRtRwWeight(a.jabatan);
         const wB = getRtRwWeight(b.jabatan);
-        if (wA !== wB) return wA - wB;
-      } else if (cat === "Kader") {
-        const wA = getKaderWeight(a.jabatan);
-        const wB = getKaderWeight(b.jabatan);
         if (wA !== wB) return wA - wB;
       }
 
@@ -166,6 +151,7 @@ export default function ProfilePage() {
     const colRef = collection(db, "personnel");
     addDocumentNonBlocking(colRef, {
       name: newName.toUpperCase().trim(),
+      nip: newNip ? newNip.trim() : "-",
       jabatan: newJabatan.toUpperCase().trim(),
       category: activeTab,
       active: true,
@@ -173,7 +159,7 @@ export default function ProfilePage() {
     });
     toast({ title: "Berhasil", description: "Personel baru ditambahkan." });
     setIsAddModalOpen(false);
-    setNewName(""); setNewJabatan("");
+    setNewName(""); setNewNip(""); setNewJabatan("");
   };
 
   const handleSaveEdit = () => {
@@ -182,6 +168,7 @@ export default function ProfilePage() {
     setDocumentNonBlocking(docRef, {
       ...editingOfficial,
       name: newName.toUpperCase().trim(),
+      nip: newNip ? newNip.trim() : "-",
       jabatan: newJabatan.toUpperCase().trim(),
     }, { merge: true });
     toast({ title: "Berhasil", description: "Data diperbarui." });
@@ -202,6 +189,7 @@ export default function ProfilePage() {
       .filter(o => o.category === activeTab)
       .map(o => ({
         'Nama': o.name,
+        'NIP': o.nip && o.nip !== '-' ? o.nip : '-',
         'Jabatan': o.jabatan
       }));
 
@@ -213,8 +201,37 @@ export default function ProfilePage() {
     const ws = XLSX.utils.json_to_sheet(exportData);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Data Personel");
-    XLSX.writeFile(wb, `Data_Personel_${activeTab.replace(/\s+/g, '_')}_karanganyar.xlsx`);
-  }
+    XLSX.writeFile(wb, `Data_Personel_${activeTab.replace(/\s+/g, '_')}_gandrungmangu.xlsx`);
+  };
+
+  const handleDownloadTemplate = () => {
+    const templateData = [
+      {
+        'Nama': 'BUDI SANTOSO, S.STP, M.Si',
+        'NIP': '19850101 201001 1 001',
+        'Jabatan': 'CAMAT GANDRUNGMANGU'
+      },
+      {
+        'Nama': 'SITI AMINAH, S.Sos',
+        'NIP': '19880512 201202 2 003',
+        'Jabatan': 'SEKRETARIS KECAMATAN'
+      },
+      {
+        'Nama': 'AHMAD HIDAYAT, S.E',
+        'NIP': '19920315 201503 1 002',
+        'Jabatan': 'KASI KESRA'
+      }
+    ];
+
+    const ws = XLSX.utils.json_to_sheet(templateData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Template");
+    XLSX.writeFile(wb, `Format_Impor_Excel_Nama_NIP_Jabatan.xlsx`);
+    toast({
+      title: "Format Terunduh",
+      description: "Format Excel (Nama, NIP, Jabatan) berhasil diunduh."
+    });
+  };
 
   const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -237,16 +254,28 @@ export default function ProfilePage() {
         let importedCount = 0;
         jsonData.forEach((row) => {
           const keys = Object.keys(row);
-          const nameKey = keys.find(k => k.toLowerCase().replace(/\s/g, '') === 'nama');
-          const jobKey = keys.find(k => k.toLowerCase().replace(/\s/g, '') === 'jabatan');
+          const nameKey = keys.find(k => {
+            const clean = k.toLowerCase().replace(/[^a-z]/g, '');
+            return clean === 'nama' || clean === 'namalengkap' || clean === 'name';
+          });
+          const nipKey = keys.find(k => {
+            const clean = k.toLowerCase().replace(/[^a-z]/g, '');
+            return clean === 'nip' || clean === 'nomorindukpegawai' || clean === 'nonip';
+          });
+          const jobKey = keys.find(k => {
+            const clean = k.toLowerCase().replace(/[^a-z]/g, '');
+            return clean === 'jabatan' || clean === 'posisi' || clean === 'role';
+          });
 
           const nameValue = nameKey ? row[nameKey] : null;
+          const nipValue = nipKey && row[nipKey] ? String(row[nipKey]).trim() : "-";
           const jobValue = jobKey ? row[jobKey] : null;
 
           if (nameValue && jobValue) {
             const colRef = collection(db, "personnel");
             addDocumentNonBlocking(colRef, {
               name: String(nameValue).toUpperCase().trim(),
+              nip: nipValue,
               jabatan: String(jobValue).toUpperCase().trim(),
               category: activeTab,
               active: true,
@@ -257,17 +286,17 @@ export default function ProfilePage() {
         });
 
         if (importedCount > 0) {
-          toast({ title: "Impor Berhasil", description: `${importedCount} data personel sedang diproses ke database.` });
+          toast({ title: "Impor Berhasil", description: `${importedCount} data personel (${activeTab}) berhasil diimpor dengan Nama, NIP, & Jabatan.` });
         } else {
           toast({
             variant: "destructive",
-            title: "Format Salah",
-            description: "Pastikan kolom Excel bernama 'Nama' dan 'Jabatan'."
+            title: "Format Kolom Salah",
+            description: "Pastikan file Excel memiliki kolom: 'Nama', 'NIP', dan 'Jabatan'."
           });
         }
       } catch (error) {
         console.error("Import error:", error);
-        toast({ variant: "destructive", title: "Impor Gagal", description: "Terjadi kesalahan saat membaca file." });
+        toast({ variant: "destructive", title: "Impor Gagal", description: "Terjadi kesalahan saat membaca file Excel." });
       } finally {
         if (fileInputRef.current) fileInputRef.current.value = "";
       }
@@ -312,8 +341,8 @@ export default function ProfilePage() {
             <Link href="/dashboard/"><ArrowLeft className="h-6 w-6" /></Link>
           </Button>
           <div>
-            <h1 className="text-xl font-black uppercase text-primary tracking-tight">Data Perangkat Desa</h1>
-            <p className="text-[10px] font-bold text-muted-foreground uppercase">Manajemen Perangkat & Lembaga Desa</p>
+            <h1 className="text-xl font-black uppercase text-primary tracking-tight">Data Karyawan Kecamatan</h1>
+            <p className="text-[10px] font-bold text-muted-foreground uppercase">Manajemen Karyawan & Lembaga Kecamatan</p>
           </div>
         </div>
         <div className="flex items-center gap-2 self-end sm:self-center">
@@ -334,7 +363,7 @@ export default function ProfilePage() {
           />
         </div>
 
-        <Tabs defaultValue="Pemerintah Desa" className="w-full" onValueChange={setActiveTab}>
+        <Tabs defaultValue="Karyawan Kecamatan" className="w-full" onValueChange={setActiveTab}>
           <TabsList className="w-full h-auto p-1.5 bg-muted/50 flex flex-row overflow-x-auto no-scrollbar md:flex-wrap rounded-2xl">
             {CATEGORIES.map((cat) => (
               <TabsTrigger key={cat} value={cat} className="flex-shrink-0 px-5 py-3 text-[10px] font-black uppercase md:flex-1 md:min-w-[120px] rounded-xl data-[state=active]:bg-primary data-[state=active]:text-white transition-all">
@@ -349,6 +378,15 @@ export default function ProfilePage() {
                 <h3 className="text-lg font-black uppercase text-slate-800 tracking-tight">{cat}</h3>
                 <div className="flex flex-wrap items-center gap-2">
                   <input type="file" ref={fileInputRef} onChange={handleImport} className="hidden" accept=".xlsx, .xls" />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleDownloadTemplate}
+                    className="h-10 rounded-xl gap-2 font-black text-[10px] uppercase border-emerald-200 text-emerald-700 bg-emerald-50/50 hover:bg-emerald-100 hover:text-emerald-800 shadow-sm"
+                    title="Unduh Contoh Format Excel (Kolom: Nama, NIP, Jabatan)"
+                  >
+                    <FileSpreadsheet className="h-3.5 w-3.5 text-emerald-600" /> Format Excel
+                  </Button>
                   <Button
                     variant="outline"
                     size="sm"
@@ -368,7 +406,9 @@ export default function ProfilePage() {
                   </Button>
                   <Button
                     onClick={() => {
-                      setNewName(""); setNewJabatan("");
+                      setNewName("");
+                      setNewNip("");
+                      setNewJabatan("");
                       setIsAddModalOpen(true);
                     }}
                     className="h-10 gap-2 text-[10px] font-black uppercase bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 rounded-xl px-5"
@@ -384,12 +424,19 @@ export default function ProfilePage() {
                   .filter(o => o.category === cat)
                   .map((official) => (
                     <Card key={official.id} className="border-none shadow-sm rounded-[1.5rem] overflow-hidden group hover:shadow-xl transition-all bg-white border border-primary/5">
-                      <CardHeader className="p-5 pb-2 flex-row items-start justify-between">
-                        <div className="flex-1 overflow-hidden">
-                          <Badge variant="outline" className="w-fit mb-2 text-[9px] uppercase font-black text-primary border-primary/20 bg-primary/5">
+                      <CardHeader className="p-5 pb-3 flex-row items-start justify-between">
+                        <div className="flex-1 overflow-hidden space-y-1.5">
+                          <Badge variant="outline" className="w-fit text-[9px] uppercase font-black text-primary border-primary/20 bg-primary/5">
                             {official.jabatan}
                           </Badge>
-                          <CardTitle className="text-base font-black truncate text-slate-800">{official.name}</CardTitle>
+                          <CardTitle className="text-base font-black truncate text-slate-800 leading-snug">{official.name}</CardTitle>
+                          <div className="flex items-center gap-1.5 text-xs text-slate-600 bg-slate-50 border border-slate-100 rounded-lg px-2.5 py-1 w-fit">
+                            <CreditCard className="h-3.5 w-3.5 text-primary/70 shrink-0" />
+                            <span className="text-[9px] font-black uppercase text-slate-400">NIP:</span>
+                            <span className="font-mono font-bold text-slate-800">
+                              {official.nip && official.nip !== '-' ? official.nip : '-'}
+                            </span>
+                          </div>
                         </div>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -399,6 +446,7 @@ export default function ProfilePage() {
                             <DropdownMenuItem className="rounded-xl cursor-pointer" onClick={() => {
                               setEditingOfficial(official);
                               setNewName(official.name);
+                              setNewNip(official.nip && official.nip !== '-' ? official.nip : "");
                               setNewJabatan(official.jabatan);
                               setIsEditModalOpen(true);
                             }}>
@@ -439,14 +487,18 @@ export default function ProfilePage() {
             <DialogTitle className="font-black uppercase text-lg text-primary">Tambah Personel</DialogTitle>
             <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{activeTab}</p>
           </DialogHeader>
-          <div className="space-y-5 py-6">
-            <div className="space-y-2">
+          <div className="space-y-4 py-4">
+            <div className="space-y-1.5">
               <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Nama Lengkap</Label>
-              <Input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Contoh: BUDI SANTOSO" className="h-12 rounded-xl" />
+              <Input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="Contoh: BUDI SANTOSO" className="h-11 rounded-xl" />
             </div>
-            <div className="space-y-2">
+            <div className="space-y-1.5">
+              <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">NIP (Nomor Induk Pegawai)</Label>
+              <Input value={newNip} onChange={(e) => setNewNip(e.target.value)} placeholder="Contoh: 19850101 201001 1 001 (opsional)" className="h-11 rounded-xl font-mono text-sm" />
+            </div>
+            <div className="space-y-1.5">
               <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Jabatan</Label>
-              <Input value={newJabatan} onChange={(e) => setNewJabatan(e.target.value)} placeholder="Contoh: KEPALA DUSUN" className="h-12 rounded-xl" />
+              <Input value={newJabatan} onChange={(e) => setNewJabatan(e.target.value)} placeholder="Contoh: KASI KESRA" className="h-11 rounded-xl" />
             </div>
           </div>
           <DialogFooter>
@@ -461,14 +513,18 @@ export default function ProfilePage() {
       <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
         <DialogContent className="rounded-[2.5rem] border-none shadow-2xl p-8 max-w-sm">
           <DialogHeader><DialogTitle className="font-black uppercase text-lg text-primary">Edit Data Personel</DialogTitle></DialogHeader>
-          <div className="space-y-5 py-6">
-            <div className="space-y-2">
-              <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Nama</Label>
-              <Input value={newName} onChange={(e) => setNewName(e.target.value)} className="h-12 rounded-xl" />
+          <div className="space-y-4 py-4">
+            <div className="space-y-1.5">
+              <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Nama Lengkap</Label>
+              <Input value={newName} onChange={(e) => setNewName(e.target.value)} className="h-11 rounded-xl" />
             </div>
-            <div className="space-y-2">
+            <div className="space-y-1.5">
+              <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">NIP (Nomor Induk Pegawai)</Label>
+              <Input value={newNip} onChange={(e) => setNewNip(e.target.value)} placeholder="Contoh: 19850101 201001 1 001" className="h-11 rounded-xl font-mono text-sm" />
+            </div>
+            <div className="space-y-1.5">
               <Label className="text-[10px] font-black uppercase text-slate-500 ml-1">Jabatan</Label>
-              <Input value={newJabatan} onChange={(e) => setNewJabatan(e.target.value)} className="h-12 rounded-xl" />
+              <Input value={newJabatan} onChange={(e) => setNewJabatan(e.target.value)} className="h-11 rounded-xl" />
             </div>
           </div>
           <DialogFooter>

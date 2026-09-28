@@ -41,7 +41,7 @@ export function IjinKeramaianPrintTemplate({ submission }: { submission: LetterS
       compact="tight"
     >
       <p className="mt-2 text-justify leading-snug">
-        Yang bertanda tangan dibawah ini kepala Desa Karanganyar, Kecamatan Gandrungmangu, Kabupaten Cilacap, menerangkan dengan sebenarnya bahwa:
+        Yang bertanda tangan dibawah ini CAMAT GANDRUNGMANGU Kecamatan Gandrungmangu, Kabupaten Cilacap, menerangkan dengan sebenarnya bahwa:
       </p>
 
       <table className="mt-1.5 border-collapse w-full">
@@ -55,7 +55,7 @@ export function IjinKeramaianPrintTemplate({ submission }: { submission: LetterS
       </table>
 
       <p className="mt-2 text-justify leading-snug">
-        Orang tersebut di atas adalah benar-benar penduduk Desa Karanganyar, Kecamatan Gandrungmangu, Kabupaten Cilacap.
+        Orang tersebut di atas adalah benar-benar penduduk Kecamatan Gandrungmangu, Kecamatan Gandrungmangu, Kabupaten Cilacap.
       </p>
 
       <p className="mt-1.5 text-justify leading-snug">

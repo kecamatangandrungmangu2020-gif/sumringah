@@ -8,7 +8,7 @@ export function BelumMenikahPrintTemplate({ submission }: { submission: LetterSu
   return (
     <PrintLayout submission={submission} hideRequesterSignature={true}>
       <p className="mt-3 text-justify leading-normal">
-        Yang bertanda tangan di bawah ini Kepala Desa Karanganyar, Kecamatan
+        Yang bertanda tangan di bawah ini CAMAT GANDRUNGMANGU Kecamatan
         Gandrungmangu, Kabupaten Cilacap, menerangkan dengan sebenar-benarnya bahwa:
       </p>
 

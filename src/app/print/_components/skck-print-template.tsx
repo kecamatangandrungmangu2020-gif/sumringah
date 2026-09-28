@@ -42,7 +42,7 @@ export function SkckPrintTemplate({ submission }: { submission: LetterSubmission
       compact="tight"
     >
       <p className="mt-2.5 text-justify leading-normal">
-        Yang bertanda tangan di bawah ini Kepala Desa Karanganyar, Kecamatan
+        Yang bertanda tangan di bawah ini CAMAT GANDRUNGMANGU Kecamatan
         Gandrungmangu, Kabupaten Cilacap, menerangkan dengan sebenar-benarnya bahwa:
       </p>
 

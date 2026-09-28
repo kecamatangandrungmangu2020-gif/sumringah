@@ -6,7 +6,7 @@ import { collection, doc, writeBatch } from "firebase/firestore"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Loader2, CheckCircle2, AlertTriangle, ArrowLeft } from "lucide-react"
-import { OFFICIALS, SILTAP_DATA, BPD_INSENTIF_DATA } from "@/lib/personel-data"
+import { OFFICIALS, SILTAP_DATA, SEKRETARIS_Kecamatan_INSENTIF_DATA } from "@/lib/personel-data"
 import Link from "next/link"
 
 export default function MigrateDataPage() {
@@ -41,9 +41,9 @@ export default function MigrateDataPage() {
         batch.set(ref, { ...item, createdAt: new Date().toISOString() })
       })
 
-      // 3. Migrate BPD Insentif to 'bpd_insentif'
-      BPD_INSENTIF_DATA.forEach((item) => {
-        const ref = doc(collection(db, "bpd_insentif"))
+      // 3. Migrate SKRETARIS Kecamatan Insentif to 'SKRETARIS Kecamatan_insentif'
+      SEKRETARIS_Kecamatan_INSENTIF_DATA.forEach((item) => {
+        const ref = doc(collection(db, "SKRETARIS Kecamatan_insentif"))
         batch.set(ref, { ...item, createdAt: new Date().toISOString() })
       })
 
@@ -73,7 +73,7 @@ export default function MigrateDataPage() {
             <AlertTriangle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
             <p className="text-xs text-amber-800 leading-relaxed font-bold uppercase">
               Klik tombol di bawah untuk memindahkan data master dari file statis ke database Firestore.
-              Gunakan akun Admin (adminkaranganyar) untuk menjalankan proses ini.
+              Gunakan akun Admin resmi untuk menjalankan proses ini.
             </p>
           </div>
 

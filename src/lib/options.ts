@@ -34,7 +34,7 @@ export const skckPurposeOptions = [
   'Melanjutkan Pendidikan / Kuliah',
   'Pendaftaran TNI / POLRI',
   'Pendaftaran PNS / PPPK',
-  'Pendaftaran Perangkat Desa',
+  'Pendaftaran Karyawan Kecamatan',
   'Persyaratan Bepergian ke Luar Negeri / Visa',
   'Persyaratan Izin Usaha / Lisensi',
   'Lainnya',

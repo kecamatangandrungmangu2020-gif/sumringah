@@ -1,10 +1,23 @@
-
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState } from "react"
 import Link from "next/link"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Archive, FileText, Scale, Loader2, Plus, Search, ExternalLink, Trash2, AlertCircle, Database, Layers, Activity, Calendar } from "lucide-react"
+import { 
+  Archive, 
+  Scale, 
+  Loader2, 
+  Plus, 
+  Search, 
+  ExternalLink, 
+  Trash2, 
+  AlertCircle, 
+  Calendar, 
+  Mail, 
+  MapPin, 
+  RefreshCw,
+  FileText
+} from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -12,10 +25,11 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
 import { useUser, useFirestore, useCollection, useMemoFirebase, useDoc } from "@/firebase"
-import { collection, doc, orderBy, query, where } from "firebase/firestore"
+import { collection, doc, orderBy, query } from "firebase/firestore"
 import { addDocumentNonBlocking, deleteDocumentNonBlocking } from "@/firebase/non-blocking-updates"
 import { GOOGLE_CONFIG } from "@/lib/google-config"
-import { BIDANG_NAMES } from "@/lib/apbdes-data"
+import { callAppsScript } from "@/app/agenda/actions"
+import { format } from "date-fns"
 
 export default function ArsipDokumenPage() {
   const { user } = useUser()
@@ -23,46 +37,20 @@ export default function ArsipDokumenPage() {
   const { toast } = useToast()
 
   const [isUploading, setIsUploading] = useState(false)
+  const [isSyncing, setIsSyncing] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
 
-  // Form states for SPJ (Integrated with APBDes Firestore)
-  const [spjTahun, setSpjTahun] = useState(new Date().getFullYear().toString())
-  const [spjBidang, setSpjBidang] = useState("")
-  const [spjSumber, setSpjSumber] = useState("")
-  const [spjKegiatan, setSpjKegiatan] = useState("")
-  const [spjBulan, setSpjBulan] = useState("")
+  // Form states for Dok Surat Masuk (Sederhana: Acara/Perihal + PDF + Tanggal & Lokasi)
+  const [suratAcara, setSuratAcara] = useState("")
+  const [suratTanggal, setSuratTanggal] = useState(format(new Date(), "yyyy-MM-dd"))
+  const [suratLokasi, setSuratLokasi] = useState("Balai Kecamatan Gandrungmangu")
 
   // Form states for Produk Hukum
   const [phNamaDokumen, setPhNamaDokumen] = useState("")
   const [phJenis, setPhJenis] = useState("")
   const [phJenisManual, setPhPhJenisManual] = useState("")
   const [phNomor, setPhNomor] = useState("")
-
-  // LIVE APBDes Fetching from Firestore filtered by Tahun
-  const apbQuery = useMemoFirebase(() => {
-    if (!db || !user) return null
-    return query(
-      collection(db, "apbdes"),
-      where("tahun", "==", spjTahun),
-      orderBy("kode", "asc")
-    )
-  }, [db, user, spjTahun])
-  const { data: apbData } = useCollection<any>(apbQuery)
-
-  // APBDes Filtering logic for SPJ
-  const filteredSources = useMemo(() => {
-    if (!spjBidang || !apbData) return []
-    const sources = apbData
-      .filter((item: any) => item.bidang.toString() === spjBidang)
-      .map((item: any) => item.sumber)
-    return Array.from(new Set(sources))
-  }, [spjBidang, apbData])
-
-  const filteredActivities = useMemo(() => {
-    if (!spjBidang || !spjSumber || !apbData) return []
-    return apbData.filter((item: any) => item.bidang.toString() === spjBidang && item.sumber === spjSumber)
-  }, [spjBidang, spjSumber, apbData])
 
   // GLOBAL DATA FETCHING
   const villageSettingsRef = useMemoFirebase(() => {
@@ -71,17 +59,19 @@ export default function ArsipDokumenPage() {
   }, [db, user])
   const { data: villageSettings } = useDoc(villageSettingsRef)
 
-  const spjRef = useMemoFirebase(() => {
+  // Realtime Collection Dok Surat Masuk
+  const suratMasukRef = useMemoFirebase(() => {
     if (!db || !user) return null
-    return query(collection(db, "spjDesa"), orderBy("createdAt", "desc"))
+    return query(collection(db, "dokSuratMasuk"), orderBy("createdAt", "desc"))
   }, [db, user])
 
+  // Realtime Collection Produk Hukum
   const phRef = useMemoFirebase(() => {
     if (!db || !user) return null
     return query(collection(db, "produkHukum"), orderBy("createdAt", "desc"))
   }, [db, user])
 
-  const { data: spjList, isLoading: isSpjLoading } = useCollection(spjRef)
+  const { data: suratMasukList, isLoading: isSuratLoading } = useCollection(suratMasukRef)
   const { data: phList, isLoading: isPhLoading } = useCollection(phRef)
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -106,11 +96,6 @@ export default function ArsipDokumenPage() {
 
   const uploadToDrive = async (fileName: string, targetFolderId: string) => {
     if (!selectedFile) return null
-    if (!targetFolderId) {
-      toast({ variant: "destructive", title: "Folder Belum Diatur", description: "Silakan atur folder penyimpanan di halaman Pengaturan." })
-      return null
-    }
-
     const base64 = await fileToBase64(selectedFile)
     const payload = {
       action: 'uploadArchiveFile',
@@ -136,41 +121,44 @@ export default function ArsipDokumenPage() {
     }
   }
 
-  const handleSaveSpj = async () => {
-    if (!user || !spjTahun || !spjBidang || !spjKegiatan || !spjSumber || !spjBulan || !selectedFile) {
-      toast({ variant: "destructive", title: "Data Tidak Lengkap", description: "Mohon isi semua bidang dan pilih file PDF." })
+  // Simpan Dok Surat Masuk Manual
+  const handleSaveSuratMasuk = async () => {
+    if (!user || !suratAcara || !selectedFile) {
+      toast({ 
+        variant: "destructive", 
+        title: "Data Belum Lengkap", 
+        description: "Harap isi Acara / Perihal surat dan pilih berkas PDF yang ingin diarsipkan." 
+      })
       return
     }
 
-    const targetFolderId = villageSettings?.spjFolderId;
-    if (!targetFolderId) {
-      toast({ variant: "destructive", title: "Folder Belum Diatur", description: "ID Folder SPJ belum diisi di Pengaturan." })
-      return
-    }
+    const targetFolderId = villageSettings?.suratMasukFolderId || villageSettings?.agendaFolderId || villageSettings?.spjFolderId || GOOGLE_CONFIG.parentFolderId;
 
     setIsUploading(true)
     try {
-      const fileName = `${spjKegiatan} | ${spjSumber} | TA ${spjTahun} | ${spjBulan}.pdf`
+      const fileName = `Surat Masuk - ${suratAcara} | ${suratTanggal}.pdf`
       const driveResult = await uploadToDrive(fileName, targetFolderId)
 
       if (driveResult) {
         const docData = {
           createdBy: user.uid,
-          tahun: spjTahun,
-          bidang: spjBidang,
-          kegiatan: spjKegiatan,
-          sumberAnggaran: spjSumber,
-          bulan: spjBulan,
+          acara: suratAcara,
+          lokasi: suratLokasi || "Balai Kecamatan Gandrungmangu",
+          tanggal: suratTanggal || format(new Date(), "yyyy-MM-dd"),
           fileUrl: driveResult.fileUrl,
           driveFileId: driveResult.fileId,
+          fileName: selectedFile.name,
+          sumber: "Input Manual",
           createdAt: new Date().toISOString()
         }
-        const ref = collection(db, "spjDesa")
+        const ref = collection(db, "dokSuratMasuk")
         addDocumentNonBlocking(ref, docData)
-        toast({ title: "Berhasil", description: "SPJ Desa telah diarsipkan secara global." })
-        setSpjBidang(""); setSpjKegiatan(""); setSpjSumber(""); setSpjBulan(""); setSelectedFile(null)
+        toast({ title: "Berhasil Diarsipkan", description: "Dokumen Surat Masuk berhasil diunggah dan disimpan ke arsip." })
+        setSuratAcara("")
+        setSuratLokasi("Balai Kecamatan Gandrungmangu")
+        setSelectedFile(null)
       } else {
-        throw new Error("Gagal unggah ke Drive. Cek izin akses folder.")
+        throw new Error("Gagal mengunggah berkas ke Google Drive. Periksa izin folder Drive.")
       }
     } catch (e: any) {
       toast({ variant: "destructive", title: "Gagal Simpan", description: e.message })
@@ -179,6 +167,7 @@ export default function ArsipDokumenPage() {
     }
   }
 
+  // Simpan Produk Hukum
   const handleSavePh = async () => {
     const finalJenis = phJenis === "Lainnya" ? phJenisManual : phJenis
     if (!user || !phNamaDokumen || !finalJenis || !phNomor || !selectedFile) {
@@ -186,11 +175,7 @@ export default function ArsipDokumenPage() {
       return
     }
 
-    const targetFolderId = villageSettings?.produkHukumFolderId;
-    if (!targetFolderId) {
-      toast({ variant: "destructive", title: "Folder Belum Diatur", description: "ID Folder Produk Hukum belum diisi di Pengaturan." })
-      return
-    }
+    const targetFolderId = villageSettings?.produkHukumFolderId || GOOGLE_CONFIG.parentFolderId;
 
     setIsUploading(true)
     try {
@@ -221,14 +206,85 @@ export default function ArsipDokumenPage() {
     }
   }
 
-  const handleDelete = (id: string, collectionName: "spjDesa" | "produkHukum") => {
-    if (!user) return
-    const docRef = doc(db, collectionName, id)
-    deleteDocumentNonBlocking(docRef)
-    toast({ title: "Dihapus", description: "Dokumen telah dihapus dari arsip desa." })
+  // Sinkronisasi otomatis dari Kalender Agenda (mengambil undangan yang tersimpan di Google Calendar)
+  const handleSyncFromAgenda = async () => {
+    if (!user || !db) return
+    setIsSyncing(true)
+    try {
+      const calendarId = GOOGLE_CONFIG.calendarId
+      const todayStr = format(new Date(), "yyyy-MM-dd")
+      const res = await callAppsScript({
+        action: 'getCalendar',
+        calendarId: calendarId,
+        date: todayStr
+      })
+
+      if (res && res.success && Array.isArray(res.items)) {
+        let syncedCount = 0
+        const existingUrls = new Set((suratMasukList || []).map((d: any) => d.fileUrl || d.acara))
+
+        for (const evt of res.items) {
+          const desc = evt.description || ""
+          const linkMatch = desc.match(/📄 Undangan \/ Lampiran:\s*(https?:\/\/[^\s]+)/)
+          const attachmentUrl = linkMatch ? linkMatch[1] : null
+          const title = evt.summary || "Agenda Undangan"
+
+          if (!existingUrls.has(attachmentUrl) && !existingUrls.has(title)) {
+            let eventDate = todayStr
+            if (evt.start?.dateTime) {
+              eventDate = evt.start.dateTime.split("T")[0]
+            } else if (evt.start?.date) {
+              eventDate = evt.start.date
+            }
+
+            const docData = {
+              createdBy: user.uid,
+              acara: title,
+              lokasi: evt.location || "Balai Kecamatan Gandrungmangu",
+              tanggal: eventDate,
+              fileUrl: attachmentUrl || "",
+              fileName: "Undangan Agenda",
+              sumber: "Agenda Undangan",
+              createdAt: new Date().toISOString()
+            }
+            addDocumentNonBlocking(collection(db, "dokSuratMasuk"), docData)
+            syncedCount++
+          }
+        }
+
+        if (syncedCount > 0) {
+          toast({ title: "Sinkronisasi Berhasil", description: `${syncedCount} dokumen undangan dari Agenda berhasil disinkronkan ke Dok Surat Masuk.` })
+        } else {
+          toast({ title: "Data Sudah Sesuai", description: "Semua dokumen dari Agenda sudah tercatat di Dok Surat Masuk." })
+        }
+      } else {
+        toast({ title: "Informasi", description: "Tidak ada data undangan baru dari kalender agenda." })
+      }
+    } catch (err: any) {
+      console.error("Sync error:", err)
+      toast({ variant: "destructive", title: "Sinkronisasi Gagal", description: err.message || "Gagal menghubungi kalender agenda." })
+    } finally {
+      setIsSyncing(false)
+    }
   }
 
-  const filteredSpj = (spjList || []).filter(item => item.kegiatan.toLowerCase().includes(searchTerm.toLowerCase()))
+  const handleDelete = (id: string, collectionName: "dokSuratMasuk" | "produkHukum") => {
+    if (!user || !db) return
+    const docRef = doc(db, collectionName, id)
+    deleteDocumentNonBlocking(docRef)
+    toast({ title: "Dihapus", description: "Dokumen telah dihapus dari arsip." })
+  }
+
+  const filteredSuratMasuk = (suratMasukList || []).filter((item: any) => {
+    const q = searchTerm.toLowerCase()
+    return (
+      (item.acara || "").toLowerCase().includes(q) ||
+      (item.lokasi || "").toLowerCase().includes(q) ||
+      (item.tanggal || "").toLowerCase().includes(q) ||
+      (item.sumber || "").toLowerCase().includes(q)
+    )
+  })
+
   const filteredPh = (phList || []).filter(item =>
     (item.namaDokumen || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
     (item.nomorDok || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -243,189 +299,250 @@ export default function ArsipDokumenPage() {
         </div>
         <div>
           <h1 className="text-2xl font-black text-primary uppercase tracking-tight">Arsip Digital Terpadu</h1>
-          <p className="text-xs text-muted-foreground font-bold uppercase">Database Desa Karanganyar</p>
+          <p className="text-xs text-muted-foreground font-bold uppercase">Database Kecamatan Gandrungmangu</p>
         </div>
       </header>
 
-      {(!villageSettings?.spjFolderId || !villageSettings?.produkHukumFolderId) && (
+      {(!villageSettings?.produkHukumFolderId && !villageSettings?.spjFolderId) && (
         <div className="p-4 bg-yellow-50 border border-yellow-100 rounded-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-1">
-          <AlertCircle className="h-5 w-5 text-yellow-600" />
+          <AlertCircle className="h-5 w-5 text-yellow-600 shrink-0" />
           <p className="text-xs font-bold text-yellow-800">
-            Folder penyimpanan belum diatur. Silakan ke menu <Link href="/settings/" className="underline">Pengaturan</Link> untuk mengisi ID Folder Drive.
+            Folder penyimpanan spesifik belum diatur di menu <Link href="/settings/" className="underline">Pengaturan</Link>. Sistem akan menggunakan folder cadangan utama Google Drive.
           </p>
         </div>
       )}
 
-      <Tabs defaultValue="spj" className="w-full">
+      <Tabs defaultValue="suratMasuk" className="w-full">
         <TabsList className="grid w-full grid-cols-2 h-14 bg-muted/50 p-1.5 rounded-2xl mb-8">
-          <TabsTrigger value="spj" className="gap-2 text-[10px] font-black uppercase rounded-xl h-full data-[state=active]:bg-primary data-[state=active]:text-white">
-            <FileText className="h-4 w-4" />
-            SPJ DESA
+          <TabsTrigger 
+            value="suratMasuk" 
+            className="gap-2 text-[10px] sm:text-xs font-black uppercase rounded-xl h-full data-[state=active]:bg-primary data-[state=active]:text-white"
+          >
+            <Mail className="h-4 w-4" />
+            Dok Surat Masuk
           </TabsTrigger>
-          <TabsTrigger value="ph" className="gap-2 text-[10px] font-black uppercase rounded-xl h-full data-[state=active]:bg-primary data-[state=active]:text-white">
+          <TabsTrigger 
+            value="ph" 
+            className="gap-2 text-[10px] sm:text-xs font-black uppercase rounded-xl h-full data-[state=active]:bg-primary data-[state=active]:text-white"
+          >
             <Scale className="h-4 w-4" />
             PRODUK HUKUM
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="spj" className="space-y-8 animate-in fade-in slide-in-from-bottom-2">
+        {/* ── TAB 1: DOK SURAT MASUK ──────────────────────────────────────────────── */}
+        <TabsContent value="suratMasuk" className="space-y-8 animate-in fade-in slide-in-from-bottom-2">
+          {/* Form Isian Dok Surat Masuk */}
           <Card className="border-none shadow-xl rounded-[2rem] overflow-hidden">
-            <CardHeader className="bg-primary/5 p-8">
-              <CardTitle className="text-lg font-black uppercase">Input SPJ Desa</CardTitle>
-              <CardDescription>Arsipkan dokumen pertanggungjawaban kegiatan desa.</CardDescription>
+            <CardHeader className="bg-primary/5 p-6 sm:p-8">
+              <CardTitle className="text-lg font-black uppercase flex items-center gap-2">
+                <Mail className="h-5 w-5 text-primary" />
+                Input Dok Surat Masuk
+              </CardTitle>
+              <CardDescription>
+                Unggah berkas PDF dan isi Acara / Perihal surat masuk atau undangan dinas Kecamatan.
+              </CardDescription>
             </CardHeader>
-            <CardContent className="p-8 space-y-6">
+            <CardContent className="p-6 sm:p-8 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label className="text-[10px] font-black uppercase text-muted-foreground flex items-center gap-2">
-                    <Calendar className="h-3 w-3" /> Pilih Tahun Anggaran
+                {/* Input Acara / Perihal (Wajib) */}
+                <div className="space-y-2 md:col-span-2">
+                  <Label className="text-[10px] font-black uppercase text-muted-foreground flex items-center gap-1.5">
+                    Acara / Perihal Surat <span className="text-destructive">*</span>
                   </Label>
-                  <Select value={spjTahun} onValueChange={(val) => { setSpjTahun(val); setSpjBidang(""); setSpjSumber(""); setSpjKegiatan(""); }}>
-                    <SelectTrigger className="h-12 rounded-xl">
-                      <SelectValue placeholder="Pilih Tahun..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {["2024", "2025", "2026", "2027", "2028", "2029", "2030"].map(y => (
-                        <SelectItem key={y} value={y}>{y}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Input 
+                    placeholder="Contoh: Undangan Rapat Koordinasi Lintas Sektoral Tingkat Kecamatan" 
+                    value={suratAcara} 
+                    onChange={(e) => setSuratAcara(e.target.value)} 
+                    className="h-12 rounded-xl" 
+                  />
                 </div>
 
+                {/* Tanggal Acara / Surat */}
                 <div className="space-y-2">
-                  <Label className="text-[10px] font-black uppercase text-muted-foreground flex items-center gap-2">
-                    <Layers className="h-3 w-3" /> Pilih Bidang
+                  <Label className="text-[10px] font-black uppercase text-muted-foreground flex items-center gap-1.5">
+                    <Calendar className="h-3.5 w-3.5 text-primary" /> Tanggal Acara / Surat
                   </Label>
-                  <Select value={spjBidang} onValueChange={(val) => { setSpjBidang(val); setSpjSumber(""); setSpjKegiatan(""); }}>
-                    <SelectTrigger className="h-12 rounded-xl">
-                      <SelectValue placeholder="Pilih Bidang..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Object.entries(BIDANG_NAMES).map(([id, name]) => (
-                        <SelectItem key={id} value={id}>Bidang {id} - {name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Input 
+                    type="date" 
+                    value={suratTanggal} 
+                    onChange={(e) => setSuratTanggal(e.target.value)} 
+                    className="h-12 rounded-xl" 
+                  />
                 </div>
 
+                {/* Lokasi Acara */}
                 <div className="space-y-2">
-                  <Label className="text-[10px] font-black uppercase text-muted-foreground flex items-center gap-2">
-                    <Database className="h-3 w-3" /> Sumber Anggaran (TA {spjTahun})
+                  <Label className="text-[10px] font-black uppercase text-muted-foreground flex items-center gap-1.5">
+                    <MapPin className="h-3.5 w-3.5 text-primary" /> Lokasi Acara
                   </Label>
-                  <Select value={spjSumber} disabled={!spjBidang} onValueChange={(val) => { setSpjSumber(val); setSpjKegiatan(""); }}>
-                    <SelectTrigger className="h-12 rounded-xl">
-                      <SelectValue placeholder="Pilih Sumber..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {filteredSources.length > 0 ? (
-                        filteredSources.map(s => (
-                          <SelectItem key={s} value={s}>{s}</SelectItem>
-                        ))
-                      ) : (
-                        <SelectItem value="none" disabled>Data anggaran tahun ini kosong</SelectItem>
-                      )}
-                    </SelectContent>
-                  </Select>
+                  <Input 
+                    placeholder="Contoh: Balai Kecamatan Gandrungmangu" 
+                    value={suratLokasi} 
+                    onChange={(e) => setSuratLokasi(e.target.value)} 
+                    className="h-12 rounded-xl" 
+                  />
                 </div>
 
-                <div className="space-y-2">
-                  <Label className="text-[10px] font-black uppercase text-muted-foreground flex items-center gap-2">
-                    <Activity className="h-3 w-3" /> Nama Kegiatan
+                {/* Upload PDF (Wajib) */}
+                <div className="space-y-2 md:col-span-2">
+                  <Label className="text-[10px] font-black uppercase text-muted-foreground flex items-center gap-1.5">
+                    <FileText className="h-3.5 w-3.5 text-primary" /> Upload Dokumen PDF Surat Masuk <span className="text-destructive">*</span>
                   </Label>
-                  <Select value={spjKegiatan} disabled={!spjSumber} onValueChange={setSpjKegiatan}>
-                    <SelectTrigger className="h-12 rounded-xl">
-                      <SelectValue placeholder="Pilih Kegiatan..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {filteredActivities.map((item: any) => (
-                        <SelectItem key={item.id} value={item.uraian}>{item.uraian}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-[10px] font-black uppercase text-muted-foreground">Pilih Bulan</Label>
-                  <Select value={spjBulan} onValueChange={setSpjBulan}>
-                    <SelectTrigger className="h-12 rounded-xl">
-                      <SelectValue placeholder="Pilih Bulan..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"].map(m => (
-                        <SelectItem key={m} value={m}>{m}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-[10px] font-black uppercase text-muted-foreground">Upload Dokumen PDF</Label>
-                  <Input type="file" accept=".pdf" onChange={handleFileChange} className="h-12 pt-2.5 rounded-xl border-dashed" />
+                  <Input 
+                    type="file" 
+                    accept=".pdf" 
+                    onChange={handleFileChange} 
+                    className="h-12 pt-2.5 rounded-xl border-dashed" 
+                  />
+                  {selectedFile && (
+                    <p className="text-xs text-emerald-600 font-bold mt-1">
+                      ✓ Berkas terpilih: {selectedFile.name} ({(selectedFile.size / 1024).toFixed(1)} KB)
+                    </p>
+                  )}
                 </div>
               </div>
+
               <Button
                 className="w-full h-14 rounded-2xl font-black uppercase shadow-lg shadow-primary/20 gap-2"
-                disabled={isUploading || !villageSettings?.spjFolderId}
-                onClick={handleSaveSpj}
+                disabled={isUploading}
+                onClick={handleSaveSuratMasuk}
               >
                 {isUploading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Plus className="h-5 w-5" />}
-                Arsipkan SPJ TA {spjTahun}
+                Arsipkan Dokumen Surat Masuk
               </Button>
             </CardContent>
           </Card>
 
+          {/* Rincian Dok Surat Masuk */}
           <div className="space-y-4">
-            <div className="flex items-center justify-between px-2">
-              <h3 className="font-black text-primary uppercase text-sm">Daftar Arsip SPJ</h3>
-              <div className="relative w-48 md:w-64">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input placeholder="Cari kegiatan..." className="pl-9 h-9 text-xs rounded-full" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-2">
+              <div>
+                <h3 className="font-black text-primary uppercase text-sm flex items-center gap-2">
+                  <span>Daftar Arsip Dok Surat Masuk</span>
+                  <span className="text-xs font-normal text-muted-foreground">({filteredSuratMasuk.length} dokumen)</span>
+                </h3>
+                <p className="text-[11px] text-muted-foreground font-medium">
+                  Rincian Acara | Lokasi | Tanggal dari berkas yang diunggah serta undangan otomatis dari Agenda Kegiatan
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleSyncFromAgenda} 
+                  disabled={isSyncing}
+                  className="rounded-xl h-9 text-xs font-bold gap-1.5 text-slate-700 hover:text-primary"
+                  title="Tarik undangan yang tercatat di Agenda Kegiatan"
+                >
+                  <RefreshCw className={`h-3.5 w-3.5 ${isSyncing ? "animate-spin text-primary" : ""}`} />
+                  <span className="hidden sm:inline">Sinkron Agenda</span>
+                </Button>
+
+                <div className="relative w-full sm:w-56">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                  <Input 
+                    placeholder="Cari acara, lokasi..." 
+                    className="pl-8 h-9 text-xs rounded-full" 
+                    value={searchTerm} 
+                    onChange={(e) => setSearchTerm(e.target.value)} 
+                  />
+                </div>
               </div>
             </div>
+
             <div className="grid gap-3">
-              {isSpjLoading ? (
+              {isSuratLoading ? (
                 <div className="py-20 text-center"><Loader2 className="h-8 w-8 animate-spin mx-auto text-primary/30" /></div>
-              ) : filteredSpj.length > 0 ? (
-                filteredSpj.map((item) => (
-                  <div key={item.id} className="p-4 bg-white border rounded-2xl shadow-sm flex items-center justify-between gap-4 group hover:border-primary/50 transition-all">
-                    <div className="flex items-center gap-4">
-                      <div className="h-10 w-10 rounded-xl bg-primary/5 flex items-center justify-center shrink-0">
-                        <FileText className="h-5 w-5 text-primary" />
+              ) : filteredSuratMasuk.length > 0 ? (
+                filteredSuratMasuk.map((item: any) => (
+                  <div 
+                    key={item.id} 
+                    className="p-4 sm:p-5 bg-white border border-slate-200/80 rounded-2xl shadow-sm hover:border-primary/50 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 group"
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className="h-11 w-11 rounded-2xl bg-amber-500/10 text-amber-600 flex items-center justify-center shrink-0 mt-0.5">
+                        <Mail className="h-5 w-5" />
                       </div>
-                      <div className="min-w-0">
-                        <p className="font-bold text-sm truncate">{item.kegiatan}</p>
-                        <p className="text-[10px] text-muted-foreground font-medium uppercase">TA {item.tahun} • {item.sumberAnggaran} • {item.bulan}</p>
+                      <div className="space-y-2 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h4 className="font-black text-slate-900 text-sm sm:text-base leading-snug">
+                            {item.acara}
+                          </h4>
+                          {item.sumber === "Agenda Undangan" ? (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-sky-100 text-sky-700 border border-sky-200">
+                              Dari Agenda
+                            </span>
+                          ) : (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-slate-100 text-slate-700 border border-slate-200">
+                              Input Arsip
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Rincian Lengkap: Acara | Lokasi | Tanggal */}
+                        <div className="flex items-center flex-wrap gap-x-2 gap-y-1 text-xs font-semibold text-slate-600 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200/60">
+                          <span className="text-primary font-bold">Acara: <span className="text-slate-800 font-normal">{item.acara}</span></span>
+                          <span className="text-slate-300 font-bold">|</span>
+                          <span className="text-primary font-bold">Lokasi: <span className="text-slate-800 font-normal">{item.lokasi || "-"}</span></span>
+                          <span className="text-slate-300 font-bold">|</span>
+                          <span className="text-primary font-bold">Tanggal: <span className="text-slate-800 font-normal">{item.tanggal || "-"}</span></span>
+                          {item.waktu && (
+                            <>
+                              <span className="text-slate-300 font-bold">|</span>
+                              <span className="text-primary font-bold">Waktu: <span className="text-slate-800 font-normal">{item.waktu} WIB</span></span>
+                            </>
+                          )}
+                        </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm" className="h-9 rounded-xl gap-2" asChild>
-                        <a href={item.fileUrl} target="_blank" rel="noopener noreferrer">
-                          <ExternalLink className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Lihat</span>
-                        </a>
-                      </Button>
-                      <Button variant="ghost" size="icon" className="h-9 w-9 text-destructive hover:bg-destructive/10 rounded-xl" onClick={() => handleDelete(item.id, "spjDesa")}>
+
+                    <div className="flex items-center gap-2 self-end md:self-center shrink-0">
+                      {item.fileUrl ? (
+                        <Button variant="outline" size="sm" className="h-9 rounded-xl gap-2 text-primary border-primary/30 hover:bg-primary/5 font-bold" asChild>
+                          <a href={item.fileUrl} target="_blank" rel="noopener noreferrer">
+                            <ExternalLink className="h-3.5 w-3.5" /> <span>Lihat PDF</span>
+                          </a>
+                        </Button>
+                      ) : (
+                        <span className="text-[11px] text-muted-foreground italic px-2">Tanpa File</span>
+                      )}
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-9 w-9 text-destructive hover:bg-destructive/10 rounded-xl" 
+                        onClick={() => handleDelete(item.id, "dokSuratMasuk")}
+                        title="Hapus dari Arsip"
+                      >
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
                   </div>
                 ))
               ) : (
-                <div className="py-20 text-center border-2 border-dashed rounded-3xl text-muted-foreground">Belum ada arsip SPJ.</div>
+                <div className="py-20 text-center border-2 border-dashed rounded-3xl text-muted-foreground space-y-2">
+                  <Mail className="h-10 w-10 mx-auto text-muted-foreground/40 mb-2" />
+                  <p className="font-bold text-sm">Belum ada arsip Dok Surat Masuk.</p>
+                  <p className="text-xs">Unggah berkas baru melalui form di atas atau berkas undangan dari Agenda Kegiatan akan otomatis muncul di sini.</p>
+                </div>
               )}
             </div>
           </div>
         </TabsContent>
 
+        {/* ── TAB 2: PRODUK HUKUM ─────────────────────────────────────────────────── */}
         <TabsContent value="ph" className="space-y-8 animate-in fade-in slide-in-from-bottom-2">
           <Card className="border-none shadow-xl rounded-[2rem] overflow-hidden">
-            <CardHeader className="bg-primary/5 p-8">
+            <CardHeader className="bg-primary/5 p-6 sm:p-8">
               <CardTitle className="text-lg font-black uppercase">Input Produk Hukum</CardTitle>
-              <CardDescription>Arsipkan SK, Perdes, Perkades, dan dokumen hukum lainnya.</CardDescription>
+              <CardDescription>Arsipkan SK, BA, SE, dan dokumen lainnya.</CardDescription>
             </CardHeader>
-            <CardContent className="p-8 space-y-6">
+            <CardContent className="p-6 sm:p-8 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2 md:col-span-2">
                   <Label className="text-[10px] font-black uppercase text-muted-foreground">Nama Dokumen</Label>
-                  <Input placeholder="Contoh: SK Pengangkatan Perangkat Desa" value={phNamaDokumen} onChange={(e) => setPhNamaDokumen(e.target.value)} className="h-12 rounded-xl" />
+                  <Input placeholder="Contoh: SK Pengangkatan Karyawan Kecamatan" value={phNamaDokumen} onChange={(e) => setPhNamaDokumen(e.target.value)} className="h-12 rounded-xl" />
                 </div>
                 <div className="space-y-2">
                   <Label className="text-[10px] font-black uppercase text-muted-foreground">Jenis Dokumen</Label>
@@ -434,7 +551,7 @@ export default function ArsipDokumenPage() {
                       <SelectValue placeholder="Pilih Jenis..." />
                     </SelectTrigger>
                     <SelectContent>
-                      {["SK", "Perdes", "Perkades", "BA", "Lainnya"].map(s => (
+                      {["SK", "BA", "SE", "Lainnya"].map(s => (
                         <SelectItem key={s} value={s}>{s}</SelectItem>
                       ))}
                     </SelectContent>
@@ -457,7 +574,7 @@ export default function ArsipDokumenPage() {
               </div>
               <Button
                 className="w-full h-14 rounded-2xl font-black uppercase shadow-lg shadow-primary/20 gap-2"
-                disabled={isUploading || !villageSettings?.produkHukumFolderId}
+                disabled={isUploading}
                 onClick={handleSavePh}
               >
                 {isUploading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Plus className="h-5 w-5" />}

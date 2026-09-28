@@ -147,7 +147,7 @@ export function DomisiliForm({ isAdmin = false }: { isAdmin?: boolean }) {
       nationality: 'WNI',
       religion: '',
       originAddress: '',
-      domicileAddress: 'Desa Karanganyar, Kec. Gandrungmangu, Kab. Cilacap',
+      domicileAddress: 'Kecamatan Gandrungmangu, Kec. Gandrungmangu, Kab. Cilacap',
     },
   });
 
@@ -293,7 +293,7 @@ export function DomisiliForm({ isAdmin = false }: { isAdmin?: boolean }) {
           <FormField control={form.control} name="domicileAddress" render={({ field }) => (
             <FormItem className="md:col-span-2">
               <FormLabel className="font-bold text-primary">Alamat Domisili Saat Ini</FormLabel>
-              <FormControl><Textarea placeholder="Alamat tempat tinggal saat ini di Desa Karanganyar" {...field} disabled={isSubmitting} className="uppercase rounded-2xl" /></FormControl>
+              <FormControl><Textarea placeholder="Alamat tempat tinggal saat ini di Kecamatan Gandrungmangu" {...field} disabled={isSubmitting} className="uppercase rounded-2xl" /></FormControl>
               <FormDescription>Alamat tempat Anda tinggal saat ini (untuk keterangan domisili).</FormDescription>
               <FormMessage />
             </FormItem>
@@ -306,7 +306,7 @@ export function DomisiliForm({ isAdmin = false }: { isAdmin?: boolean }) {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 pt-4">
               <GoogleFileUploader label="Foto KTP" fieldName="ktp" onFileSelect={handleFileSelect} isRequired={!isAdmin} disabled={isSubmitting} />
               <GoogleFileUploader label="Foto KK" fieldName="kk" onFileSelect={handleFileSelect} disabled={isSubmitting} />
-              <GoogleFileUploader label="Surat Pengantar RT/RW" fieldName="pengantarRt" onFileSelect={handleFileSelect} isRequired={false} disabled={isSubmitting} />
+              <GoogleFileUploader label="Surat Pengantar KEPALA Kecamatan" fieldName="pengantarRt" onFileSelect={handleFileSelect} isRequired={false} disabled={isSubmitting} />
             </div>
           </div>
         </FormSection>

@@ -180,7 +180,7 @@ export function PrintLayout({
       if (!firestore) return;
       setIsLoading(true);
       try {
-        // 1. Cek pengaturan global desa di settings/village (hasil upload dari /settings/)
+        // 1. Cek pengaturan global Kecamatan di settings/village (hasil upload dari /settings/)
         const villageRef = doc(firestore, 'settings', 'village');
         const villageSnap = await getDoc(villageRef);
         if (villageSnap.exists()) {
@@ -279,7 +279,7 @@ export function PrintLayout({
 
       toast({
         title: "Berhasil Mengunduh",
-        description: "Dokumen PDF telah disimpan ke perangkat Anda.",
+        description: "Dokumen PDF telah disimpan ke Karyawan Anda.",
       });
     } catch (error) {
       console.error('PDF Generation Error:', error);
@@ -312,9 +312,9 @@ export function PrintLayout({
     <div className={cn("flex justify-between text-center items-start", reverseSignatures && "flex-row-reverse")}>
       <div className={cn("w-[40%]", hideRequesterSignature && "invisible")}>
         {reverseSignatures ? (
-          <p className="mb-0.5">Karanganyar, {formattedDate}</p>
+          <p className="mb-0.5">Gandrungmangu, {formattedDate}</p>
         ) : (
-          <p className="invisible mb-0.5">Karanganyar, 00 Bulan 0000</p>
+          <p className="invisible mb-0.5">Gandrungmangu, 00 Bulan 0000</p>
         )}
         <p>{requesterLabel}</p>
         <div className={inlineSignatures ? "h-16" : isTight ? "h-11" : compactSpacing ? "h-14" : "h-16"}></div>
@@ -325,23 +325,23 @@ export function PrintLayout({
 
       <div className="w-[45%]">
         {!reverseSignatures ? (
-          <p className="mb-0.5">Karanganyar, {formattedDate}</p>
+          <p className="mb-0.5">Gandrungmangu, {formattedDate}</p>
         ) : (
-          <p className="invisible mb-0.5">Karanganyar, 00 Bulan 0000</p>
+          <p className="invisible mb-0.5">Gandrungmangu, 00 Bulan 0000</p>
         )}
 
         {signerType === 'sekdes' ? (
           <>
-            <p>A.n. Kepala Desa Karanganyar</p>
-            <p>Sekretaris Desa Karanganyar</p>
+            <p>A.n. CAMAT GANDRUNGMANGU</p>
+            <p>Sekretaris Kecamatan Gandrungmangu</p>
             <div className={inlineSignatures ? "h-16" : isTight ? "h-11" : compactSpacing ? "h-14" : "h-16"}></div>
             <p className="font-bold underline tracking-wider uppercase">PRIYO SUMARNO, S.PD.</p>
           </>
         ) : (
           <>
-            <p>Kepala Desa Karanganyar</p>
+            <p>CAMAT GANDRUNGMANGU</p>
             <div className={inlineSignatures ? "h-16" : isTight ? "h-11" : compactSpacing ? "h-14" : "h-16"}></div>
-            <p className="font-bold underline tracking-wider uppercase">RISKIANASARI, SE.</p>
+            <p className="font-bold underline tracking-wider uppercase">FATHAN ADY CHANDRA, S.STP., M.M.</p>
           </>
         )}
       </div>

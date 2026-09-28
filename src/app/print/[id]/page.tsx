@@ -26,7 +26,7 @@ export default function PrintPage() {
   const params = useParams();
   const rawId = params?.id as string;
   const id = rawId ? decodeURIComponent(rawId).trim() : '';
-  
+
   const [submission, setSubmission] = useState<LetterSubmission | 'not_found' | 'error' | 'verifying' | null>(null);
   const { firestore, isUserLoading, user } = useFirebase();
 
@@ -62,7 +62,7 @@ export default function PrintPage() {
         }
       }
     }
-    
+
     fetchSubmission();
   }, [id, firestore, isUserLoading, user]);
 
@@ -72,12 +72,12 @@ export default function PrintPage() {
       <div className="flex h-screen w-full flex-col items-center justify-center bg-slate-50">
         <Loader2 className="h-10 w-10 animate-spin text-primary mb-4" />
         <div className="text-center space-y-2">
-            <p className="text-sm font-black uppercase tracking-widest text-slate-900">
-                Memverifikasi Otoritas Admin
-            </p>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest animate-pulse">
-                Mohon tunggu sejenak, sedang memulihkan sesi Anda...
-            </p>
+          <p className="text-sm font-black uppercase tracking-widest text-slate-900">
+            Memverifikasi Otoritas Admin
+          </p>
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest animate-pulse">
+            Mohon tunggu sejenak, sedang memulihkan sesi Anda...
+          </p>
         </div>
       </div>
     );
@@ -87,29 +87,29 @@ export default function PrintPage() {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-slate-50 p-8">
         <div className="max-w-md w-full p-10 bg-white rounded-[3rem] shadow-2xl border border-red-100 text-center space-y-6">
-            <div className="mx-auto w-20 h-20 bg-red-50 rounded-3xl flex items-center justify-center">
-                <ShieldAlert className="h-10 w-10 text-red-500" />
-            </div>
-            <div className="space-y-2">
-                <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight italic">Akses Dibatasi</h2>
-                <p className="text-slate-500 text-sm leading-relaxed">
-                    Sistem tidak dapat memverifikasi izin Admin Anda. Hal ini biasanya terjadi jika sesi login kadaluwarsa atau tab baru gagal mendeteksi identitas Anda.
-                </p>
-            </div>
-            <div className="pt-4 flex flex-col gap-3">
-                <button 
-                  onClick={() => window.location.reload()} 
-                  className="w-full py-4 bg-primary text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-slate-800 transition-all active:scale-95 shadow-xl shadow-primary/20"
-                >
-                  MUAT ULANG HALAMAN
-                </button>
-                <button 
-                  onClick={() => window.location.href = '/login'} 
-                  className="w-full py-4 bg-slate-100 text-slate-600 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-slate-200 transition-all"
-                >
-                  LOGIN ULANG ADMIN
-                </button>
-            </div>
+          <div className="mx-auto w-20 h-20 bg-red-50 rounded-3xl flex items-center justify-center">
+            <ShieldAlert className="h-10 w-10 text-red-500" />
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight italic">Akses Dibatasi</h2>
+            <p className="text-slate-500 text-sm leading-relaxed">
+              Sistem tidak dapat memverifikasi izin Admin Anda. Hal ini biasanya terjadi jika sesi login kadaluwarsa atau tab baru gagal mendeteksi identitas Anda.
+            </p>
+          </div>
+          <div className="pt-4 flex flex-col gap-3">
+            <button
+              onClick={() => window.location.reload()}
+              className="w-full py-4 bg-primary text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-slate-800 transition-all active:scale-95 shadow-xl shadow-primary/20"
+            >
+              MUAT ULANG HALAMAN
+            </button>
+            <button
+              onClick={() => window.location.href = '/login'}
+              className="w-full py-4 bg-slate-100 text-slate-600 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-slate-200 transition-all"
+            >
+              LOGIN ULANG ADMIN
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -119,13 +119,13 @@ export default function PrintPage() {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-slate-50 p-8">
         <div className="max-w-md w-full p-8 bg-white rounded-[2rem] shadow-xl border border-amber-100 text-center space-y-4">
-            <div className="mx-auto w-16 h-16 bg-amber-50 rounded-2xl flex items-center justify-center">
-                <FileSearch className="h-8 w-8 text-amber-500" />
-            </div>
-            <h2 className="text-xl font-black text-slate-900 uppercase">Data Tidak Ditemukan</h2>
-            <p className="text-slate-500 text-sm leading-relaxed">
-                Maaf, data pengajuan dengan ID tersebut tidak tersedia di database.
-            </p>
+          <div className="mx-auto w-16 h-16 bg-amber-50 rounded-2xl flex items-center justify-center">
+            <FileSearch className="h-8 w-8 text-amber-500" />
+          </div>
+          <h2 className="text-xl font-black text-slate-900 uppercase">Data Tidak Ditemukan</h2>
+          <p className="text-slate-500 text-sm leading-relaxed">
+            Maaf, data pengajuan dengan ID tersebut tidak tersedia di database.
+          </p>
         </div>
       </div>
     );
@@ -133,10 +133,10 @@ export default function PrintPage() {
 
   // Wajib persetujuan admin terlebih dahulu sebelum cetak
   if (
-    submission && 
-    typeof submission !== 'string' && 
-    submission.status !== 'APPROVED' && 
-    submission.status !== 'COMPLETED' && 
+    submission &&
+    typeof submission !== 'string' &&
+    submission.status !== 'APPROVED' &&
+    submission.status !== 'COMPLETED' &&
     submission.status !== 'disetujui'
   ) {
     return (
@@ -149,7 +149,7 @@ export default function PrintPage() {
           <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">
             Pengajuan surat ini masih berstatus <strong className="text-amber-700 uppercase">"{submission.status || 'MENUNGGU'}"</strong>.
             <br />
-            Admin desa <strong>wajib menyetujui</strong> permohonan surat terlebih dahulu di menu <strong>Pelayanan Surat</strong> sebelum dokumen resmi dapat dicetak.
+            Admin Kecamatan <strong>wajib menyetujui</strong> permohonan surat terlebih dahulu di menu <strong>Pelayanan Surat</strong> sebelum dokumen resmi dapat dicetak.
           </p>
           <div className="pt-2">
             <button
@@ -168,14 +168,14 @@ export default function PrintPage() {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-slate-50 p-8">
         <div className="max-w-md w-full p-8 bg-white rounded-[2rem] shadow-xl border border-amber-100 text-center space-y-4">
-            <div className="mx-auto w-16 h-16 bg-amber-50 rounded-2xl flex items-center justify-center">
-                <AlertCircle className="h-8 w-8 text-amber-500" />
-            </div>
-            <h2 className="text-xl font-black text-slate-900 uppercase">Nomor Surat Belum Ada</h2>
-            <p className="text-slate-500 text-sm leading-relaxed">
-                Dokumen tidak dapat dicetak karena belum memiliki nomor surat resmi. <br/>
-                Silakan kembali ke dasbor admin dan klik tombol <strong>"Tarik Surat"</strong> terlebih dahulu.
-            </p>
+          <div className="mx-auto w-16 h-16 bg-amber-50 rounded-2xl flex items-center justify-center">
+            <AlertCircle className="h-8 w-8 text-amber-500" />
+          </div>
+          <h2 className="text-xl font-black text-slate-900 uppercase">Nomor Surat Belum Ada</h2>
+          <p className="text-slate-500 text-sm leading-relaxed">
+            Dokumen tidak dapat dicetak karena belum memiliki nomor surat resmi. <br />
+            Silakan kembali ke dasbor admin dan klik tombol <strong>"Tarik Surat"</strong> terlebih dahulu.
+          </p>
         </div>
       </div>
     );

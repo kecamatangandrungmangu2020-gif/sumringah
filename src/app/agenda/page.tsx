@@ -1,10 +1,12 @@
 "use client"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Calendar, FilePlus, Globe } from "lucide-react"
+import { Calendar, FilePlus, Globe, UserCheck } from "lucide-react"
 import { RincianKegiatan } from "@/components/agenda/RincianKegiatan"
+import { DisposisiKegiatan } from "@/components/agenda/DisposisiKegiatan"
 import { InputAgendaForm } from "@/components/agenda/InputAgendaForm"
 import { Card, CardContent } from "@/components/ui/card"
+import { GOOGLE_CONFIG } from "@/lib/google-config"
 
 export default function AgendaPage() {
   return (
@@ -15,28 +17,36 @@ export default function AgendaPage() {
         </div>
         <div>
           <h1 className="text-2xl font-black text-primary uppercase tracking-tight">Agenda Kegiatan</h1>
-          <p className="text-xs text-muted-foreground font-bold uppercase">Manajemen Kalender & Input Acara Desa</p>
+          <p className="text-xs text-muted-foreground font-bold uppercase">Manajemen Kalender, Disposisi & Input Acara</p>
         </div>
       </header>
 
       <Tabs defaultValue="rincian" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 h-14 bg-muted/50 p-1.5 rounded-2xl">
-          <TabsTrigger value="rincian" className="gap-2 text-[10px] font-black uppercase rounded-xl h-full">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto sm:h-14 bg-muted/50 p-1.5 rounded-2xl gap-1 sm:gap-0">
+          <TabsTrigger value="rincian" className="gap-2 text-[10px] font-black uppercase rounded-xl h-11 sm:h-full">
             <Calendar className="h-4 w-4" />
             Rincian
           </TabsTrigger>
-          <TabsTrigger value="input" className="gap-2 text-[10px] font-black uppercase rounded-xl h-full">
+          <TabsTrigger value="disposisi" className="gap-2 text-[10px] font-black uppercase rounded-xl h-11 sm:h-full data-[state=active]:bg-emerald-600 data-[state=active]:text-white">
+            <UserCheck className="h-4 w-4" />
+            Disposisi
+          </TabsTrigger>
+          <TabsTrigger value="input" className="gap-2 text-[10px] font-black uppercase rounded-xl h-11 sm:h-full">
             <FilePlus className="h-4 w-4" />
             Input Baru
           </TabsTrigger>
-          <TabsTrigger value="visual" className="gap-2 text-[10px] font-black uppercase rounded-xl h-full">
+          <TabsTrigger value="visual" className="gap-2 text-[10px] font-black uppercase rounded-xl h-11 sm:h-full">
             <Globe className="h-4 w-4" />
-            Tampilan Kalender
+            Kalender
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="rincian" className="mt-6">
           <RincianKegiatan />
+        </TabsContent>
+
+        <TabsContent value="disposisi" className="mt-6">
+          <DisposisiKegiatan />
         </TabsContent>
 
         <TabsContent value="input" className="mt-6">
@@ -48,7 +58,7 @@ export default function AgendaPage() {
             <CardContent className="p-0">
               <div className="aspect-[4/3] md:aspect-video w-full">
                 <iframe
-                  src="https://calendar.google.com/calendar/embed?src=desakaranganyargandrungmangu%40gmail.com&ctz=Asia%2FJakarta"
+                  src={`https://calendar.google.com/calendar/embed?src=${encodeURIComponent(GOOGLE_CONFIG.calendarId)}&ctz=Asia%2FJakarta`}
                   style={{ border: 0 }}
                   width="100%"
                   height="100%"
@@ -67,3 +77,4 @@ export default function AgendaPage() {
     </div>
   )
 }
+

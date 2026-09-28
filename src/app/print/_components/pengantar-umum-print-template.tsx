@@ -8,7 +8,7 @@ export function PengantarUmumPrintTemplate({ submission }: { submission: LetterS
   return (
     <PrintLayout submission={submission}>
       <p className="mt-3 text-justify leading-normal">
-        Yang bertanda tangan di bawah ini Kepala Desa Karanganyar, Kecamatan
+        Yang bertanda tangan di bawah ini CAMAT GANDRUNGMANGU Kecamatan
         Gandrungmangu, Kabupaten Cilacap, menerangkan dengan sebenarnya bahwa:
       </p>
 

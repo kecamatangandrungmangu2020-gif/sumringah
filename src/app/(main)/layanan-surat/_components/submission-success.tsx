@@ -47,13 +47,13 @@ export function SubmissionSuccess({ ticketNumber, onReset }: SubmissionSuccessPr
       }
 
       const link = document.createElement('a');
-      link.download = `tiket-desa-${ticketNumber}.png`;
+      link.download = `tiket-Kecamatan-${ticketNumber}.png`;
       link.href = dataUrl;
       link.click();
 
       toast({
         title: "Berhasil",
-        description: "Tiket telah disimpan ke perangkat Anda.",
+        description: "Tiket telah disimpan ke Karyawan Anda.",
       });
     } catch (err) {
       console.error('Gagal mengunduh gambar:', err);
@@ -77,7 +77,7 @@ export function SubmissionSuccess({ ticketNumber, onReset }: SubmissionSuccessPr
             </div>
             <CardTitle className="text-2xl font-black text-slate-900 tracking-tight">Pengajuan Surat Berhasil Terkirim!</CardTitle>
             <CardDescription className="text-xs text-slate-500">
-              Permohonan Anda otomatis masuk ke sistem antrean verifikasi Admin Desa Karanganyar.
+              Permohonan Anda otomatis masuk ke sistem antrean verifikasi Admin Kecamatan Gandrungmangu.
             </CardDescription>
           </CardHeader>
           <CardContent className="text-center space-y-6">
@@ -95,9 +95,9 @@ export function SubmissionSuccess({ ticketNumber, onReset }: SubmissionSuccessPr
             <div className="text-xs text-slate-600 text-left p-4 border border-slate-200/80 rounded-xl bg-slate-50/70 space-y-2">
               <p className="font-bold text-slate-900">Ketentuan & Prosedur Pengambilan:</p>
               <ul className="list-disc pl-5 space-y-1 text-slate-600">
-                <li>Admin Desa akan memverifikasi kelengkapan data & berkas persyaratan Anda.</li>
+                <li>Admin Kecamatan akan memverifikasi kelengkapan data & berkas persyaratan Anda.</li>
                 <li>Ketika status berubah menjadi <strong>"Disetujui Admin"</strong>, dokumen resmi siap diambil.</li>
-                <li>Pengambilan di <strong>Balai Desa Karanganyar</strong> pada hari kerja (Senin - Jumat, 07:00 - 16:00 WIB) dengan membawa <strong>KTP Asli</strong>.</li>
+                <li>Pengambilan di <strong>Balai Kecamatan Gandrungmangu</strong> pada hari kerja (Senin - Jumat, 07:00 - 16:00 WIB) dengan membawa <strong>KTP Asli</strong>.</li>
               </ul>
             </div>
           </CardContent>

@@ -55,7 +55,7 @@ export function KelahiranPrintTemplate({ submission }: { submission: LetterSubmi
       content: (
         <>
           <p className="mt-3 text-justify leading-relaxed">
-            Yang bertanda tangan di bawah ini, Kepala Desa Karanganyar, Kecamatan
+            Yang bertanda tangan di bawah ini, CAMAT GANDRUNGMANGU Kecamatan
             Gandrungmangu, Kabupaten Cilacap, dengan ini menerangkan kepada :
           </p>
 

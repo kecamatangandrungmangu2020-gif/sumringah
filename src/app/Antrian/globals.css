@@ -1,0 +1,73 @@
+/* Unified Modern Design System for /Antrian/ */
+
+.antrian-system {
+  font-family: var(--font-outfit), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  color: #ffffff;
+  -webkit-font-smoothing: antialiased;
+}
+
+.antrian-system * {
+  font-family: inherit;
+}
+
+/* Glassmorphism Cards */
+.antrian-glass,
+.card.antrian-glass {
+  background: rgba(255, 255, 255, 0.06) !important;
+  background-color: rgba(255, 255, 255, 0.06) !important;
+  --bs-card-bg: transparent !important;
+  --bs-card-color: #ffffff !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 22px !important;
+  color: #ffffff !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.antrian-glass-hover:hover,
+.card.antrian-glass-hover:hover {
+  transform: translateY(-6px);
+  background: rgba(255, 255, 255, 0.10) !important;
+  background-color: rgba(255, 255, 255, 0.10) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Accent Glows */
+.glow-cyan:hover {
+  border-color: rgba(56, 189, 248, 0.5) !important;
+  box-shadow: 0 15px 35px rgba(56, 189, 248, 0.25) !important;
+}
+
+.glow-indigo:hover {
+  border-color: rgba(129, 140, 248, 0.5) !important;
+  box-shadow: 0 15px 35px rgba(129, 140, 248, 0.25) !important;
+}
+
+.glow-emerald:hover {
+  border-color: rgba(52, 211, 153, 0.5) !important;
+  box-shadow: 0 15px 35px rgba(52, 211, 153, 0.25) !important;
+}
+
+.glow-amber:hover {
+  border-color: rgba(251, 191, 36, 0.5) !important;
+  box-shadow: 0 15px 35px rgba(251, 191, 36, 0.25) !important;
+}
+
+/* Custom modern scrollbar for Antrian */
+.antrian-system ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.antrian-system ::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+.antrian-system ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 4px;
+}
+.antrian-system ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.45);
+}

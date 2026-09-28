@@ -2,7 +2,7 @@
 import { jsPDF } from "jspdf";
 import { format } from "date-fns";
 import { id as localeID } from "date-fns/locale";
-import { addKopSuratSync, loadImage } from "./pdf-utils";
+import { addKopSuratSync, loadImage, formatWaktuSurat } from "./pdf-utils";
 
 const LOGO_CILACAP_FALLBACK = "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Lambang_Kabupaten_Cilacap.png/120px-Lambang_Kabupaten_Cilacap.png";
 
@@ -56,9 +56,8 @@ export const generateDaftarHadirPDF = async (values: PDFData, logoBase64?: strin
 
     addHeaderDetail("Kegiatan", values.kegiatan);
     addHeaderDetail("Hari / Tanggal", format(d, "EEEE, d MMMM yyyy", { locale: localeID }));
-    const displayTime = values.time ? `Pukul ${values.time} s.d selesai` : "Pukul 09:00 WIB s.d selesai";
-    addHeaderDetail("Waktu", displayTime);
-    addHeaderDetail("Tempat", values.location || "Balai Desa Karanganyar");
+    addHeaderDetail("Waktu", formatWaktuSurat(values.time));
+    addHeaderDetail("Tempat", values.location || "Balai Kecamatan Gandrungmangu");
 
     currentY += 8;
     const colW = [12, 75, 55, 38];
@@ -133,12 +132,12 @@ export const generateDaftarHadirPDF = async (values: PDFData, logoBase64?: strin
     const sigX = pageWidth - margin - 65;
     doc.setFontSize(10);
     doc.setFont("helvetica", "normal");
-    doc.text(`Karanganyar, ${format(d, "d MMMM yyyy", { locale: localeID })}`, sigX, currentY);
+    doc.text(`Gandrungmangu, ${format(d, "d MMMM yyyy", { locale: localeID })}`, sigX, currentY);
     doc.setFont("helvetica", "bold");
-    doc.text("Kepala Desa Karanganyar,", sigX, currentY + 6);
+    doc.text("CAMAT GANDRUNGMANGU", sigX, currentY + 6);
     currentY += 25;
-    doc.text("RISKIANASARI, SE.", sigX, currentY);
-    const nW = doc.getTextWidth("RISKIANASARI, SE.");
+    doc.text("FATHAN ADY CHANDRA, S.STP., M.M.", sigX, currentY);
+    const nW = doc.getTextWidth("FATHAN ADY CHANDRA, S.STP., M.M.");
     doc.line(sigX, currentY + 1, sigX + nW, currentY + 1);
 
     return doc.output("blob");
@@ -176,9 +175,8 @@ export const generateDaftarHadirPesertaPDF = async (values: PDFData, logoBase64?
 
     addHeaderDetail("Kegiatan", values.kegiatan);
     addHeaderDetail("Hari / Tanggal", format(d, "EEEE, d MMMM yyyy", { locale: localeID }));
-    const displayTime = values.time ? `Pukul ${values.time} s.d selesai` : "Pukul 09:00 WIB s.d selesai";
-    addHeaderDetail("Waktu", displayTime);
-    addHeaderDetail("Tempat", values.location || "Balai Desa Karanganyar");
+    addHeaderDetail("Waktu", formatWaktuSurat(values.time));
+    addHeaderDetail("Tempat", values.location || "Balai Kecamatan Gandrungmangu");
 
     currentY += 8;
     const colW = [12, 75, 60, 33]; // NO, NAMA PESERTA, ALAMAT, TTD
@@ -250,12 +248,12 @@ export const generateDaftarHadirPesertaPDF = async (values: PDFData, logoBase64?
     const sigX = pageWidth - margin - 65;
     doc.setFontSize(10);
     doc.setFont("helvetica", "normal");
-    doc.text(`Karanganyar, ${format(d, "d MMMM yyyy", { locale: localeID })}`, sigX, currentY);
+    doc.text(`Gandrungmangu, ${format(d, "d MMMM yyyy", { locale: localeID })}`, sigX, currentY);
     doc.setFont("helvetica", "bold");
-    doc.text("Kepala Desa Karanganyar,", sigX, currentY + 6);
+    doc.text("CAMAT GANDRUNGMANGU", sigX, currentY + 6);
     currentY += 25;
-    doc.text("RISKIANASARI, SE.", sigX, currentY);
-    const nW = doc.getTextWidth("RISKIANASARI, SE.");
+    doc.text("FATHAN ADY CHANDRA, S.STP., M.M.", sigX, currentY);
+    const nW = doc.getTextWidth("FATHAN ADY CHANDRA, S.STP., M.M.");
     doc.line(sigX, currentY + 1, sigX + nW, currentY + 1);
 
     return doc.output("blob");
@@ -319,9 +317,8 @@ export const generateUangSakuPDF = async (values: PDFData, logoBase64?: string |
         "Hari / Tanggal",
         format(d, "EEEE, d MMMM yyyy", { locale: localeID })
     );
-    addHeaderRow("Tempat", values.location || "Balai Desa Karanganyar");
-    const displayTime = values.time ? `Pukul ${values.time} s.d selesai` : "Pukul 09:00 WIB s.d selesai";
-    addHeaderRow("Waktu", displayTime);
+    addHeaderRow("Waktu", formatWaktuSurat(values.time));
+    addHeaderRow("Tempat", values.location || "Balai Kecamatan Gandrungmangu");
     currentY += 4;
     drawTableHeader();
 
@@ -412,12 +409,12 @@ export const generateUangSakuPDF = async (values: PDFData, logoBase64?: string |
     const sigX = pageWidth - 70;
     doc.setFontSize(10);
     doc.setFont("helvetica", "normal");
-    doc.text(`Karanganyar, ${format(d, "d MMMM yyyy", { locale: localeID })}`, sigX, currentY);
+    doc.text(`Gandrungmangu, ${format(d, "d MMMM yyyy", { locale: localeID })}`, sigX, currentY);
     doc.setFont("helvetica", "bold");
-    doc.text("Kepala Desa Karanganyar,", sigX, currentY + 6);
+    doc.text("CAMAT GANDRUNGMANGU", sigX, currentY + 6);
     currentY += 25;
-    doc.text("RISKIANASARI, SE.", sigX, currentY);
-    const nW = doc.getTextWidth("RISKIANASARI, SE.");
+    doc.text("FATHAN ADY CHANDRA, S.STP., M.M.", sigX, currentY);
+    const nW = doc.getTextWidth("FATHAN ADY CHANDRA, S.STP., M.M.");
     doc.line(sigX, currentY + 1, sigX + nW, currentY + 1);
 
     return doc.output("blob");

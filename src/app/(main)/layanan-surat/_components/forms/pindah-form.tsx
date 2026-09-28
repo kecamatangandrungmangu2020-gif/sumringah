@@ -118,7 +118,7 @@ const formSchema = z.object({
   kkHead: z.string().min(1, 'Nama kepala keluarga wajib diisi.'),
   currentAddressRt: z.string().min(1, 'RT wajib diisi.'),
   currentAddressRw: z.string().min(1, 'RW wajib diisi.'),
-  destinationAddress: z.string().min(1, 'Desa tujuan wajib diisi.'),
+  destinationAddress: z.string().min(1, 'Kecamatan tujuan wajib diisi.'),
   destinationAddressRt: z.string().min(1, 'RT tujuan wajib diisi.'),
   destinationAddressRw: z.string().min(1, 'RW tujuan wajib diisi.'),
   destinationKecamatan: z.string().min(1, 'Kecamatan tujuan wajib diisi.'),
@@ -278,8 +278,8 @@ export function PindahForm({ isAdmin = false }: { isAdmin?: boolean }) {
             <FormField control={form.control} name="currentAddressRt" render={({ field }) => (<FormItem><FormLabel>RT</FormLabel><FormControl><Input placeholder="001" {...field} disabled={isSubmitting} className="h-12 rounded-xl" /></FormControl><FormMessage /></FormItem>)} />
             <FormField control={form.control} name="currentAddressRw" render={({ field }) => (<FormItem><FormLabel>RW</FormLabel><FormControl><Input placeholder="001" {...field} disabled={isSubmitting} className="h-12 rounded-xl" /></FormControl><FormMessage /></FormItem>)} />
           </div>
-          <FormItem><FormLabel>Desa</FormLabel><FormControl><Input value="KARANGANYAR" disabled className="h-12 rounded-xl bg-slate-50" /></FormControl></FormItem>
-          <FormItem><FormLabel>Kecamatan</FormLabel><FormControl><Input value="KARANGANYAR" disabled className="h-12 rounded-xl bg-slate-50" /></FormControl></FormItem>
+          <FormItem><FormLabel>Kecamatan</FormLabel><FormControl><Input value="GANDRUNGMANGU" disabled className="h-12 rounded-xl bg-slate-50" /></FormControl></FormItem>
+          <FormItem><FormLabel>Kecamatan</FormLabel><FormControl><Input value="GANDRUNGMANGU" disabled className="h-12 rounded-xl bg-slate-50" /></FormControl></FormItem>
           <FormItem><FormLabel>Kabupaten / Kota</FormLabel><FormControl><Input value="CILACAP" disabled className="h-12 rounded-xl bg-slate-50" /></FormControl></FormItem>
           <FormItem><FormLabel>Provinsi</FormLabel><FormControl><Input value="JAWA TENGAH" disabled className="h-12 rounded-xl bg-slate-50" /></FormControl></FormItem>
         </FormSection>
@@ -289,7 +289,7 @@ export function PindahForm({ isAdmin = false }: { isAdmin?: boolean }) {
             <FormField control={form.control} name="destinationAddressRt" render={({ field }) => (<FormItem><FormLabel>RT</FormLabel><FormControl><Input placeholder="001" {...field} disabled={isSubmitting} className="h-12 rounded-xl" /></FormControl><FormMessage /></FormItem>)} />
             <FormField control={form.control} name="destinationAddressRw" render={({ field }) => (<FormItem><FormLabel>RW</FormLabel><FormControl><Input placeholder="001" {...field} disabled={isSubmitting} className="h-12 rounded-xl" /></FormControl><FormMessage /></FormItem>)} />
           </div>
-          <FormField control={form.control} name="destinationAddress" render={({ field }) => (<FormItem><FormLabel>Desa Tujuan</FormLabel><FormControl><Input placeholder="Desa Tujuan" {...field} disabled={isSubmitting} className="h-12 rounded-xl" /></FormControl><FormMessage /></FormItem>)} />
+          <FormField control={form.control} name="destinationAddress" render={({ field }) => (<FormItem><FormLabel>Kecamatan Tujuan</FormLabel><FormControl><Input placeholder="Kecamatan Tujuan" {...field} disabled={isSubmitting} className="h-12 rounded-xl" /></FormControl><FormMessage /></FormItem>)} />
           <FormField control={form.control} name="destinationKecamatan" render={({ field }) => (<FormItem><FormLabel>Kecamatan Tujuan</FormLabel><FormControl><Input placeholder="Kecamatan" {...field} disabled={isSubmitting} className="h-12 rounded-xl" /></FormControl><FormMessage /></FormItem>)} />
           <FormField control={form.control} name="destinationKabupaten" render={({ field }) => (<FormItem><FormLabel>Kabupaten / Kota Tujuan</FormLabel><FormControl><Input placeholder="Kabupaten" {...field} disabled={isSubmitting} className="h-12 rounded-xl" /></FormControl><FormMessage /></FormItem>)} />
           <FormField control={form.control} name="destinationProvinsi" render={({ field }) => (<FormItem><FormLabel>Provinsi Tujuan</FormLabel><FormControl><Input placeholder="Provinsi" {...field} disabled={isSubmitting} className="h-12 rounded-xl" /></FormControl><FormMessage /></FormItem>)} />
@@ -326,7 +326,7 @@ export function PindahForm({ isAdmin = false }: { isAdmin?: boolean }) {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 pt-4">
               <GoogleFileUploader label="Foto KTP Pemohon" fieldName="ktp" onFileSelect={handleFileSelect} isRequired={!isAdmin} disabled={isSubmitting} />
               <GoogleFileUploader label="Foto KK" fieldName="kk" onFileSelect={handleFileSelect} isRequired={!isAdmin} disabled={isSubmitting} />
-              <GoogleFileUploader label="Surat Pengantar RT/RW" fieldName="pengantarRt" onFileSelect={handleFileSelect} isRequired={false} disabled={isSubmitting} />
+              <GoogleFileUploader label="Surat Pengantar KEPALA Kecamatan" fieldName="pengantarRt" onFileSelect={handleFileSelect} isRequired={false} disabled={isSubmitting} />
             </div>
           </div>
         </FormSection>

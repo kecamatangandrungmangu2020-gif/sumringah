@@ -290,7 +290,7 @@ export function ResidentList() {
             <div className="text-2xl font-black text-slate-900">
               {totalCount === null ? <Skeleton className="h-7 w-20" /> : totalCount.toLocaleString('id-ID')}
             </div>
-            <p className="text-[11px] text-slate-500 font-medium italic mt-0.5">Total dokumen penduduk Desa Karanganyar</p>
+            <p className="text-[11px] text-slate-500 font-medium italic mt-0.5">Total dokumen penduduk Kecamatan Gandrungmangu</p>
           </CardContent>
         </Card>
       </div>

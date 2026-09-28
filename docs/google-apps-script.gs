@@ -1,5 +1,5 @@
 /**
- * BACKEND GOOGLE APPS SCRIPT - DESA DIGITAL
+ * BACKEND GOOGLE APPS SCRIPT - Kecamatan DIGITAL
  * Versi 3.0: Menambahkan kemampuan untuk mengambil data kalender dan memperbarui deskripsi acara (notulensi).
  * Logika Terpadu: Agenda, Arsip, Google Drive, & Google Kalender.
  */
@@ -19,6 +19,10 @@ function doPost(e) {
       case 'uploadArchiveFile':
         result = handleArchiveUpload(data);
         break;
+
+      case 'saveToDrive':
+        result = handleSaveToDrive(data);
+        break;
         
       case 'getCalendar':
         result = handleGetCalendar(data);
@@ -26,6 +30,10 @@ function doPost(e) {
 
       case 'updateEventDescription':
         result = handleUpdateDescription(data);
+        break;
+
+      case 'updateEventDisposition':
+        result = handleUpdateDisposition(data);
         break;
 
       default:
@@ -107,6 +115,52 @@ function handleUpdateDescription(data) {
   }
 }
 
+/**
+ * FUNGSI BARU: Memperbarui penugasan disposisi (petugas) pada acara kalender.
+ */
+function handleUpdateDisposition(data) {
+  const { calendarId, eventId, disposition, dispositionNotes } = data;
+  if (!calendarId || !eventId) {
+    throw new Error("calendarId dan eventId diperlukan.");
+  }
+
+  try {
+    const event = Calendar.Events.get(calendarId, eventId);
+    let description = event.description || "";
+
+    const cleanDisp = (disposition && disposition.trim() !== '') ? disposition.trim() : 'Belum Didisposisi';
+    const dispLine = (cleanDisp !== 'Belum Didisposisi' && dispositionNotes && dispositionNotes.trim() !== '') 
+      ? `DISPOSISI: ${cleanDisp} (Catatan: ${dispositionNotes.trim()})`
+      : `DISPOSISI: ${cleanDisp}`;
+
+    if (data.eventType) {
+      const typeLine = `JENIS: ${data.eventType}`;
+      if (/^JENIS:.*$/m.test(description)) {
+        description = description.replace(/^JENIS:.*$/m, typeLine);
+      } else {
+        description = typeLine + '\n' + description;
+      }
+    }
+
+    if (/^DISPOSISI:.*$/m.test(description)) {
+      description = description.replace(/^DISPOSISI:.*$/m, dispLine);
+    } else if (/^JENIS:.*$/m.test(description)) {
+      description = description.replace(/^JENIS:.*$/m, (match) => match + '\n' + dispLine);
+    } else {
+      description = dispLine + '\n\n' + description;
+    }
+
+    const updatedEvent = {
+      description: description.trim()
+    };
+
+    const result = Calendar.Events.patch(updatedEvent, calendarId, eventId);
+    return { message: "Disposisi acara berhasil diperbarui.", updatedEvent: result };
+  } catch (e) {
+    throw new Error('Gagal memperbarui disposisi acara: ' + e.message);
+  }
+}
+
 
 /**
  * Menangani unggahan file arsip ke Google Drive.
@@ -134,33 +188,144 @@ function handleArchiveUpload(data) {
   }
 }
 
+/**
+ * Menyimpan seluruh dokumen dan lampiran kegiatan ke Google Drive dalam folder kegiatan.
+ */
+function handleSaveToDrive(data) {
+  const { folderName, parentFolderId, files } = data;
+  let parentFolder;
+  
+  if (parentFolderId && typeof parentFolderId === 'string' && parentFolderId.trim() !== '') {
+    try {
+      parentFolder = DriveApp.getFolderById(parentFolderId.trim());
+    } catch (e) {
+      console.warn("Parent folder spesifik tidak ditemukan: " + e.message);
+      parentFolder = DriveApp.getRootFolder();
+    }
+  } else {
+    parentFolder = DriveApp.getRootFolder();
+  }
+
+  // Buat subfolder khusus kegiatan ini
+  const targetFolder = parentFolder.createFolder(folderName || "Arsip Kegiatan");
+  try {
+    targetFolder.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+  } catch (err) {
+    console.warn("Peringatan izin sharing folder: " + err.message);
+  }
+
+  const fileUrls = {};
+
+  function saveSingleFile(key, fileObj) {
+    if (!fileObj || !fileObj.base64) return;
+    try {
+      const decoded = Utilities.base64Decode(fileObj.base64);
+      const blob = Utilities.newBlob(decoded, fileObj.type || 'application/pdf', fileObj.name || (key + '.pdf'));
+      const newFile = targetFolder.createFile(blob);
+      try {
+        newFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+      } catch (shareErr) {}
+      fileUrls[key] = newFile.getUrl();
+    } catch (e) {
+      console.error("Gagal simpan file " + key + ": " + e.message);
+    }
+  }
+
+  if (files) {
+    saveSingleFile('notulen', files.notulen);
+    saveSingleFile('bast', files.bast);
+    saveSingleFile('dokKegiatan', files.dokKegiatan);
+    saveSingleFile('dokAtk', files.dokAtk);
+    saveSingleFile('dokKonsumsi', files.dokKonsumsi);
+    saveSingleFile('undangan', files.undangan);
+
+    if (Array.isArray(files.materials)) {
+      files.materials.forEach(function(mat, idx) {
+        saveSingleFile('materi_' + (idx + 1), mat);
+      });
+    }
+
+    if (Array.isArray(files.photos)) {
+      files.photos.forEach(function(photo, idx) {
+        saveSingleFile('foto_' + (idx + 1), photo);
+      });
+    }
+  }
+
+  return {
+    message: "Seluruh berkas kegiatan berhasil diarsipkan ke Google Drive.",
+    folderId: targetFolder.getId(),
+    folderUrl: targetFolder.getUrl(),
+    fileUrls: fileUrls
+  };
+}
+
 
 /**
- * Membuat acara di Google Calendar & mengunggah file ke Google Drive.
+ * Membuat acara di Google Calendar & mengunggah file ke Google Drive sebagai Lampiran Resmi.
  */
 function handleCreateEventAndUpload(data) {
   const { eventData, fileData, folderId } = data;
   let fileUrl = null;
   let eventUrl = null;
+  let uploadedFile = null;
 
-  if (!eventData || !eventData.calendarId || !eventData.title || !folderId) {
-    throw new Error("Data tidak lengkap.");
+  if (!eventData || !eventData.calendarId || !eventData.title) {
+    throw new Error("Data agenda tidak lengkap (ID Kalender atau Acara kosong).");
   }
 
+  // 1. Simpan file jika dilampirkan
+  let uploadWarning = null;
   if (fileData && fileData.base64) {
     try {
       const decoded = Utilities.base64Decode(fileData.base64);
-      const blob = Utilities.newBlob(decoded, fileData.type, fileData.name);
-      const targetFolder = DriveApp.getFolderById(folderId);
-      const newFile = targetFolder.createFile(blob);
-      fileUrl = newFile.getUrl();
+      const blob = Utilities.newBlob(decoded, fileData.type || 'application/pdf', fileData.name || 'Undangan.pdf');
+      
+      let targetFolder = null;
+      if (folderId && typeof folderId === 'string' && folderId.trim() !== '') {
+        try {
+          targetFolder = DriveApp.getFolderById(folderId.trim());
+        } catch (e) {
+          console.warn("Folder ID spesifik tidak ditemukan: " + e.message);
+        }
+      }
+      
+      // Jika folderId tidak diisi atau tidak valid, simpan ke folder 'Lampiran Agenda Kecamatan'
+      if (!targetFolder) {
+        try {
+          const folders = DriveApp.getFoldersByName("Lampiran Agenda Kecamatan");
+          if (folders.hasNext()) {
+            targetFolder = folders.next();
+          } else {
+            targetFolder = DriveApp.createFolder("Lampiran Agenda Kecamatan");
+          }
+        } catch (folderErr) {
+          targetFolder = DriveApp.getRootFolder();
+        }
+      }
+
+      uploadedFile = targetFolder.createFile(blob);
+      try {
+        // Atur izin agar file dapat dilihat oleh siapa saja yang memiliki tautan
+        uploadedFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+      } catch (shareErr) {
+        console.warn("Peringatan izin sharing file: " + shareErr.message);
+      }
+      fileUrl = uploadedFile.getUrl();
     } catch (e) {
-      throw new Error('Gagal unggah ke Drive: ' + e.message);
+      console.error('Gagal unggah berkas ke Google Drive: ' + e.message);
+      uploadWarning = 'Agenda dicatat ke Kalender, namun berkas belum tersimpan ke Drive (' + e.message + '). Silakan jalankan forceGrantAllPermissions di Editor Apps Script.';
     }
   }
 
+  // 2. Buat Acara di Google Calendar dengan Lampiran Resmi (Calendar Attachment)
   try {
-    const finalDescription = (eventData.description || '') + (fileUrl ? `\n\n🔗 Link Undangan: ${fileUrl}` : '');
+    let finalDescription = (eventData.description || '');
+    if (fileUrl) {
+      finalDescription += `\n\n📄 Undangan / Lampiran: ${fileUrl}`;
+    } else if (uploadWarning) {
+      finalDescription += `\n\n⚠️ Lampiran: Gagal tersimpan ke Drive (${uploadWarning})`;
+    }
 
     const eventResource = {
       summary: eventData.title,
@@ -170,29 +335,44 @@ function handleCreateEventAndUpload(data) {
       end: { dateTime: eventData.end, timeZone: 'Asia/Jakarta' },
       reminders: { 'useDefault': false, 'overrides': [{'method': 'popup', 'minutes': 60}, {'method': 'email', 'minutes': 1440}] }
     };
+
+    // Daftarkan sebagai attachment resmi di Google Calendar API jika file berhasil dibuat
+    if (uploadedFile && fileUrl) {
+      eventResource.attachments = [{
+        fileUrl: uploadedFile.getUrl(),
+        title: uploadedFile.getName(),
+        mimeType: uploadedFile.getMimeType(),
+        fileId: uploadedFile.getId()
+      }];
+    }
     
-    const createdEvent = Calendar.Events.insert(eventResource, eventData.calendarId);
+    // Parameter supportsAttachments: true wajib digunakan untuk menyertakan lampiran
+    const createdEvent = Calendar.Events.insert(eventResource, eventData.calendarId, { supportsAttachments: true });
     eventUrl = createdEvent.htmlLink;
 
   } catch (e) {
-    throw new Error('Gagal buat acara Kalender: ' + e.message);
+    throw new Error('Gagal membuat acara di Google Calendar: ' + e.message);
   }
 
   return { 
-    message: 'Agenda berhasil disimpan.',
+    message: uploadWarning ? uploadWarning : 'Agenda dan lampiran berhasil disimpan.',
+    warning: uploadWarning,
     eventUrl: eventUrl,
     fileUrl: fileUrl
   };
 }
 
 /**
- * FUNGSI DIAGNOSTIK: Jalankan fungsi ini secara manual untuk otorisasi.
+ * FUNGSI DIAGNOSTIK: Jalankan fungsi ini secara manual di Editor Apps Script untuk otorisasi penuh Drive & Calendar.
  */
 function forceGrantAllPermissions() {
   try {
     Calendar.Events.list('primary');
-    DriveApp.getRootFolder();
+    const root = DriveApp.getRootFolder();
+    Logger.log('DriveApp berhasil diakses: ' + root.getName());
+    Logger.log('Otorisasi Google Calendar & DriveApp berhasil 100%!');
   } catch (e) {
     console.error('Gagal saat meminta izin: ' + e.message);
+    throw new Error('Otorisasi gagal: ' + e.message);
   }
 }

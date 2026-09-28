@@ -12,7 +12,7 @@ import { useForm } from "react-hook-form"
 import * as z from "zod"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth"
+import { signInWithEmailAndPassword } from "firebase/auth"
 import { doc, setDoc } from "firebase/firestore"
 import Link from "next/link"
 
@@ -22,8 +22,7 @@ const loginSchema = z.object({
 })
 
 /**
- * Halaman Login Utama Manajemen Desa
- * KHUSUS AKUN PUSAT: karanganyar@gmail.id
+ * Halaman Login Khusus Sistem Utama
  */
 export default function LoginPage() {
   const { user, isUserLoading } = useUser()
@@ -35,9 +34,9 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
 
   useEffect(() => {
-    // Redirect jika sudah login sebagai admin pusat
-    if (user && !isUserLoading && user.email?.toLowerCase() === "karanganyar@gmail.id") {
-      router.push("/dashboard/");
+    // Redirect jika sudah login
+    if (user && !isUserLoading) {
+      router.push("/admin/")
     }
   }, [user, isUserLoading, router])
 
@@ -50,53 +49,55 @@ export default function LoginPage() {
   })
 
   async function onSubmit(values: z.infer<typeof loginSchema>) {
-    if (!db || !auth) return
+    if (!auth) return
     setIsProcessing(true)
     try {
-      const allowedEmail = "karanganyar@gmail.id";
-      const allowedPass = "karanganyar123";
+      // 1. Otentikasi langsung ke Firebase Authentication
+      const userCredential = await signInWithEmailAndPassword(auth, values.email.trim(), values.password)
 
-      // 1. Hard Check Kredensial Manajemen
-      if (values.email.toLowerCase() !== allowedEmail || values.password !== allowedPass) {
-        throw new Error("Akses Ditolak: Hanya akun manajemen pusat yang diizinkan masuk ke sistem ini.");
-      }
-
-      // 2. Prosedur Auth Firebase
-      try {
-        await signInWithEmailAndPassword(auth, values.email, values.password)
-      } catch (authErr: any) {
-        // Jika akun belum terdaftar di Firebase Auth (Initial Run), daftarkan otomatis
-        if (authErr.code === 'auth/user-not-found' || authErr.code === 'auth/invalid-credential' || authErr.code === 'auth/wrong-password') {
-          // Jika ini adalah percobaan login pertama dengan karanganyar@gmail.id, buatkan akunnya
-          if (values.email.toLowerCase() === allowedEmail && values.password === allowedPass) {
-            const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password)
-            // Daftarkan di Firestore agar role admin terbaca global
-            await setDoc(doc(db, "users", userCredential.user.uid), {
-              id: userCredential.user.uid,
-              email: values.email.toLowerCase(),
-              name: "ADMINISTRATOR PUSAT",
-              role: "admin",
-              createdAt: new Date().toISOString()
-            }, { merge: true })
-          } else {
-            throw new Error("Email atau kata sandi manajemen salah.");
-          }
-        } else {
-          throw authErr
+      // 2. Simpan profil / jejak login ke Firestore jika ada koneksi
+      if (db && userCredential?.user) {
+        try {
+          await setDoc(doc(db, "users", userCredential.user.uid), {
+            id: userCredential.user.uid,
+            email: values.email.trim().toLowerCase(),
+            lastLogin: new Date().toISOString()
+          }, { merge: true })
+        } catch {
+          // Abaikan jika Firestore sedang tidak tersedia, sesi login tetap valid
         }
       }
 
       toast({
         title: "Login Berhasil",
-        description: "Selamat datang di Panel Manajemen Desa.",
+        description: `Selamat datang, ${userCredential.user.email}. Membuka Dashboard Admin...`,
       })
-      router.push("/dashboard/")
+
+      router.push("/admin/")
     } catch (error: any) {
-      console.error("Login Error:", error);
+      console.error("Login Error:", error)
+      let errorMsg = "Terjadi kesalahan saat memproses login."
+      if (
+        error.code === 'auth/invalid-credential' ||
+        error.code === 'auth/user-not-found' ||
+        error.code === 'auth/wrong-password' ||
+        error.code === 'auth/invalid-login-credentials'
+      ) {
+        errorMsg = "Email atau kata sandi tidak cocok dengan akun di Firebase Authentication."
+      } else if (error.code === 'auth/user-disabled') {
+        errorMsg = "Akun ini telah dinonaktifkan di Firebase Authentication."
+      } else if (error.code === 'auth/too-many-requests') {
+        errorMsg = "Terlalu banyak percobaan gagal. Silakan coba beberapa saat lagi."
+      } else if (error.code === 'auth/network-request-failed') {
+        errorMsg = "Koneksi jaringan gagal. Periksa koneksi internet Anda."
+      } else if (error.message) {
+        errorMsg = error.message
+      }
+
       toast({
         variant: "destructive",
         title: "Gagal Masuk",
-        description: error.message || "Terjadi kesalahan saat memproses login.",
+        description: errorMsg,
       })
     } finally {
       setIsProcessing(false)
@@ -125,8 +126,8 @@ export default function LoginPage() {
             <Home className="text-primary-foreground h-10 w-10" />
           </div>
           <div className="space-y-1">
-            <CardTitle className="text-2xl font-black tracking-tighter uppercase text-primary">MANAJEMEN PUSAT</CardTitle>
-            <CardDescription className="font-bold text-[10px] uppercase tracking-widest opacity-60 text-destructive">Akses Terbatas Administrator</CardDescription>
+            <CardTitle className="text-2xl font-black tracking-tighter uppercase text-primary">SISTEM UTAMA</CardTitle>
+            <CardDescription className="font-bold text-[10px] uppercase tracking-widest text-muted-foreground">Masuk Menggunakan Akun Firebase Administrator</CardDescription>
           </div>
         </CardHeader>
         <CardContent className="p-8 sm:p-10 space-y-6">
@@ -142,7 +143,7 @@ export default function LoginPage() {
                       <div className="relative">
                         <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
-                          placeholder="karanganyar@gmail.id"
+                          placeholder="Email terdaftar di Firebase..."
                           {...field}
                           className="h-12 rounded-xl pl-10 text-sm border-primary/10 bg-muted/30"
                           autoComplete="off"
@@ -186,7 +187,7 @@ export default function LoginPage() {
               />
               <Button
                 type="submit"
-                className="w-full h-14 text-base font-black uppercase gap-4 shadow-lg active:scale-95 transition-all rounded-2xl bg-primary hover:bg-primary/90 mt-4"
+                className="w-full h-14 text-base font-black uppercase gap-3 shadow-lg active:scale-95 transition-all rounded-2xl mt-4 text-white bg-primary hover:bg-primary/90 shadow-primary/20"
                 disabled={isProcessing}
               >
                 {isProcessing ? (
@@ -194,18 +195,20 @@ export default function LoginPage() {
                 ) : (
                   <>
                     <LogIn className="h-5 w-5" />
-                    Masuk Manajemen
+                    Masuk ke Sistem Utama
                   </>
                 )}
               </Button>
             </form>
           </Form>
 
-          <div className="p-4 bg-amber-50 rounded-xl flex items-start gap-3 border border-dashed border-amber-200">
-            <AlertCircle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
-            <p className="text-[10px] text-amber-700 leading-relaxed font-bold uppercase">
-              Halaman ini dikunci untuk Administrator Pusat Desa Karanganyar. Perangkat desa silakan gunakan Portal Absensi.
-            </p>
+          <div className="space-y-3">
+            <div className="p-4 bg-muted/40 rounded-xl flex items-start gap-3 border border-dashed border-border">
+              <AlertCircle className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+              <p className="text-[10px] text-muted-foreground leading-relaxed font-bold uppercase">
+                Gunakan email dan kata sandi yang telah didaftarkan pada Firebase Authentication untuk mengakses Sistem Utama.
+              </p>
+            </div>
           </div>
         </CardContent>
       </Card>

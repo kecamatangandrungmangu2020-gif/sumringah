@@ -4,62 +4,24 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // == Rules: Akun Personel Absensi ==
-    match /personel/{docId} {
-      // Izinkan baca publik agar halaman login bisa mencari email berdasarkan username.
-      allow read: if true;
-      
-      // Admin bisa mengelola akun secara penuh
-      allow create, delete: if isSignedIn() && isAdmin();
-      
-      // User diizinkan update datanya sendiri (termasuk sinkronisasi UID awal)
-      allow update: if (isAdmin()) || (isSignedIn() && (
-        (resource.data.get('uid', '') == request.auth.uid) ||
-        (resource.data.get('email', '').lower() == request.auth.token.email.lower()) ||
-        ((resource.data.get('username', '').lower() + "@karanganyar.id") == request.auth.token.email.lower()) ||
-        (request.resource.data.get('uid', '') == request.auth.uid) ||
-        (docId == request.auth.uid)
-      ));
-    }
-
     // == Helper Functions ==
     function isSignedIn() {
       return request.auth != null;
     }
 
     function isAdmin() {
-      return isSignedIn() && (
-        request.auth.token.email.lower() == 'admin@karanganyar.id' ||
-        request.auth.token.email.lower() == 'karanganyar@gmail.id' ||
-        request.auth.token.email.lower() == 'desakaranganyargandrungmangu@gmail.com'
-      );
+      return isSignedIn();
     }
 
     // == Rules: Global Shared Village Data ==
-    // Semua perangkat yang login bisa melihat dan mengelola data operasional desa
-    match /kegiatans/{docId} { allow read, write: if isSignedIn(); }
+    match /kegiatans/{docId} { allow read, create: if true; allow update, delete: if isSignedIn(); }
+    match /personnel/{docId} { allow read: if true; allow write: if isSignedIn(); }
     match /sppds/{docId} { allow read, write: if isSignedIn(); }
-    match /spjDesa/{docId} { allow read, write: if isSignedIn(); }
+    match /spjKecamatan/{docId} { allow read, write: if isSignedIn(); }
+    match /dokSuratMasuk/{docId} { allow read, write: if isSignedIn(); }
+    match /agenda_types/{docId} { allow read, write: if isSignedIn(); }
     match /produkHukum/{docId} { allow read, write: if isSignedIn(); }
     match /settings/village { allow read: if true; allow write: if isSignedIn(); }
-
-    // == Rules: Absensi Records ==
-    match /absensi/{absenId} {
-      allow get, list: if isSignedIn();
-      // Admin atau pemilik UID boleh membuat/mengubah data
-      allow create, update: if isSignedIn() && (
-        isAdmin() ||
-        (request.resource.data.personel_id == request.auth.uid) ||
-        (resource.data.personel_id == request.auth.uid)
-      );
-      allow delete: if isAdmin();
-    }
-
-    // == Rules: Global Settings for Attendance ==
-    match /absensi_settings/{settingId} {
-      allow read: if isSignedIn();
-      allow write: if isAdmin();
-    }
 
     match /users/{userId} {
       allow read, write: if isSignedIn() && (isAdmin() || request.auth.uid == userId);
@@ -78,6 +40,19 @@ service cloud.firestore {
     match /pbb_transaksi/{docId} { allow read, write: if isSignedIn(); }
     match /pbb_setoran/{docId} { allow read, write: if isSignedIn(); }
     
+    // == Rules: Antrian System Collections ==
+    match /pelayanan/{docId} { allow read, write: if true; }
+    match /antrian/{docId} { allow read, write: if true; }
+    match /loket/{docId} { allow read, write: if true; }
+    match /operators/{docId} { allow read, write: if true; }
+    match /settings/{docId} { allow read, write: if true; }
+    match /informasi/{docId} { allow read: if true; allow write: if isSignedIn(); }
+    match /desa/{docId} { allow read: if true; allow write: if isSignedIn(); }
+
+    // == Rules: Layanan Surat Online Warga ==
+    match /submissions/{docId} { allow read, create: if true; allow update, delete: if isSignedIn(); }
+    match /residents/{docId} { allow read: if true; allow write: if isSignedIn(); }
+
     // Default: Admin only
     match /{document=**} {
       allow read, write: if isAdmin();

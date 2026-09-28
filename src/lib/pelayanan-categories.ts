@@ -9,7 +9,7 @@ export const PELAYANAN_CATEGORIES: PelayananCategory[] = [
   { id: 'visi-misi', label: 'Visi & Misi Pelayanan' },
   { id: 'maklumat', label: 'Maklumat Pelayanan' },
   { id: 'pojok-baca', label: 'Pojok Baca / Informasi' },
-  { id: 'regulasi-desa', label: 'Regulasi & Peraturan Desa' },
+  { id: 'regulasi-Kecamatan', label: 'Regulasi & Peraturan Kecamatan' },
   { id: 'panduan-layanan', label: 'Panduan Syarat Layanan' },
   { id: 'lainnya', label: 'Informasi Publik Lainnya' }
 ];

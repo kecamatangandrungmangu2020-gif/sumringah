@@ -61,14 +61,14 @@ export function SppdUpload({ onSuccess, initialData }: SppdUploadProps) {
   const [agendas, setAgendas] = useState<AgendaItem[]>([])
   const [selectedCalendarDate, setSelectedCalendarDate] = useState(format(new Date(), "yyyy-MM-dd"))
   const [duration, setDuration] = useState<number>(1)
-  
+
   const [numCompanions, setNumCompanions] = useState<number>(0)
   const [companionsList, setCompanionsList] = useState<CompanionEntry[]>([])
 
   const { toast } = useToast()
   const { user } = useUser()
   const db = useFirestore()
-  
+
   const personnelRef = useMemoFirebase(() => (db && user) ? collection(db, "personnel") : null, [db, user])
   const { data: dbOfficials } = useCollection(personnelRef)
 
@@ -77,7 +77,7 @@ export function SppdUpload({ onSuccess, initialData }: SppdUploadProps) {
   const { data: userData } = useDoc(userDocRef)
   const villageSettingsRef = useMemoFirebase(() => (db && user) ? doc(db, "settings", "village") : null, [db, user])
   const { data: villageSettings } = useDoc(villageSettingsRef)
-  
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -99,7 +99,7 @@ export function SppdUpload({ onSuccess, initialData }: SppdUploadProps) {
       const lines = initialData.companions.split("\n").filter(Boolean)
       const parsed = lines.map((line: string) => {
         const parts = line.split(" - ")
-        return { name: parts[0], category: parts[1] || "Pemerintah Desa" }
+        return { name: parts[0], category: parts[1] || "Karyawan Kecamatan" }
       })
       setCompanionsList(parsed)
       setNumCompanions(parsed.length)
@@ -134,7 +134,7 @@ export function SppdUpload({ onSuccess, initialData }: SppdUploadProps) {
   const updateCompanion = (index: number, field: keyof CompanionEntry, value: string) => {
     const newList = [...companionsList]
     newList[index] = { ...newList[index], [field]: value }
-    if (field === 'category') newList[index].name = "" 
+    if (field === 'category') newList[index].name = ""
     setCompanionsList(newList)
   }
 
@@ -202,7 +202,7 @@ export function SppdUpload({ onSuccess, initialData }: SppdUploadProps) {
   }, [selectedCalendarDate, handleSync, activeTab, userData, villageSettings]);
 
   const handleSelectAgenda = (agenda: AgendaItem) => {
-    form.setValue("destination", agenda.location || "Luar Desa", { shouldValidate: true })
+    form.setValue("destination", agenda.location || "Luar Kecamatan", { shouldValidate: true })
     form.setValue("startDate", format(new Date(agenda.start.dateTime), "yyyy-MM-dd"), { shouldValidate: true })
     form.setValue("description", agenda.summary, { shouldValidate: true })
     setActiveTab("manual")
@@ -211,7 +211,7 @@ export function SppdUpload({ onSuccess, initialData }: SppdUploadProps) {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     if (!user || !db) return
     setIsUploading(true)
-    
+
     const serializedCompanions = companionsList
       .filter(c => c.name && c.category)
       .map(c => `${c.name} - ${c.category}`)
@@ -265,9 +265,9 @@ export function SppdUpload({ onSuccess, initialData }: SppdUploadProps) {
   }
 
   const personnelCategories = [
-    { id: "Pemerintah Desa", label: "Perangkat" },
-    { id: "BPD", label: "BPD" },
-    { id: "RT/RW", label: "RT/RW" },
+    { id: "Karyawan Kecamatan", label: "Karyawan" },
+    { id: "SKRETARIS Kecamatan", label: "SKRETARIS Kecamatan" },
+    { id: "KEPALA Kecamatan", label: "KEPALA Kecamatan" },
     { id: "Kader", label: "Kader" },
     { id: "Lainnya", label: "Lainnya" }
   ]
@@ -278,7 +278,7 @@ export function SppdUpload({ onSuccess, initialData }: SppdUploadProps) {
         <TabsList className="grid grid-cols-2 w-full h-11 mb-6 bg-accent/5 p-1 rounded-xl">
           <TabsTrigger value="agenda" className="gap-2 text-[10px] font-black uppercase rounded-lg">
             <CalendarIcon className="h-4 w-4" />
-            Agenda Desa
+            Agenda Kecamatan
           </TabsTrigger>
           <TabsTrigger value="manual" className="gap-2 text-[10px] font-black uppercase rounded-lg">
             <Plane className="h-4 w-4" />
@@ -291,25 +291,25 @@ export function SppdUpload({ onSuccess, initialData }: SppdUploadProps) {
         <div className="flex items-end gap-2 p-4 border rounded-2xl bg-accent/5 shadow-inner border-accent/10">
           <div className="flex-1">
             <label className="text-[10px] font-black uppercase text-accent mb-1 block">Pilih Tanggal Agenda</label>
-            <Input 
-              type="date" 
+            <Input
+              type="date"
               value={selectedCalendarDate}
               onChange={(e) => setSelectedCalendarDate(e.target.value)}
               className="h-12 font-black border-accent/20 bg-white"
             />
           </div>
-          <Button 
-            type="button" 
-            variant="outline" 
-            size="icon" 
-            onClick={() => handleSync(selectedCalendarDate)} 
-            disabled={isSyncing} 
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={() => handleSync(selectedCalendarDate)}
+            disabled={isSyncing}
             className="h-12 w-12 shrink-0 border-accent/20 bg-white shadow-sm"
           >
             <RefreshCw className={cn("h-5 w-5 text-accent", isSyncing && "animate-spin")} />
           </Button>
         </div>
-        
+
         <ScrollArea className="h-[300px] border rounded-2xl p-2 bg-muted/20">
           {isSyncing ? (
             <div className="flex flex-col items-center justify-center py-16 gap-3">
@@ -327,14 +327,14 @@ export function SppdUpload({ onSuccess, initialData }: SppdUploadProps) {
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                        <span className="text-[7px] font-black uppercase px-1.5 py-0.5 rounded border bg-sky-100 border-sky-200 text-sky-700">
-                            EKSTERNAL
-                        </span>
+                      <span className="text-[7px] font-black uppercase px-1.5 py-0.5 rounded border bg-sky-100 border-sky-200 text-sky-700">
+                        EKSTERNAL
+                      </span>
                     </div>
                     <p className="text-sm font-black group-hover:text-accent leading-tight whitespace-normal">{agenda.summary}</p>
                     <div className="flex items-center gap-2 mt-2">
                       <MapPin className="h-3 w-3 text-accent/50" />
-                      <p className="text-[10px] text-muted-foreground truncate font-bold uppercase">{agenda.location || "Luar Desa"}</p>
+                      <p className="text-[10px] text-muted-foreground truncate font-bold uppercase">{agenda.location || "Luar Kecamatan"}</p>
                     </div>
                   </div>
                   <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-accent shrink-0 mt-1" />
@@ -423,8 +423,8 @@ export function SppdUpload({ onSuccess, initialData }: SppdUploadProps) {
                   <FormItem>
                     <div className="flex items-center justify-between">
                       <FormLabel className="text-[9px] font-black uppercase text-primary">No. Surat Tugas</FormLabel>
-                      <button 
-                        type="button" 
+                      <button
+                        type="button"
                         onClick={handlePullStNumber}
                         disabled={isFetchingStNumber}
                         className="text-[8px] font-black text-primary uppercase flex items-center gap-1 hover:opacity-70 disabled:opacity-50"
@@ -436,7 +436,7 @@ export function SppdUpload({ onSuccess, initialData }: SppdUploadProps) {
                     <FormControl>
                       <div className="relative">
                         <FileText className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-primary/40" />
-                        <Input placeholder="800.1.11.1 / XXX / 04 / 2026" className="h-10 pl-9 border-primary/20 font-mono text-[11px] font-bold bg-white" {...field} />
+                        <Input placeholder="800.1.11.1 / XXX / 49 / 2026" className="h-10 pl-9 border-primary/20 font-mono text-[11px] font-bold bg-white" {...field} />
                       </div>
                     </FormControl>
                     <FormMessage />
@@ -451,8 +451,8 @@ export function SppdUpload({ onSuccess, initialData }: SppdUploadProps) {
                   <FormItem>
                     <div className="flex items-center justify-between">
                       <FormLabel className="text-[9px] font-black uppercase text-accent">No. SPPD</FormLabel>
-                      <button 
-                        type="button" 
+                      <button
+                        type="button"
                         onClick={handlePullSppdNumber}
                         disabled={isFetchingSppdNumber}
                         className="text-[8px] font-black text-accent uppercase flex items-center gap-1 hover:opacity-70 disabled:opacity-50"
@@ -464,7 +464,7 @@ export function SppdUpload({ onSuccess, initialData }: SppdUploadProps) {
                     <FormControl>
                       <div className="relative">
                         <Hash className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-accent/40" />
-                        <Input placeholder="000.1.2.3 / XXX / 04 / 2026" className="h-10 pl-9 border-accent/20 font-mono text-[11px] font-bold bg-white" {...field} />
+                        <Input placeholder="000.1.2.3 / XXX / 49 / 2026" className="h-10 pl-9 border-accent/20 font-mono text-[11px] font-bold bg-white" {...field} />
                       </div>
                     </FormControl>
                     <FormMessage />
@@ -495,17 +495,17 @@ export function SppdUpload({ onSuccess, initialData }: SppdUploadProps) {
                 <Users className="h-4 w-4 text-slate-500" />
                 <h4 className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Daftar Pengikut</h4>
               </div>
-              
+
               <FormItem>
                 <FormLabel className="text-[10px] font-black uppercase text-muted-foreground">Jumlah Pengikut</FormLabel>
                 <FormControl>
-                  <Input 
-                    type="number" 
-                    min="0" 
-                    max="10" 
+                  <Input
+                    type="number"
+                    min="0"
+                    max="10"
                     value={numCompanions}
                     onChange={(e) => handleNumCompanionsChange(e.target.value)}
-                    placeholder="0" 
+                    placeholder="0"
                     className="h-11 border-slate-300"
                   />
                 </FormControl>
@@ -517,8 +517,8 @@ export function SppdUpload({ onSuccess, initialData }: SppdUploadProps) {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="space-y-1.5">
                       <FormLabel className="text-[9px] font-bold uppercase text-muted-foreground">Lembaga</FormLabel>
-                      <Select 
-                        value={comp.category} 
+                      <Select
+                        value={comp.category}
                         onValueChange={(val) => updateCompanion(idx, 'category', val)}
                       >
                         <SelectTrigger className="h-10 text-xs border-slate-300 bg-white">
@@ -534,16 +534,16 @@ export function SppdUpload({ onSuccess, initialData }: SppdUploadProps) {
                     <div className="space-y-1.5">
                       <FormLabel className="text-[9px] font-bold uppercase text-muted-foreground">Nama Personel</FormLabel>
                       {comp.category === "Lainnya" ? (
-                        <Input 
-                          placeholder="Ketik nama..." 
-                          value={comp.name} 
+                        <Input
+                          placeholder="Ketik nama..."
+                          value={comp.name}
                           onChange={(e) => updateCompanion(idx, 'name', e.target.value)}
-                          className="h-10 text-xs border-slate-300 bg-white" 
+                          className="h-10 text-xs border-slate-300 bg-white"
                         />
                       ) : (
-                        <Select 
+                        <Select
                           disabled={!comp.category}
-                          value={comp.name} 
+                          value={comp.name}
                           onValueChange={(val) => updateCompanion(idx, 'name', val)}
                         >
                           <SelectTrigger className="h-10 text-xs border-slate-300 bg-white">

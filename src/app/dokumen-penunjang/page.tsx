@@ -32,11 +32,15 @@ import {
   Plus,
   Trash2,
   Store,
-  ShoppingBag
+  ShoppingBag,
+  RefreshCw
 } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Link from "next/link"
-import { useState, Suspense, useMemo, useEffect } from "react"
+import { useState, Suspense, useMemo, useEffect, useCallback } from "react"
+import { format } from "date-fns"
+import { GOOGLE_CONFIG } from "@/lib/google-config"
+import { callAppsScript } from "@/app/agenda/actions"
 import { useToast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
 import { BIDANG_NAMES, type ApbItem } from "@/lib/apbdes-data"
@@ -68,7 +72,7 @@ const HEALTH_CATEGORIES = [
 const configs = {
   "daftar-hadir": {
     title: "Daftar Hadir",
-    desc: "Cetak absensi rapat atau kegiatan umum desa.",
+    desc: "Cetak daftar hadir rapat atau kegiatan umum Kecamatan.",
     icon: Users,
     color: "text-blue-600",
     bgColor: "bg-blue-50"
@@ -80,40 +84,12 @@ const configs = {
     color: "text-teal-600",
     bgColor: "bg-teal-50"
   },
-  "daftar-hadir-posyandu": {
-    title: "Posyandu",
-    desc: "Cetak daftar hadir Kader & Peserta Posyandu.",
-    icon: Stethoscope,
-    color: "text-rose-600",
-    bgColor: "bg-rose-50"
-  },
   "honor-narasumber": {
     title: "Honor Narasumber",
     desc: "Cetak tanda terima honorarium narasumber.",
     icon: UserPlus,
     color: "text-amber-600",
     bgColor: "bg-amber-50"
-  },
-  "honor-kegiatan": {
-    title: "Honor Kegiatan",
-    desc: "Cetak tanda terima honorarium kepanitiaan & petugas kegiatan desa.",
-    icon: Award,
-    color: "text-indigo-600",
-    bgColor: "bg-indigo-50"
-  },
-  "insentif": {
-    title: "Insentif Lembaga",
-    desc: "Cetak tanda terima insentif RT/RW, Kader, dll.",
-    icon: Coins,
-    color: "text-purple-600",
-    bgColor: "bg-purple-50"
-  },
-  "siltap": {
-    title: "Siltap & BPD",
-    desc: "Cetak tanda terima Siltap Perangkat & BPD.",
-    icon: Banknote,
-    color: "text-emerald-600",
-    bgColor: "bg-emerald-50"
   },
   "bukti-transaksi": {
     title: "Cetak Bukti Transaksi",
@@ -128,9 +104,9 @@ const configs = {
  * Utilitas Pengurutan Hierarkis untuk PDF
  */
 const CATEGORY_ORDER = [
-  "Pemerintah Desa",
-  "BPD",
-  "RT/RW",
+  "Karyawan Kecamatan",
+  "SKRETARIS Kecamatan",
+  "KEPALA Kecamatan",
   "Kader",
   "KPM",
   "Karang Taruna",
@@ -143,11 +119,11 @@ const CATEGORY_ORDER = [
 
 const getRankWeight = (jabatan: string) => {
   const j = jabatan.toUpperCase();
-  if (j.includes("KEPALA DESA")) return 1;
-  if (j.includes("SEKRETARIS DESA")) return 2;
+  if (j.includes("KEPALA Kecamatan")) return 1;
+  if (j.includes("SEKRETARIS Kecamatan")) return 2;
   if (j.includes("KASI") || j.includes("KEPALA SEKSI")) return 3;
   if (j.includes("KAUR") || j.includes("KEPALA URUSAN")) return 4;
-  if (j.includes("KEPALA DUSUN") || j.includes("KADUS")) return 5;
+  if (j.includes("KASI KESRA") || j.includes("KADUS")) return 5;
   if (j.includes("STAF")) return 6;
   return 100;
 };
@@ -182,9 +158,9 @@ const sortParticipants = (list: any[]) => {
       return CATEGORY_ORDER.indexOf(catA) - CATEGORY_ORDER.indexOf(catB);
     }
 
-    if (catA === "Pemerintah Desa") {
+    if (catA === "Karyawan Kecamatan") {
       return getRankWeight(a.jabatan) - getRankWeight(b.jabatan);
-    } else if (catA === "RT/RW") {
+    } else if (catA === "KEPALA Kecamatan") {
       return getRtRwWeight(a.jabatan) - getRtRwWeight(b.jabatan);
     } else if (catA === "Kader") {
       return getKaderWeight(a.jabatan) - getKaderWeight(b.jabatan);
@@ -218,7 +194,7 @@ function DokumenContent() {
   const personnelRef = useMemoFirebase(() => (db && user) ? collection(db, "personnel") : null, [db, user])
   const { data: dbOfficials } = useCollection(personnelRef)
 
-  // GLOBAL CONFIG: Ambil Logo dari Pengaturan Desa
+  // GLOBAL CONFIG: Ambil Logo dari Pengaturan Kecamatan
   const villageSettingsRef = useMemoFirebase(() => {
     if (!db || !user) return null
     return doc(db, "settings", "village")
@@ -231,9 +207,99 @@ function DokumenContent() {
   const [sumber, setSumber] = useState("")
   const [kegiatan, setKegiatan] = useState("")
   const [manualTitle, setManualTitle] = useState("")
-  const [date, setDate] = useState("")
-  const [location, setLocation] = useState("Balai Desa Karanganyar")
+  const [date, setDate] = useState(format(new Date(), "yyyy-MM-dd"))
+  const [location, setLocation] = useState("Balai Kecamatan Gandrungmangu")
   const [time, setTime] = useState("09:00 WIB")
+
+  // Agenda states
+  const [selectedAgendaDate, setSelectedAgendaDate] = useState<string>(format(new Date(), "yyyy-MM-dd"))
+  const [agendaList, setAgendaList] = useState<any[]>([])
+  const [isAgendaLoading, setIsAgendaLoading] = useState(false)
+
+  const fetchAgendas = useCallback(async (targetDate: string) => {
+    setIsAgendaLoading(true)
+    try {
+      const calendarId = villageSettings?.googleCalendarId || GOOGLE_CONFIG.calendarId;
+      const res = await callAppsScript({
+        action: 'getCalendar',
+        date: targetDate,
+        calendarId: calendarId
+      });
+
+      if (res.success && res.items) {
+        setAgendaList(res.items);
+      } else {
+        setAgendaList([]);
+      }
+    } catch (err) {
+      console.error("Fetch Agenda Error:", err);
+      setAgendaList([]);
+    } finally {
+      setIsAgendaLoading(false);
+    }
+  }, [villageSettings]);
+
+  useEffect(() => {
+    if (useApbdes && selectedAgendaDate) {
+      fetchAgendas(selectedAgendaDate);
+    }
+  }, [useApbdes, selectedAgendaDate, fetchAgendas]);
+
+  const internalAgendaList = useMemo(() => {
+    return (agendaList || []).filter((item: any) => {
+      const desc = item.description || "";
+      const summary = item.summary || "";
+
+      // Jangan tampilkan jika terindikasi kegiatan eksternal
+      if (
+        desc.includes("JENIS: Eksternal") ||
+        desc.toLowerCase().includes("eksternal") ||
+        summary.toLowerCase().includes("eksternal")
+      ) {
+        return false;
+      }
+
+      // Khusus kegiatan internal saja (memiliki penanda JENIS: Internal atau kata kunci internal)
+      return (
+        desc.includes("JENIS: Internal") ||
+        desc.toLowerCase().includes("internal") ||
+        summary.toLowerCase().includes("internal")
+      );
+    });
+  }, [agendaList]);
+
+  const handleSelectAgendaItem = (agenda: any) => {
+    const cleanTitle = (agenda.summary || "").replace(/^Kegiatan\s*:\s*/i, "").trim();
+    setKegiatan(cleanTitle);
+
+    // Otomatis sesuaikan Tanggal & Waktu
+    let eventDate = selectedAgendaDate;
+    if (agenda.start?.dateTime) {
+      const startDate = new Date(agenda.start.dateTime);
+      eventDate = format(startDate, "yyyy-MM-dd");
+      setDate(eventDate);
+      setTime(`${format(startDate, "HH:mm")} WIB`);
+    } else if (agenda.start?.date) {
+      eventDate = agenda.start.date;
+      setDate(eventDate);
+      setTime("09:00 WIB");
+    } else {
+      setDate(selectedAgendaDate);
+      setTime("09:00 WIB");
+    }
+
+    // Otomatis sesuaikan Lokasi
+    if (agenda.location && agenda.location.trim() !== "") {
+      setLocation(agenda.location.trim());
+    } else {
+      setLocation("Balai Kecamatan Gandrungmangu");
+    }
+
+    toast({
+      title: "Kegiatan Internal Dipilih",
+      description: `${cleanTitle} (Tanggal, Waktu & Lokasi otomatis disesuaikan)`,
+    });
+  };
 
   const [jumlahOrang, setJumlahOrang] = useState<number>(15)
   const [jumlahKuotaPeserta, setJumlahKuotaPeserta] = useState<number>(30)
@@ -266,12 +332,12 @@ function DokumenContent() {
   const [batchHonorNominal, setBatchHonorNominal] = useState("")
   const [batchHonorTax, setBatchHonorTax] = useState("0")
 
-  const [insentifCat, setInsentifCat] = useState("RT/RW")
+  const [insentifCat, setInsentifCat] = useState("KEPALA Kecamatan")
   const [insentifMonth, setInsentifMonth] = useState("Januari")
   const [insentifNominal, setInsentifNominal] = useState("0")
   const [insentifTax, setInsentifTax] = useState("0")
 
-  const [siltapSubType, setSiltapSubType] = useState<"perangkat" | "bpd">("perangkat")
+  const [siltapSubType, setSiltapSubType] = useState<"Karyawan" | "SKRETARIS Kecamatan">("Karyawan")
 
   // Posyandu States
   const [selectedLestari, setSelectedLestari] = useState("")
@@ -294,12 +360,12 @@ function DokumenContent() {
 
   // Tab 1: Nota & Faktur Pengiriman
   const [notaDate, setNotaDate] = useState("");
-  const [notaPerangkatNama, setNotaPerangkatNama] = useState("");
-  const [notaPerangkatJabatan, setNotaPerangkatJabatan] = useState("");
-  const [notaKepalaDesa, setNotaKepalaDesa] = useState("CATUR SILVIA DEWI");
+  const [notaKaryawanNama, setNotaKaryawanNama] = useState("");
+  const [notaKaryawanJabatan, setNotaKaryawanJabatan] = useState("");
+  const [notaKepalaKecamatan, setNotaKepalaKecamatan] = useState("ASMARUL FUADI");
   const [notaNamaToko, setNotaNamaToko] = useState("");
   const [notaNamaPemilik, setNotaNamaPemilik] = useState("");
-  const [notaAlamatToko, setNotaAlamatToko] = useState("KARANGANYAR");
+  const [notaAlamatToko, setNotaAlamatToko] = useState("GANDRUNGMANGU");
   const [notaNoTelp, setNotaNoTelp] = useState("");
   const [notaNoNota, setNotaNoNota] = useState("");
   const [notaNoFaktur, setNotaNoFaktur] = useState("");
@@ -313,7 +379,7 @@ function DokumenContent() {
   const [strukMenit, setStrukMenit] = useState("30");
   const [strukDetik, setStrukDetik] = useState("00");
   const [strukNamaToko, setStrukNamaToko] = useState("");
-  const [strukAlamatToko, setStrukAlamatToko] = useState("Jl. Slamet Riyadi No. 60, Desa Karanganyar");
+  const [strukAlamatToko, setStrukAlamatToko] = useState("Jl. Slamet Riyadi No. 60, Kecamatan Gandrungmangu");
   const [strukNoTelp, setStrukNoTelp] = useState("");
   const [strukKasir, setStrukKasir] = useState("KASIR 01");
   const [strukNoRef, setStrukNoRef] = useState("");
@@ -504,7 +570,7 @@ function DokumenContent() {
       else if (type === "bukti-transaksi") {
         if (buktiTab === "nota-faktur") {
           if (!notaNamaToko.trim()) throw new Error("Nama toko / penyedia barang harus diisi")
-          if (!notaPerangkatNama.trim()) throw new Error("Pilih perangkat / pelaksana yang membidangi")
+          if (!notaKaryawanNama.trim()) throw new Error("Pilih Karyawan / pelaksana yang membidangi")
           const valid = notaItems.filter(it => it.jenisBarang && it.jenisBarang.trim() !== "")
           if (valid.length === 0) throw new Error("Tambahkan minimal 1 barang pada nota")
 
@@ -514,9 +580,9 @@ function DokumenContent() {
             namaPemilik: notaNamaPemilik,
             alamatToko: notaAlamatToko,
             noTeleponToko: notaNoTelp,
-            perangkatNama: notaPerangkatNama,
-            perangkatJabatan: notaPerangkatJabatan,
-            kepalaDesaNama: notaKepalaDesa || "CATUR SILVIA DEWI",
+            KaryawanNama: notaKaryawanNama,
+            KaryawanJabatan: notaKaryawanJabatan,
+            kepalaKecamatanNama: notaKepalaKecamatan || "ASMARUL FUADI",
             noNota: notaNoNota,
             noFaktur: notaNoFaktur,
             items: notaItems
@@ -544,7 +610,7 @@ function DokumenContent() {
       else if (type === "insentif") {
         let insentifParticipants: { name: string; position: string; category: string }[] = []
         const categoryMap = {
-          "RT/RW": "RT/RW",
+          "KEPALA Kecamatan": "KEPALA Kecamatan",
           "KADER POSYANDU": "Kader",
           "GURU PAUD": "Guru TK & Paud",
           "KADER KPM": "KPM",
@@ -574,20 +640,20 @@ function DokumenContent() {
       }
       else if (type === "siltap") {
         let dataToPrint = [];
-        if (siltapSubType === "perangkat") {
+        if (siltapSubType === "Karyawan") {
           dataToPrint = (dbOfficials || [])
-            .filter(o => o.category === "Pemerintah Desa")
+            .filter(o => o.category === "Karyawan Kecamatan")
             .map(o => {
               let nominal = 0;
               const job = (o.jabatan || "").toUpperCase();
-              if (job.includes("KEPALA DESA")) nominal = 4000000;
-              else if (job.includes("SEKRETARIS DESA")) nominal = 3000000;
+              if (job.includes("KEPALA Kecamatan")) nominal = 4000000;
+              else if (job.includes("SEKRETARIS Kecamatan")) nominal = 3000000;
               else if (job.includes("KAUR KEUANGAN")) nominal = 2400000;
               else if (job.includes("KAUR UMUM") || job.includes("KAUR UMUM ADD")) nominal = 2400000;
               else if (job.includes("KASI PEMERINTAHAN")) nominal = 2400000;
               else if (job.includes("KASI KESEJAHTERAAN")) nominal = 2400000;
               else if (job.includes("KASI PELAYANAN")) nominal = 2400000;
-              else if (job.includes("KEPALA DUSUN")) nominal = 2200000;
+              else if (job.includes("KASI KESRA")) nominal = 2200000;
               else if (job.includes("STAF")) nominal = 2050000;
               else nominal = 0;
               return { name: o.name, jabatan: o.jabatan, nominal: nominal, category: o.category };
@@ -595,7 +661,7 @@ function DokumenContent() {
           dataToPrint = sortParticipants(dataToPrint);
         } else {
           dataToPrint = (dbOfficials || [])
-            .filter(o => o.category === "BPD")
+            .filter(o => o.category === "SKRETARIS Kecamatan")
             .map(o => {
               let nominal = 0;
               const job = (o.jabatan || "").toUpperCase();
@@ -610,7 +676,7 @@ function DokumenContent() {
         pdfBlob = await generateSiltapPDF({
           month: insentifMonth,
           date,
-          title: siltapSubType === "perangkat" ? "TANDA TERIMA SILTAP" : "TANDA TERIMA INSENTIF BPD",
+          title: siltapSubType === "Karyawan" ? "TANDA TERIMA SILTAP" : "TANDA TERIMA INSENTIF SKRETARIS Kecamatan",
           data: dataToPrint
         }, villageSettings?.logoBase64)
       }
@@ -754,7 +820,7 @@ function DokumenContent() {
           <h1 className="text-3xl md:text-4xl font-black text-primary uppercase tracking-tight">Pusat Dokumen</h1>
           <p className="text-muted-foreground font-medium">Pilih jenis berkas administrasi yang ingin Anda cetak.</p>
         </header>
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6 mt-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mt-4">
           {Object.entries(configs).map(([key, item]) => (
             <Link key={key} href={`/dokumen-penunjang/?type=${key}`}>
               <Card className="border border-slate-200/80 shadow-xs hover:shadow-lg hover:border-primary/50 transition-all cursor-pointer group active:scale-95 h-full flex flex-col rounded-xl md:rounded-2xl overflow-hidden bg-white">
@@ -810,7 +876,7 @@ function DokumenContent() {
               <div className="space-y-4">
                 <Label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest ml-1">Pilih Kelompok Penerima</Label>
                 <div className="grid grid-cols-2 gap-4">
-                  {["RT/RW", "KADER POSYANDU", "GURU PAUD", "KADER KPM", "HONORARIUM LINMAS"].map((cat) => (
+                  {["KEPALA Kecamatan", "KADER POSYANDU", "GURU PAUD", "KADER KPM", "HONORARIUM LINMAS"].map((cat) => (
                     <Button
                       key={cat}
                       type="button"
@@ -894,23 +960,23 @@ function DokumenContent() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <Button
                     type="button"
-                    onClick={() => setSiltapSubType("perangkat")}
+                    onClick={() => setSiltapSubType("Karyawan")}
                     className={cn(
                       "h-16 rounded-2xl font-black text-xs uppercase gap-3 transition-all",
-                      siltapSubType === "perangkat" ? "bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20" : "bg-muted/30 text-muted-foreground hover:bg-primary/10 hover:text-primary border-2 border-transparent"
+                      siltapSubType === "Karyawan" ? "bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20" : "bg-muted/30 text-muted-foreground hover:bg-primary/10 hover:text-primary border-2 border-transparent"
                     )}
                   >
-                    <Users className="h-5 w-5" /> SILTAP PERANGKAT
+                    <Users className="h-5 w-5" /> SILTAP Karyawan
                   </Button>
                   <Button
                     type="button"
-                    onClick={() => setSiltapSubType("bpd")}
+                    onClick={() => setSiltapSubType("SKRETARIS Kecamatan")}
                     className={cn(
                       "h-16 rounded-2xl font-black text-xs uppercase gap-3 transition-all",
-                      siltapSubType === "bpd" ? "bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20" : "bg-muted/30 text-muted-foreground hover:bg-primary/10 hover:text-primary border-2 border-transparent"
+                      siltapSubType === "SKRETARIS Kecamatan" ? "bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20" : "bg-muted/30 text-muted-foreground hover:bg-primary/10 hover:text-primary border-2 border-transparent"
                     )}
                   >
-                    <ShieldCheck className="h-5 w-5" /> INSENTIF BPD
+                    <ShieldCheck className="h-5 w-5" /> INSENTIF SKRETARIS Kecamatan
                   </Button>
                 </div>
               </div>
@@ -1067,7 +1133,7 @@ function DokumenContent() {
               {/* TAB 1: NOTA & FAKTUR PENGIRIMAN */}
               {buktiTab === "nota-faktur" && (
                 <div className="space-y-6 animate-in slide-in-from-bottom-2">
-                  {/* Identitas Toko & Perangkat */}
+                  {/* Identitas Toko & Karyawan */}
                   <div className="p-6 rounded-3xl bg-orange-50/40 border border-orange-200/80 space-y-5">
                     <div className="flex items-center gap-2">
                       <Store className="h-4 w-4 text-orange-600" />
@@ -1092,14 +1158,14 @@ function DokumenContent() {
 
                       <div className="space-y-1.5">
                         <div className="flex items-center justify-between">
-                          <Label className="text-[9px] font-black uppercase text-muted-foreground ml-1">Perangkat / Pemesan Barang</Label>
+                          <Label className="text-[9px] font-black uppercase text-muted-foreground ml-1">Karyawan / Pemesan Barang</Label>
                           {dbOfficials && dbOfficials.length > 0 && (
                             <Select
                               onValueChange={(val) => {
                                 const off = dbOfficials.find(o => o.name === val);
                                 if (off) {
-                                  setNotaPerangkatNama(off.name);
-                                  setNotaPerangkatJabatan(off.jabatan || off.category);
+                                  setNotaKaryawanNama(off.name);
+                                  setNotaKaryawanJabatan(off.jabatan || off.category);
                                 }
                               }}
                             >
@@ -1118,21 +1184,21 @@ function DokumenContent() {
                         </div>
                         <Input
                           placeholder="Contoh: TEDY TRISNANTO"
-                          value={notaPerangkatNama}
-                          onChange={(e) => setNotaPerangkatNama(e.target.value)}
+                          value={notaKaryawanNama}
+                          onChange={(e) => setNotaKaryawanNama(e.target.value)}
                           className="h-12 rounded-xl bg-white border-orange-200 font-bold"
                         />
                       </div>
 
                       <div className="space-y-1.5">
                         <div className="flex items-center justify-between">
-                          <Label className="text-[9px] font-black uppercase text-muted-foreground ml-1">Penerima Faktur (Kepala Desa)</Label>
+                          <Label className="text-[9px] font-black uppercase text-muted-foreground ml-1">Penerima Faktur (Kepala Kecamatan)</Label>
                           {dbOfficials && dbOfficials.length > 0 && (
                             <Select
-                              onValueChange={(val) => setNotaKepalaDesa(val)}
+                              onValueChange={(val) => setNotaKepalaKecamatan(val)}
                             >
                               <SelectTrigger className="h-6 text-[9px] font-bold border-orange-200 text-orange-700 bg-white w-auto px-2 rounded-lg">
-                                <SelectValue placeholder="Pilih Kades" />
+                                <SelectValue placeholder="Pilih Kary." />
                               </SelectTrigger>
                               <SelectContent>
                                 {(dbOfficials || []).map((o, oIdx) => (
@@ -1145,9 +1211,9 @@ function DokumenContent() {
                           )}
                         </div>
                         <Input
-                          placeholder="Contoh: CATUR SILVIA DEWI"
-                          value={notaKepalaDesa}
-                          onChange={(e) => setNotaKepalaDesa(e.target.value)}
+                          placeholder="Contoh: ASMARUL FUADI"
+                          value={notaKepalaKecamatan}
+                          onChange={(e) => setNotaKepalaKecamatan(e.target.value)}
                           className="h-12 rounded-xl bg-white border-orange-200 font-bold"
                         />
                       </div>
@@ -1173,9 +1239,9 @@ function DokumenContent() {
                       </div>
 
                       <div className="space-y-1.5">
-                        <Label className="text-[9px] font-black uppercase text-muted-foreground ml-1">Desa / Lokasi Toko (Di-)</Label>
+                        <Label className="text-[9px] font-black uppercase text-muted-foreground ml-1">Kecamatan / Lokasi Toko (Di-)</Label>
                         <Input
-                          placeholder="Contoh: KARANGANYAR"
+                          placeholder="Contoh: GANDRUNGMANGU"
                           value={notaAlamatToko}
                           onChange={(e) => setNotaAlamatToko(e.target.value)}
                           className="h-12 rounded-xl bg-white border-orange-200 font-medium"
@@ -1388,7 +1454,7 @@ function DokumenContent() {
                       <div className="space-y-1.5">
                         <Label className="text-[9px] font-black uppercase text-muted-foreground ml-1">Nama Toko / Minimarket</Label>
                         <Input
-                          placeholder="Contoh: MINIMARKET KARANGANYAR JAYA"
+                          placeholder="Contoh: MINIMARKET GANDRUNGMANGU JAYA"
                           value={strukNamaToko}
                           onChange={(e) => setStrukNamaToko(e.target.value)}
                           className="h-12 rounded-xl bg-white border-orange-200 font-bold text-orange-950"
@@ -1398,7 +1464,7 @@ function DokumenContent() {
                       <div className="space-y-1.5">
                         <Label className="text-[9px] font-black uppercase text-muted-foreground ml-1">Alamat Toko</Label>
                         <Input
-                          placeholder="Contoh: Jl. Slamet Riyadi No. 60, Desa Karanganyar"
+                          placeholder="Contoh: Jl. Slamet Riyadi No. 60, Kecamatan Gandrungmangu"
                           value={strukAlamatToko}
                           onChange={(e) => setStrukAlamatToko(e.target.value)}
                           className="h-12 rounded-xl bg-white border-orange-200 font-medium"
@@ -1578,7 +1644,7 @@ function DokumenContent() {
                   className={cn("flex-1 text-[10px] uppercase font-black gap-2 h-10", useApbdes && "shadow-md")}
                   onClick={() => setUseApbdes(true)}
                 >
-                  <Database className="h-3 w-3" /> APBDes
+                  <Calendar className="h-3 w-3" /> Agenda
                 </Button>
                 <Button
                   variant={!useApbdes ? "default" : "ghost"}
@@ -1591,62 +1657,156 @@ function DokumenContent() {
 
               <div className="grid gap-5">
                 {useApbdes ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="sm:col-span-2 space-y-2">
-                      <Label className="text-[10px] font-black uppercase text-primary tracking-widest ml-1 flex items-center gap-2">
-                        <Calendar className="h-3 w-3" /> Pilih Tahun APBDes
-                      </Label>
-                      <Select value={selectedYear} onValueChange={(val) => { setSelectedYear(val); setSumber(""); setKegiatan(""); }}>
-                        <SelectTrigger className="h-12 rounded-xl bg-primary/5 border-primary/10 px-5 font-black text-primary">
-                          <SelectValue placeholder="Pilih Tahun..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {["2024", "2025", "2026", "2027", "2028", "2029"].map(y => (
-                            <SelectItem key={y} value={y}>{y}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                  <div className="space-y-5">
+                    {/* Pilih Tanggal Agenda Kegiatan */}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <Label className="text-[10px] font-black uppercase text-primary tracking-widest ml-1 flex items-center gap-1.5">
+                          <Calendar className="h-3.5 w-3.5 text-primary" />
+                          Pilih Tanggal Agenda Giat
+                        </Label>
+                        {isAgendaLoading && (
+                          <span className="text-[10px] font-bold text-muted-foreground flex items-center gap-1">
+                            <Loader2 className="h-3 w-3 animate-spin text-primary" /> Sinkronisasi kalender...
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="relative flex-1">
+                          <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            type="date"
+                            value={selectedAgendaDate}
+                            onChange={(e) => {
+                              setSelectedAgendaDate(e.target.value);
+                              setDate(e.target.value);
+                            }}
+                            className="h-12 pl-12 rounded-xl bg-primary/5 border-primary/20 font-bold text-primary"
+                          />
+                        </div>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          onClick={() => fetchAgendas(selectedAgendaDate)}
+                          disabled={isAgendaLoading}
+                          className="h-12 w-12 rounded-xl border-primary/20 hover:bg-primary/5 shrink-0"
+                          title="Sinkronisasi ulang agenda"
+                        >
+                          <RefreshCw className={cn("h-4 w-4 text-primary", isAgendaLoading && "animate-spin")} />
+                        </Button>
+                      </div>
                     </div>
 
+                    {/* Munculkan Daftar Kegiatan Internal */}
                     <div className="space-y-2">
-                      <Label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Pilih Bidang</Label>
-                      <Select onValueChange={(val) => { setBidang(val); setSumber(""); setKegiatan(""); }}>
-                        <SelectTrigger className="h-12 rounded-xl bg-muted/20 border-none px-5">
-                          <SelectValue placeholder="Pilih..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {Object.entries(BIDANG_NAMES).map(([id, name]) => (
-                            <SelectItem key={id} value={id}>Bidang {id} - {name}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <div className="flex items-center justify-between ml-1">
+                        <Label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">
+                          Daftar Kegiatan Internal ({selectedAgendaDate})
+                        </Label>
+                        <span className="text-[10px] font-bold text-amber-800 bg-amber-100/70 border border-amber-200/80 px-2 py-0.5 rounded-full">
+                          {internalAgendaList.length} Kegiatan Internal
+                        </span>
+                      </div>
+
+                      {isAgendaLoading ? (
+                        <div className="flex flex-col items-center justify-center py-10 gap-2 bg-muted/10 rounded-2xl border border-dashed border-primary/20">
+                          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                          <p className="text-xs font-bold text-muted-foreground">Mengambil agenda kegiatan internal...</p>
+                        </div>
+                      ) : internalAgendaList.length > 0 ? (
+                        <div className="space-y-2.5 max-h-64 overflow-y-auto pr-1">
+                          {internalAgendaList.map((agenda: any) => {
+                            const cleanTitle = (agenda.summary || "").replace(/^Kegiatan\s*:\s*/i, "").trim();
+                            const isSelected = kegiatan === cleanTitle;
+                            const timeDisplay = agenda.start?.dateTime
+                              ? `${format(new Date(agenda.start.dateTime), "HH:mm")} WIB`
+                              : "09:00 WIB";
+
+                            return (
+                              <button
+                                key={agenda.id}
+                                type="button"
+                                onClick={() => handleSelectAgendaItem(agenda)}
+                                className={cn(
+                                  "w-full p-4 rounded-2xl border transition-all flex items-start justify-between gap-3 text-left shadow-xs group",
+                                  isSelected
+                                    ? "bg-amber-50/70 border-amber-400 shadow-sm ring-1 ring-amber-400/40"
+                                    : "bg-white hover:bg-amber-50/20 border-slate-200/90"
+                                )}
+                              >
+                                <div className="space-y-1.5 flex-1 min-w-0">
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-[7px] font-black uppercase px-1.5 py-0.5 rounded border bg-amber-100 border-amber-200 text-amber-800">
+                                      INTERNAL
+                                    </span>
+                                  </div>
+                                  <p className={cn("text-xs font-bold leading-snug break-words group-hover:text-amber-900 transition-colors", isSelected ? "text-amber-950 font-black" : "text-slate-800")}>
+                                    {cleanTitle}
+                                  </p>
+                                  <div className="flex items-center gap-3 text-[10px] text-muted-foreground font-medium flex-wrap">
+                                    <span className="flex items-center gap-1 font-semibold text-slate-700">
+                                      <Clock className="h-3 w-3 text-amber-700/70" />
+                                      {timeDisplay}
+                                    </span>
+                                    {agenda.location && (
+                                      <span className="truncate max-w-[220px]">
+                                        📍 {agenda.location}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                                <span className={cn(
+                                  "text-[9px] font-black uppercase px-2.5 py-1 rounded-lg shrink-0 mt-0.5",
+                                  isSelected ? "bg-amber-600 text-white font-bold" : "bg-muted text-muted-foreground group-hover:bg-amber-100 group-hover:text-amber-900"
+                                )}>
+                                  {isSelected ? "Terpilih" : "Pilih"}
+                                </span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <div className="py-8 px-4 text-center bg-muted/10 rounded-2xl border border-dashed border-muted-foreground/30 space-y-1">
+                          <p className="text-xs font-bold text-muted-foreground">
+                            Tidak ada agenda kegiatan internal pada tanggal ini.
+                          </p>
+                          <p className="text-[10px] text-muted-foreground/70">
+                            Silakan pilih tanggal lain atau gunakan tab <span className="text-primary font-bold cursor-pointer underline" onClick={() => setUseApbdes(false)}>Manual</span> untuk mengetik perihal kegiatan.
+                          </p>
+                        </div>
+                      )}
                     </div>
-                    <div className="space-y-2">
-                      <Label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Sumber Dana ({selectedYear})</Label>
-                      <Select disabled={!bidang || isApbLoading} onValueChange={(val) => { setSumber(val); setKegiatan(""); }}>
-                        <SelectTrigger className="h-12 rounded-xl bg-muted/20 border-none px-5">
-                          <SelectValue placeholder={isApbLoading ? "Memuat..." : "Pilih..."} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {filteredSources.map(s => (
-                            <SelectItem key={s} value={s}>{s}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="sm:col-span-2 space-y-2">
-                      <Label className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">Pilih Kegiatan (Database {selectedYear})</Label>
-                      <Select disabled={!sumber || isApbLoading} onValueChange={setKegiatan}>
-                        <SelectTrigger className="h-12 rounded-xl bg-muted/20 border-none px-5">
-                          <SelectValue placeholder={isApbLoading ? "Memuat..." : "Pilih Uraian..."} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {filteredActivities.map((item: any) => (
-                            <SelectItem key={item.id} value={item.uraian}>{item.uraian}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
+
+                    {/* Badge Notifikasi Kegiatan Terpilih */}
+                    {kegiatan && (
+                      <div className="p-3.5 bg-primary/5 border border-primary/20 rounded-2xl flex items-center justify-between gap-3 animate-in fade-in">
+                        <div className="min-w-0 flex-1 space-y-1">
+                          <p className="text-[9px] font-black uppercase text-primary tracking-wider">Kegiatan Terpilih untuk Dokumen:</p>
+                          <p className="text-xs font-bold text-slate-900 break-words">{kegiatan}</p>
+                          <div className="flex items-center gap-2.5 text-[10px] text-muted-foreground font-medium flex-wrap pt-0.5">
+                            <span className="flex items-center gap-1 font-semibold text-slate-700">
+                              <Calendar className="h-3 w-3 text-primary" /> {date}
+                            </span>
+                            <span className="flex items-center gap-1 font-semibold text-slate-700">
+                              <Clock className="h-3 w-3 text-primary" /> {time}
+                            </span>
+                            <span className="truncate max-w-[240px]">
+                              📍 {location}
+                            </span>
+                          </div>
+                        </div>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setKegiatan("")}
+                          className="h-8 text-[10px] font-bold text-destructive hover:bg-destructive/10 shrink-0"
+                        >
+                          Ubah
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div className="space-y-2">
@@ -1961,7 +2121,7 @@ function DokumenContent() {
                                 }}
                               >
                                 <SelectTrigger className="h-7 text-[10px] font-bold border-indigo-100 text-indigo-600 bg-indigo-50/50 w-auto px-2 rounded-lg">
-                                  <SelectValue placeholder="Pilih dari Data Personil Desa" />
+                                  <SelectValue placeholder="Pilih dari Data Personil Kecamatan" />
                                 </SelectTrigger>
                                 <SelectContent>
                                   {(dbOfficials || []).map((o, oIdx) => (
@@ -2128,7 +2288,7 @@ function DokumenContent() {
               Cetak PDF Sekarang
             </Button>
             <p className="text-[10px] text-center text-muted-foreground italic font-medium">
-              * Dokumen akan dicetak dengan kop surat Pemerintah Desa Karanganyar.
+              * Dokumen akan dicetak dengan kop surat Pemerintah Kecamatan Gandrungmangu.
             </p>
           </div>
         </CardContent>

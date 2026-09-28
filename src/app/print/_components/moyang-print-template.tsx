@@ -9,7 +9,7 @@ export function MoyangPrintTemplate({ submission }: { submission: LetterSubmissi
   return (
     <PrintLayout submission={submission} hideRequesterSignature={true}>
       <p className="mt-2 text-justify leading-normal">
-        Yang bertanda tangan di bawah ini Kepala Desa Karanganyar, Kecamatan
+        Yang bertanda tangan di bawah ini CAMAT GANDRUNGMANGU Kecamatan
         Gandrungmangu, Kabupaten Cilacap, menerangkan dengan sebenarnya bahwa:
       </p>
 

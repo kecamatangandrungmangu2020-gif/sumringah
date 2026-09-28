@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { ImagePlus, Loader2, FileText, Upload, Calendar as CalendarIcon, RefreshCw, Printer, FileCheck, Sparkles, BookOpen, AlertCircle, ChevronRight, CheckCircle, Save, Clock, ListOrdered } from "lucide-react"
+import { ImagePlus, Loader2, FileText, Upload, Calendar as CalendarIcon, RefreshCw, Printer, FileCheck, Sparkles, BookOpen, AlertCircle, ChevronRight, CheckCircle, Save, Clock, ListOrdered, MessageSquare, Copy, Check, Send } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { format } from "date-fns"
@@ -24,7 +24,10 @@ import { GOOGLE_CONFIG } from "@/lib/google-config"
 import { generateNotulenPDF, generateBASTPDF, generateDokumentasiPDF, generateRAPDF } from "@/lib/pdf-utils"
 import { callAppsScript } from "@/app/agenda/actions"
 import { generateNotulen } from "@/ai/flows/generate-notulen-flow"
+import { convertNotulenToWa } from "@/lib/wa-notulen-formatter"
 import { ImageUploader } from "@/components/ui/image-uploader"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 
 const formSchema = z.object({
   title: z.string().min(5, "Judul minimal 5 karakter"),
@@ -35,6 +38,8 @@ const formSchema = z.object({
   date: z.string().min(1, "Pilih tanggal"),
   time: z.string().optional(),
   officialName: z.string().optional(),
+  aiPromptNotes: z.string().optional(),
+  notulenWa: z.string().optional(),
 }).refine((data) => {
   if (data.activityType === "Internal" && (!data.officialName || data.officialName === "")) {
     return false;
@@ -44,6 +49,46 @@ const formSchema = z.object({
   message: "Pilih pelaksana kegiatan untuk kegiatan internal",
   path: ["officialName"],
 })
+
+function formatIndonesianDateWithDay(dateStr?: string) {
+  if (!dateStr) return "Senin, 31 Agustus 2026";
+  try {
+    const parts = dateStr.split("-").map(Number);
+    if (parts.length === 3) {
+      const [year, month, day] = parts;
+      const d = new Date(year, month - 1, day);
+      const days = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+      const months = [
+        "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+        "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+      ];
+      return `${days[d.getDay()]}, ${day} ${months[month - 1]} ${year}`;
+    }
+  } catch (e) {}
+  return dateStr;
+}
+
+function buildDefaultWaSchema(data: {
+  notulen?: string;
+  title?: string;
+  date?: string;
+  time?: string;
+  location?: string;
+  notes?: string;
+  officialName?: string;
+  activityType?: string;
+}) {
+  return convertNotulenToWa({
+    notulen: data.notulen,
+    title: data.title,
+    date: data.date,
+    time: data.time,
+    location: data.location,
+    notes: data.notes,
+    officialName: data.officialName,
+    activityType: data.activityType,
+  });
+}
 
 interface AgendaItem {
   id: string
@@ -88,14 +133,16 @@ export function KegiatanUpload({ onSuccess, initialData }: { onSuccess?: () => v
 
   // GLOBAL CONFIG: Use shared village settings
   const villageSettingsRef = useMemoFirebase(() => {
-    if (!db || !user) return null
+    if (!db) return null
     return doc(db, "settings", "village")
-  }, [db, user])
+  }, [db])
   const { data: villageSettings } = useDoc(villageSettingsRef)
 
   const filteredOfficials = (dbOfficials || []).filter(o =>
-    o.jabatan?.includes("KAUR") || o.jabatan?.includes("KEPALA SEKSI") || o.category === "Pemerintah Desa"
+    o.jabatan?.includes("KAUR") || o.jabatan?.includes("KEPALA SEKSI") || o.category === "Karyawan Kecamatan"
   );
+
+  const [isCopiedWa, setIsCopiedWa] = useState(false)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -104,14 +151,32 @@ export function KegiatanUpload({ onSuccess, initialData }: { onSuccess?: () => v
       description: initialData?.description || "",
       activityType: initialData?.activityType || "Internal",
       category: initialData?.category || "Internal",
-      location: initialData?.location || "Balai Desa Karanganyar",
+      location: initialData?.location || "Balai Kecamatan Gandrungmangu",
       date: initialData?.date || format(new Date(), "yyyy-MM-dd"),
       time: initialData?.time || "",
       officialName: initialData?.officialName || "",
+      aiPromptNotes: initialData?.aiPromptNotes || "",
+      notulenWa: initialData?.notulenWa || "",
     },
   })
 
   const watchActivityType = form.watch("activityType");
+
+  useEffect(() => {
+    if (watchActivityType === "Eksternal" && !form.getValues("notulenWa")) {
+      const template = convertNotulenToWa({
+        notulen: form.getValues("description"),
+        title: form.getValues("title"),
+        date: form.getValues("date"),
+        time: form.getValues("time"),
+        location: form.getValues("location"),
+        notes: form.getValues("aiPromptNotes"),
+        officialName: form.getValues("officialName"),
+        activityType: "Eksternal",
+      });
+      form.setValue("notulenWa", template, { shouldDirty: false });
+    }
+  }, [watchActivityType, form]);
 
   const handleSync = useCallback(async (date: string) => {
     setIsSyncing(true)
@@ -184,7 +249,7 @@ export function KegiatanUpload({ onSuccess, initialData }: { onSuccess?: () => v
       form.setValue("time", format(startDate, "HH:mm"), { shouldDirty: true, shouldValidate: true })
     }
 
-    form.setValue("location", agenda.location || "Balai Desa Karanganyar", { shouldDirty: true, shouldValidate: true })
+    form.setValue("location", agenda.location || "Balai Kecamatan Gandrungmangu", { shouldDirty: true, shouldValidate: true })
 
     // Otomatisasi tipe kegiatan berdasarkan agenda
     const desc = agenda.description || "";
@@ -281,24 +346,82 @@ export function KegiatanUpload({ onSuccess, initialData }: { onSuccess?: () => v
     try {
       const response = await generateNotulen({
         title: values.title,
-        location: values.location || "Balai Desa Karanganyar",
-        date: values.date || format(new Date(), "yyyy-MM-dd")
+        location: values.location || "Balai Kecamatan Gandrungmangu",
+        date: values.date || format(new Date(), "yyyy-MM-dd"),
+        time: values.time || "",
+        notes: values.aiPromptNotes || "",
+        activityType: values.activityType || "Internal",
       });
 
       if (response && response.notulen) {
         form.setValue("description", response.notulen, { shouldDirty: true, shouldValidate: true });
-        toast({ title: "AI Berhasil", description: "Draf notulen telah dibuat." });
+        
+        // Selalu sinkronkan format WA dengan notulen yang baru saja dibuat oleh AI
+        const finalWa = response.notulenWa || convertNotulenToWa({
+          notulen: response.notulen,
+          title: values.title,
+          location: values.location || "Balai Kecamatan Gandrungmangu",
+          date: values.date || format(new Date(), "yyyy-MM-dd"),
+          time: values.time || "",
+          notes: values.aiPromptNotes || "",
+          officialName: values.officialName,
+          activityType: values.activityType || "Internal",
+        });
+
+        form.setValue("notulenWa", finalWa, { shouldDirty: true, shouldValidate: true });
+        toast({ title: "AI Berhasil", description: "Draf notulen & format WA telah diselaraskan." });
       }
     } catch (e: any) {
-      toast({ variant: "destructive", title: "Gagal AI", description: "Layanan AI tidak tersedia." });
+      console.error("Gagal AI Notulen:", e);
+      toast({ 
+        variant: "destructive", 
+        title: "Gagal AI", 
+        description: e?.message || "Layanan AI sedang sibuk. Silakan coba beberapa saat lagi." 
+      });
     } finally {
       setIsGeneratingAI(false);
     }
   }
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    if (!user) return;
+  const handleGenerateWaTemplate = () => {
+    const values = form.getValues();
+    const template = convertNotulenToWa({
+      notulen: values.description,
+      title: values.title,
+      location: values.location,
+      date: values.date,
+      time: values.time,
+      notes: values.aiPromptNotes,
+      officialName: values.officialName,
+      activityType: values.activityType,
+    });
+    form.setValue("notulenWa", template, { shouldDirty: true, shouldValidate: true });
+    toast({ title: "Format WA Diselaraskan", description: "Format laporan WhatsApp telah disesuaikan dengan isi notulen kegiatan." });
+  }
 
+  const handleCopyWa = () => {
+    const text = form.getValues("notulenWa");
+    if (!text) {
+      toast({ variant: "destructive", title: "Teks Kosong", description: "Format pesan WA belum terisi." });
+      return;
+    }
+    navigator.clipboard.writeText(text);
+    setIsCopiedWa(true);
+    toast({ title: "Tersalin!", description: "Format pesan WA berhasil disalin ke clipboard." });
+    setTimeout(() => setIsCopiedWa(false), 2000);
+  }
+
+  const handleSendWa = () => {
+    const text = form.getValues("notulenWa");
+    if (!text) {
+      toast({ variant: "destructive", title: "Teks Kosong", description: "Format pesan WA belum terisi." });
+      return;
+    }
+    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+    window.open(url, "_blank");
+  }
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     if (cloudinaryUrls.kegiatan.length === 0) {
       toast({ variant: "destructive", title: "Foto Wajib", description: "Minimal upload 1 foto kegiatan ke Cloudinary." });
       return;
@@ -345,45 +468,101 @@ export function KegiatanUpload({ onSuccess, initialData }: { onSuccess?: () => v
 
       const targetFolderId = villageSettings?.kegiatanFolderId || GOOGLE_CONFIG.parentFolderId;
 
+      const filesPayload: any = {
+        photos: [],
+        materials: materialData.filter(Boolean),
+        undangan: undanganData,
+        notulen: notulenBase64 ? { name: `Notulen_${values.title}.pdf`, type: 'application/pdf', base64: notulenBase64 } : null,
+        bast: bastBase64 ? { name: `BAST_${values.title}.pdf`, type: 'application/pdf', base64: bastBase64 } : null,
+        dokKegiatan: dokKegiatanBase64 ? { name: `Dokumentasi_Kegiatan.pdf`, type: 'application/pdf', base64: dokKegiatanBase64 } : null,
+        dokAtk: dokAtkBase64 ? { name: `Dokumentasi_ATK.pdf`, type: 'application/pdf', base64: dokAtkBase64 } : null,
+        dokKonsumsi: dokKonsumsiBase64 ? { name: `Dokumentasi_Konsumsi.pdf`, type: 'application/pdf', base64: dokKonsumsiBase64 } : null,
+      };
+
       // 4. Save Everything to Google Drive via Apps Script
-      const result = await callAppsScript({
+      let result = await callAppsScript({
         action: 'saveToDrive',
         folderName: `${values.title} | ${values.date} ${initialData ? '(UPDATED)' : ''}`,
         parentFolderId: targetFolderId,
-        files: {
-          photos: [],
-          materials: materialData.filter(Boolean),
-          undangan: undanganData,
-          notulen: { name: `Notulen_${values.title}.pdf`, type: 'application/pdf', base64: notulenBase64 },
-          bast: bastBase64 ? { name: `BAST_${values.title}.pdf`, type: 'application/pdf', base64: bastBase64 } : null,
-          dokKegiatan: dokKegiatanBase64 ? { name: `Dokumentasi_Kegiatan.pdf`, type: 'application/pdf', base64: dokKegiatanBase64 } : null,
-          dokAtk: dokAtkBase64 ? { name: `Dokumentasi_ATK.pdf`, type: 'application/pdf', base64: dokAtkBase64 } : null,
-          dokKonsumsi: dokKonsumsiBase64 ? { name: `Dokumentasi_Konsumsi.pdf`, type: 'application/pdf', base64: dokKonsumsiBase64 } : null,
-        }
+        files: filesPayload
       });
 
-      if (!result.success) throw new Error(result.error || "Gagal simpan ke Drive");
+      // Fallback: Jika Apps Script yang aktif di cloud belum dideploy dengan fungsi saveToDrive,
+      // otomatis beralih mengunggah arsip berkas menggunakan aksi uploadArchiveFile yang sudah ada di Apps Script!
+      if (!result?.success && result?.error && (result.error.includes("saveToDrive") || result.error.includes("Aksi tidak dikenal"))) {
+        console.warn("saveToDrive belum tersedia di deployment Apps Script, beralih ke fallback uploadArchiveFile...");
+        const fallbackUrls: Record<string, string> = {};
+
+        const filesToUpload: { key: string; name: string; type: string; base64: string }[] = [];
+        if (filesPayload.notulen?.base64) filesToUpload.push({ key: 'notulen', name: filesPayload.notulen.name, type: filesPayload.notulen.type, base64: filesPayload.notulen.base64 });
+        if (filesPayload.bast?.base64) filesToUpload.push({ key: 'bast', name: filesPayload.bast.name, type: filesPayload.bast.type, base64: filesPayload.bast.base64 });
+        if (filesPayload.dokKegiatan?.base64) filesToUpload.push({ key: 'dokKegiatan', name: filesPayload.dokKegiatan.name, type: filesPayload.dokKegiatan.type, base64: filesPayload.dokKegiatan.base64 });
+        if (filesPayload.dokAtk?.base64) filesToUpload.push({ key: 'dokAtk', name: filesPayload.dokAtk.name, type: filesPayload.dokAtk.type, base64: filesPayload.dokAtk.base64 });
+        if (filesPayload.dokKonsumsi?.base64) filesToUpload.push({ key: 'dokKonsumsi', name: filesPayload.dokKonsumsi.name, type: filesPayload.dokKonsumsi.type, base64: filesPayload.dokKonsumsi.base64 });
+        if (filesPayload.undangan?.base64) filesToUpload.push({ key: 'undangan', name: filesPayload.undangan.name, type: filesPayload.undangan.type, base64: filesPayload.undangan.base64 });
+        if (Array.isArray(filesPayload.materials)) {
+          filesPayload.materials.forEach((mat: any, idx: number) => {
+            if (mat?.base64) filesToUpload.push({ key: `materi_${idx + 1}`, name: mat.name, type: mat.type, base64: mat.base64 });
+          });
+        }
+
+        for (const item of filesToUpload) {
+          try {
+            const upRes = await callAppsScript({
+              action: 'uploadArchiveFile',
+              folderId: targetFolderId,
+              fileName: item.name,
+              fileData: {
+                type: item.type || 'application/pdf',
+                base64: item.base64
+              }
+            });
+            if (upRes?.success && upRes.fileUrl) {
+              fallbackUrls[item.key] = upRes.fileUrl;
+            }
+          } catch (itemErr) {
+            console.error(`Gagal upload fallback ${item.key}:`, itemErr);
+          }
+        }
+
+        result = {
+          success: true,
+          folderId: targetFolderId,
+          fileUrls: fallbackUrls
+        };
+      }
+
+      if (!result?.success) throw new Error(result?.error || "Gagal simpan ke Drive");
 
       // 5. Save to Firestore (Village Root Collection)
       const docData = {
         ...values,
-        updatedBy: user.uid,
+        updatedBy: user?.uid || "publik",
         uploadDate: initialData?.uploadDate || new Date().toISOString(),
         lastUpdate: new Date().toISOString(),
-        driveFolderId: result.folderId,
+        driveFolderId: result.folderId || targetFolderId,
         driveUrls: result.fileUrls || {},
         cloudinaryUrls: cloudinaryUrls,
         imageUrls: [...cloudinaryUrls.kegiatan, ...cloudinaryUrls.atk, ...cloudinaryUrls.konsumsi]
       };
 
       if (initialData?.id) {
+        if (!db) throw new Error("Database tidak siap");
         const docRef = doc(db, "kegiatans", initialData.id);
         updateDocumentNonBlocking(docRef, docData);
-        toast({ title: "Laporan Diperbarui!", description: `Data desa telah diupdate dan dokumen PDF baru telah diunggah ke Drive.` });
+        toast({ title: "Laporan Diperbarui!", description: `Data Kecamatan telah diupdate dan dokumen PDF baru telah diunggah ke Drive.` });
       } else {
-        const kegiatanRef = collection(db, "kegiatans");
-        addDocumentNonBlocking(kegiatanRef, docData);
-        toast({ title: "Berhasil!", description: `Laporan masuk ke database desa & Seluruh dokumen PDF diarsipkan ke Drive.` });
+        if (db) {
+          const kegiatanRef = collection(db, "kegiatans");
+          addDocumentNonBlocking(kegiatanRef, docData);
+        } else {
+          await fetch('/api/kegiatan/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(docData),
+          });
+        }
+        toast({ title: "Berhasil!", description: `Laporan masuk ke database Kecamatan & Seluruh dokumen PDF diarsipkan ke Drive.` });
       }
 
       form.reset();
@@ -404,7 +583,7 @@ export function KegiatanUpload({ onSuccess, initialData }: { onSuccess?: () => v
           <TabsList className="grid grid-cols-2 w-full h-12 mb-4 bg-muted/50 p-1">
             <TabsTrigger value="agenda" className="gap-2 text-xs font-bold">
               <CalendarIcon className="h-4 w-4" />
-              Agenda Desa
+              Agenda Kecamatan
             </TabsTrigger>
             <TabsTrigger value="manual" className="gap-2 text-xs font-bold">
               <FileText className="h-4 w-4" />
@@ -590,6 +769,37 @@ export function KegiatanUpload({ onSuccess, initialData }: { onSuccess?: () => v
                 )} />
               </div>
 
+              {watchActivityType === "Eksternal" && (
+                <FormField
+                  control={form.control}
+                  name="aiPromptNotes"
+                  render={({ field }) => (
+                    <FormItem className="p-4 border rounded-2xl bg-amber-50/50 border-amber-200/80 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <FormLabel className="text-xs font-black uppercase text-amber-900 flex items-center gap-1.5">
+                          <Sparkles className="h-3.5 w-3.5 text-amber-600" />
+                          Prompt / Catatan Acuan AI (Opsional)
+                        </FormLabel>
+                        <Badge variant="outline" className="text-[9px] font-bold border-amber-300 text-amber-800 bg-amber-100/60">
+                          Khusus Eksternal
+                        </Badge>
+                      </div>
+                      <p className="text-[11px] text-amber-800/80 leading-snug">
+                        Tuliskan catatan, poin-poin rapat, atau tamu yang hadir sebagai acuan jika di-generate oleh AI untuk menyusun notulen dan format laporan WA otomatis.
+                      </p>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Contoh: Hadir Danramil 10 Gdm, Polsek/yg mewakili, Sekcam, Kades, Pengurus Karang Taruna. Rapat bahas persiapan Pordes Sepak Bola & Voli tgl 13-27 Sept di Desa Cinangsi..."
+                          className="min-h-[85px] text-xs leading-relaxed bg-white border-amber-200 focus-visible:ring-amber-400 placeholder:text-muted-foreground/60"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+
               <FormField
                 control={form.control}
                 name="description"
@@ -623,6 +833,84 @@ export function KegiatanUpload({ onSuccess, initialData }: { onSuccess?: () => v
                   </FormItem>
                 )}
               />
+
+              {watchActivityType === "Eksternal" && (
+                <Card className="border border-emerald-200/80 bg-gradient-to-b from-emerald-50/40 to-white rounded-3xl overflow-hidden shadow-sm">
+                  <CardHeader className="p-4 sm:p-5 pb-3 border-b border-emerald-100 bg-emerald-50/60">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div className="flex items-center gap-2.5">
+                        <div className="h-9 w-9 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-sm shrink-0">
+                          <MessageSquare className="h-5 w-5" />
+                        </div>
+                        <div>
+                          <CardTitle className="text-sm font-black uppercase text-emerald-950 tracking-tight">
+                            Notulen Kirim WA
+                          </CardTitle>
+                          <p className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider">
+                            Format Laporan WhatsApp Resmi Siap Kirim
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={handleGenerateWaTemplate}
+                          title="Sinkronkan format WA dari isi notulen saat ini"
+                          className="h-8 px-2.5 text-[10px] font-bold uppercase rounded-xl border-emerald-300 text-emerald-800 hover:bg-emerald-100/60 gap-1.5"
+                        >
+                          <RefreshCw className="h-3 w-3 text-emerald-600" />
+                          Sinkronkan dari Notulen
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={handleCopyWa}
+                          className="h-8 px-2.5 text-[10px] font-bold uppercase rounded-xl border-emerald-300 text-emerald-800 hover:bg-emerald-100/60 gap-1.5"
+                        >
+                          {isCopiedWa ? <Check className="h-3 w-3 text-emerald-600" /> : <Copy className="h-3 w-3 text-emerald-600" />}
+                          {isCopiedWa ? "Tersalin" : "Salin Teks"}
+                        </Button>
+                        <Button
+                          type="button"
+                          size="sm"
+                          onClick={handleSendWa}
+                          className="h-8 px-3 text-[10px] font-black uppercase rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm gap-1.5"
+                        >
+                          <Send className="h-3 w-3" />
+                          Kirim WA
+                        </Button>
+                      </div>
+                    </div>
+                  </CardHeader>
+
+                  <CardContent className="p-4 sm:p-5 space-y-2.5">
+                    <FormField
+                      control={form.control}
+                      name="notulenWa"
+                      render={({ field }) => (
+                        <FormItem className="space-y-1.5">
+                          <FormControl>
+                            <Textarea
+                              placeholder="Format laporan WhatsApp akan tampil di sini..."
+                              className="font-mono text-xs leading-relaxed min-h-[260px] bg-white border-emerald-200/80 focus-visible:ring-emerald-500 text-slate-800"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <div className="flex items-center justify-between text-[10px] text-muted-foreground px-1">
+                      <span>Skema laporan Camat Gandrungmangu (DUMP).</span>
+                      <span className="font-mono">{(form.watch("notulenWa") || "").length} karakter</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
 
               <div className="space-y-8 p-6 bg-slate-50 border rounded-[2rem]">
                 <div className="flex items-center gap-2">
@@ -705,7 +993,7 @@ export function KegiatanUpload({ onSuccess, initialData }: { onSuccess?: () => v
               </div>
 
               <Button type="submit" className="w-full h-14 text-base font-black uppercase shadow-lg shadow-primary/20 bg-primary hover:bg-primary/90" disabled={isUploading}>
-                {isUploading ? <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> {initialData ? 'Memperbarui...' : 'Menyimpan ke Database Desa...'}</> : initialData ? <><Save className="mr-2 h-5 w-5" /> Perbarui Laporan</> : <><Upload className="mr-2 h-5 w-5" /> Simpan ke Arsip Desa</>}
+                {isUploading ? <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> {initialData ? 'Memperbarui...' : 'Menyimpan ke Database Kecamatan...'}</> : initialData ? <><Save className="mr-2 h-5 w-5" /> Perbarui Laporan</> : <><Upload className="mr-2 h-5 w-5" /> Simpan ke Arsip Kecamatan</>}
               </Button>
             </form>
           </Form>

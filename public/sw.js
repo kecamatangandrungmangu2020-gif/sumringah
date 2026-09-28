@@ -1,9 +1,9 @@
 /**
- * Service Worker - Manajemen Desa Karanganyar PWA
+ * Service Worker - Manajemen Kecamatan Gandrungmangu PWA
  * Versi yang dioptimalkan untuk skor PWABuilder & TWA Android.
  */
 
-const CACHE_NAME = 'karanganyar-pwa-v3';
+const CACHE_NAME = 'gandrungmangu-pwa-v3';
 const OFFLINE_URL = '/offline.html';
 const PRECACHE_ASSETS = [
   '/offline.html',
@@ -118,7 +118,7 @@ self.addEventListener('fetch', (event) => {
 self.addEventListener('push', (event) => {
   if (!event.data) return;
   const data = event.data.json();
-  self.registration.showNotification(data.title || 'Karanganyar', {
+  self.registration.showNotification(data.title || 'Gandrungmangu', {
     body: data.body || 'Ada notifikasi baru',
     icon: '/android-chrome-192x192.png',
     badge: '/favicon-32x32.png',

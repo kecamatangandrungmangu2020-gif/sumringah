@@ -1,15 +1,15 @@
-# Panduan Operasional Sistem Manajemen Desa Karanganyar
+# Panduan Operasional Sistem Manajemen Kecamatan Gandrungmangu
 
-Dokumen ini berisi petunjuk penggunaan rinci untuk seluruh fitur yang tersedia di portal Manajemen Desa, Admin Absensi, dan Absensi Perangkat.
+Dokumen ini berisi petunjuk penggunaan rinci untuk seluruh fitur yang tersedia di portal Manajemen Kecamatan, Admin Absensi, dan Absensi Karyawan.
 
 ---
 
-## 1. PORTAL ABSENSI (Untuk Perangkat Desa)
-Portal ini dirancang untuk penggunaan harian oleh perangkat desa melalui smartphone di lokasi kantor.
+## 1. PORTAL ABSENSI (Untuk Karyawan Kecamatan)
+Portal ini dirancang untuk penggunaan harian oleh Karyawan Kecamatan melalui smartphone di lokasi kantor.
 
 ### Cara Masuk
 *   Akses halaman utama.
-*   Pilih tombol **"Absensi Perangkat"**.
+*   Pilih tombol **"Absensi Karyawan"**.
 *   Gunakan **Username** (huruf kecil semua) dan **Kata Sandi** yang telah diberikan oleh Admin.
 
 ### Menu Utama (Dashboard)
@@ -23,10 +23,10 @@ Portal ini dirancang untuk penggunaan harian oleh perangkat desa melalui smartph
 ---
 
 ## 2. PORTAL ADMIN ABSENSI (Untuk Petugas Kontrol)
-Portal khusus untuk memonitoring kedisiplinan dan mengelola akun perangkat.
+Portal khusus untuk memonitoring kedisiplinan dan mengelola akun Karyawan.
 
 ### Menu Monitoring
-*   **Grid Real-time:** Menampilkan tabel besar kehadiran seluruh perangkat secara live.
+*   **Grid Real-time:** Menampilkan tabel besar kehadiran seluruh Karyawan secara live.
     *   **Warna Hijau:** Sudah absen masuk & pulang (Hadir).
     *   **Warna Oranye:** Sudah absen masuk, belum absen pulang (Sedang Bekerja).
     *   **Warna Merah:** Tidak ada data absen (Alpha/Tanpa Keterangan).
@@ -34,35 +34,35 @@ Portal khusus untuk memonitoring kedisiplinan dan mengelola akun perangkat.
 *   **Kalkulasi Otomatis:** Menampilkan total detik/jam keterlambatan dan total jam kerja efektif setiap personel.
 
 ### Menu Input Absensi
-*   **Manual/Massal:** Digunakan untuk menginput absen jika ada perangkat yang lupa membawa HP atau untuk menginput status "Izin", "Dinas Luar", dan "Sakit" secara kolektif.
+*   **Manual/Massal:** Digunakan untuk menginput absen jika ada Karyawan yang lupa membawa HP atau untuk menginput status "Izin", "Dinas Luar", dan "Sakit" secara kolektif.
 
 ### Menu Cetak Dokumen
-*   **Laporan Bulanan:** Pilih Bulan dan Tahun, lalu klik **"Unduh Laporan PDF"** untuk mendapatkan rekap resmi dengan Kop Surat Pemerintah Desa Karanganyar. Tersedia juga format **Excel** untuk pengolahan data internal.
+*   **Laporan Bulanan:** Pilih Bulan dan Tahun, lalu klik **"Unduh Laporan PDF"** untuk mendapatkan rekap resmi dengan Kop Surat Pemerintah Kecamatan Gandrungmangu. Tersedia juga format **Excel** untuk pengolahan data internal.
 
 ### Menu Pengaturan (Konfigurasi)
 *   **Waktu & Lokasi:** Mengatur jam masuk, jam pulang, toleransi keterlambatan, titik koordinat kantor (Latitude/Longitude), dan radius jangkauan absen (Meter).
-*   **Manajemen Akun:** Menambah perangkat baru, mengubah jabatan, atau mereset kata sandi jika perangkat lupa.
+*   **Manajemen Akun:** Menambah Karyawan baru, mengubah jabatan, atau mereset kata sandi jika Karyawan lupa.
 
 ---
 
-## 3. PANEL MANAJEMEN DESA (Untuk Admin Pusat)
-Pusat kendali administrasi, keuangan, dan dokumentasi desa.
-**Login Khusus:** `karanganyar@gmail.id` | **Password:** `karanganyar123`
+## 3. PANEL MANAJEMEN Kecamatan (Untuk Admin Pusat)
+Pusat kendali administrasi, keuangan, dan dokumentasi Kecamatan.
+**Login Khusus:** `gandrungmangu@gmail.id` | **Password:** `gandrungmangu123`
 
 ### Menu Dashboard
-*   Ringkasan visual jumlah laporan kegiatan, status pengajuan SPPD terbaru, dan widget **Agenda Hari Ini** yang sinkron dengan Google Calendar desa.
+*   Ringkasan visual jumlah laporan kegiatan, status pengajuan SPPD terbaru, dan widget **Agenda Hari Ini** yang sinkron dengan Google Calendar Kecamatan.
 
 ### Menu Informasi APBDes
-*   Visualisasi grafik komposisi anggaran (Dana Desa, ADD, PBK).
+*   Visualisasi grafik komposisi anggaran (Dana Kecamatan, ADD, PBK).
 *   **Fitur Impor:** Anda bisa mengimpor rincian kegiatan APBDes dari file Excel agar nama-nama kegiatan tersebut muncul otomatis di menu "Dokumentasi Kegiatan" dan "SPPD".
 
 ### Menu Agenda Kegiatan
-*   **Input Baru:** Masukkan acara/undangan ke kalender desa. Anda bisa mengunggah file Undangan PDF untuk dipindai atau disimpan.
+*   **Input Baru:** Masukkan acara/undangan ke kalender Kecamatan. Anda bisa mengunggah file Undangan PDF untuk dipindai atau disimpan.
 *   **Rincian & Notulensi:** Klik pada agenda yang sudah ada, lalu tulis hasil rapat di kolom **Notulensi**. Klik "Simpan" untuk memperbarui deskripsi di Google Calendar secara otomatis.
 
 ### Menu Arsip Digital
-*   **SPJ Desa:** Kelola file PDF SPJ berdasarkan bidang pembangunan.
-*   **Produk Hukum:** Database penyimpanan Peraturan Desa (Perdes), Perkades, dan SK. File tersimpan aman di Google Drive desa.
+*   **SPJ Kecamatan:** Kelola file PDF SPJ berdasarkan bidang pembangunan.
+*   **Produk Hukum:** Database penyimpanan Peraturan Kecamatan (Perdes), Perkades, dan SK. File tersimpan aman di Google Drive Kecamatan.
 
 ### Menu Register Surat (Buku Agenda)
 *   Mencatat secara digital setiap nomor surat keluar, surat masuk, SK, dan SPPD agar penomoran tertib dan tidak ganda.
@@ -89,8 +89,8 @@ Pusat kendali administrasi, keuangan, dan dokumentasi desa.
 *   Database Posyandu untuk memantau data Balita, Stunting, Lansia, dan Disabilitas. Data bisa diekspor ke Excel untuk laporan ke Kecamatan.
 
 ### Menu Pengaturan (Settings)
-*   **Logo Pemerintah Desa:** Unggah logo PNG transparan untuk digunakan di seluruh dokumen PDF sistem.
-*   **Foto Halaman Utama:** Ubah latar belakang foto desa pada halaman depan aplikasi.
+*   **Logo Karyawan Kecamatan:** Unggah logo PNG transparan untuk digunakan di seluruh dokumen PDF sistem.
+*   **Foto Halaman Utama:** Ubah latar belakang foto Kecamatan pada halaman depan aplikasi.
 *   **Integrasi Google:** Konfigurasi ID Folder Google Drive dan ID Kalender agar fitur penyimpanan otomatis berfungsi dengan benar.
 
 ---

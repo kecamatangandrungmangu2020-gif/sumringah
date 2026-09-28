@@ -8,7 +8,7 @@ export default function AdminPendudukPage() {
     <div className="p-6 md:p-8 space-y-6 pb-16 max-w-7xl mx-auto">
       <PageHeader
         title="Database Kependudukan"
-        description="Manajemen data penduduk Desa Karanganyar. Gunakan fitur pencarian untuk menemukan data warga dengan cepat."
+        description="Manajemen data penduduk Kecamatan Gandrungmangu. Gunakan fitur pencarian untuk menemukan data warga dengan cepat."
       />
 
       <ResidentList />

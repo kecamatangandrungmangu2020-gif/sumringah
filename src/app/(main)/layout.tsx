@@ -34,10 +34,10 @@ import { cn } from '@/lib/utils';
 
 const navItems = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard Utama' },
-  { href: '/pelayanan-desa', icon: BookOpen, label: 'Pelayanan Desa' },
-  { href: '/statistik', icon: BarChart3, label: 'Statistik Desa' },
-  { href: '/profil-desa', icon: Info, label: 'Profil Desa' },
-  { href: '/BeritaDesa', icon: Newspaper, label: 'Berita Desa' },
+  { href: '/pelayanan-Kecamatan', icon: BookOpen, label: 'Pelayanan Kecamatan' },
+  { href: '/statistik', icon: BarChart3, label: 'Statistik Kecamatan' },
+  { href: '/profil-Kecamatan', icon: Info, label: 'Profil Kecamatan' },
+  { href: '/BeritaKecamatan', icon: Newspaper, label: 'Berita Kecamatan' },
   { href: '/layanan-surat', icon: FileText, label: 'Layanan Surat' },
   { href: '/pengaduan', icon: MessageSquareWarning, label: 'Pengaduan Warga' },
   { href: '/pengumuman', icon: Megaphone, label: 'Pengumuman' },
@@ -109,7 +109,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         <SidebarFooter className="p-8">
           <div className="bg-white/5 rounded-3xl p-5 border border-white/10 space-y-4">
             <p className="text-[9px] text-white/40 font-black text-center uppercase tracking-widest leading-relaxed">
-              Pelayanan Mandiri Digital Karanganyar
+              Pelayanan Mandiri Digital Gandrungmangu
             </p>
             {user ? (
               <Button

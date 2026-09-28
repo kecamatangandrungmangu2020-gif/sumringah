@@ -11,6 +11,3 @@ import { firebaseConfig } from '@/firebase/config';
 export const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 export const auth = getAuth(app);
 export const firestore = getFirestore(app);
-
-console.log("PROJECT ID:", app.options.projectId);
-console.log("USER:", auth.currentUser?.email);

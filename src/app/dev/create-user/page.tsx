@@ -44,7 +44,7 @@ export default function CreateUserPage() {
 
       for (const u of users as any[]) {
         const username = (u.username || "unknown").toLowerCase().trim()
-        const email = `${username}@karanganyar.id`
+        const email = `${username}@gandrungmangu.id`
         const password = u.password || "password123"
 
         addLog(`⏳ Sinkronisasi: [${username.toUpperCase()}]...`)
@@ -111,7 +111,7 @@ export default function CreateUserPage() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" asChild className="rounded-full">
-            <Link href="/absensi-admin/dashboard/"><ArrowLeft className="h-5 w-5" /></Link>
+            <Link href="/dashboard/"><ArrowLeft className="h-5 w-5" /></Link>
           </Button>
           <h1 className="text-xl font-black uppercase tracking-tighter text-slate-900">Credential Sync Tool</h1>
         </div>
@@ -145,7 +145,7 @@ export default function CreateUserPage() {
             </div>
           </div>
           <Button asChild variant="secondary" className="rounded-xl font-black uppercase text-[10px] h-11 px-8">
-            <Link href="/absensi-admin/login/">Masuk Admin Kembali</Link>
+            <Link href="/login/">Masuk Kembali</Link>
           </Button>
         </div>
       )}

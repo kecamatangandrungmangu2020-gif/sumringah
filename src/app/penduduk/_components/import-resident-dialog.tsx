@@ -50,8 +50,8 @@ export function ImportResidentDialog({ open, onOpenChange }: ImportResidentDialo
     }
 
     if (!firestore) {
-        toast({ title: "Database Error", description: "Koneksi database belum siap.", variant: "destructive" });
-        return;
+      toast({ title: "Database Error", description: "Koneksi database belum siap.", variant: "destructive" });
+      return;
     }
 
     setIsProcessing(true);
@@ -69,11 +69,11 @@ export function ImportResidentDialog({ open, onOpenChange }: ImportResidentDialo
         if (json.length === 0) throw new Error("File Excel kosong.");
 
         const findValue = (row: any, aliases: string[]) => {
-            const keys = Object.keys(row);
-            const match = keys.find(k => 
-                aliases.some(alias => k.toLowerCase().trim().replace(/[\W_]+/g, "") === alias.toLowerCase().trim().replace(/[\W_]+/g, ""))
-            );
-            return match ? String(row[match]).trim() : '';
+          const keys = Object.keys(row);
+          const match = keys.find(k =>
+            aliases.some(alias => k.toLowerCase().trim().replace(/[\W_]+/g, "") === alias.toLowerCase().trim().replace(/[\W_]+/g, ""))
+          );
+          return match ? String(row[match]).trim() : '';
         };
 
         let count = 0;
@@ -81,52 +81,52 @@ export function ImportResidentDialog({ open, onOpenChange }: ImportResidentDialo
         for (let i = 0; i < json.length; i += 500) chunks.push(json.slice(i, i + 500));
 
         for (const chunk of chunks) {
-            const batch = writeBatch(firestore);
-            chunk.forEach((row) => {
-                const nik = findValue(row, ['NIK', 'NomorInduk', 'NO_INDUK']);
-                const fullName = findValue(row, ['NAMA_LGKP', 'NamaLengkap', 'NAMA']);
-                
-                if (nik && fullName && nik.length === 16) {
-                    const docRef = doc(firestore, 'residents', nik);
-                    
-                    // We save the RAW values directly from the spreadsheet
-                    // No sanitation against predefined options to match user request
-                    const residentData = {
-                        nik,
-                        noKk: findValue(row, ['NO_KK', 'NomorKK']),
-                        fullName: fullName.toUpperCase(),
-                        gender: findValue(row, ['JENIS_KLM', 'JK', 'Gender', 'JENISKELAMIN']),
-                        dateOfBirth: findValue(row, ['TGL_LAHIR', 'TanggalLahir']),
-                        age: findValue(row, ['UMUR']),
-                        placeOfBirth: findValue(row, ['TEMPAT_LAHIR', 'TempatLahir']),
-                        address: findValue(row, ['ALAMAT']),
-                        rt: findValue(row, ['NO_RT', 'RT']),
-                        rw: findValue(row, ['NO_RW', 'RW']),
-                        kelurahan: findValue(row, ['KELURAHAN', 'DESA']),
-                        relationshipToHeadOfFamily: findValue(row, ['SHDK', 'HUBUNGAN']),
-                        maritalStatus: findValue(row, ['STATUS_KAWIN', 'STATUS']),
-                        educationLevel: findValue(row, ['PENDIDIKAN']),
-                        religion: findValue(row, ['AGAMA']),
-                        occupation: findValue(row, ['PEKERJAAN']),
-                        bloodType: findValue(row, ['GOLONGAN_DARAH', 'GOL_DARAH']),
-                        hasBirthCertificate: findValue(row, ['AKTA_LAHIR']),
-                        birthCertificateNumber: findValue(row, ['NO_AKTA_LAHIR']),
-                        hasMarriageCertificate: findValue(row, ['AKTA_KAWIN']),
-                        marriageCertificateNumber: findValue(row, ['NO_AKTA_KAWIN']),
-                        hasDivorceCertificate: findValue(row, ['AKTA_CERAI']),
-                        divorceCertificateNumber: findValue(row, ['NO_AKTA_CERAI']),
-                        fatherName: findValue(row, ['NAMA_AYAH']),
-                        motherName: findValue(row, ['NAMA_IBU']),
-                        updatedAt: serverTimestamp(),
-                        createdAt: serverTimestamp(),
-                    };
-                    batch.set(docRef, residentData, { merge: true });
-                    cacheResident(residentData as any);
-                    count++;
+          const batch = writeBatch(firestore);
+          chunk.forEach((row) => {
+            const nik = findValue(row, ['NIK', 'NomorInduk', 'NO_INDUK']);
+            const fullName = findValue(row, ['NAMA_LGKP', 'NamaLengkap', 'NAMA']);
 
-                }
-            });
-            await batch.commit();
+            if (nik && fullName && nik.length === 16) {
+              const docRef = doc(firestore, 'residents', nik);
+
+              // We save the RAW values directly from the spreadsheet
+              // No sanitation against predefined options to match user request
+              const residentData = {
+                nik,
+                noKk: findValue(row, ['NO_KK', 'NomorKK']),
+                fullName: fullName.toUpperCase(),
+                gender: findValue(row, ['JENIS_KLM', 'JK', 'Gender', 'JENISKELAMIN']),
+                dateOfBirth: findValue(row, ['TGL_LAHIR', 'TanggalLahir']),
+                age: findValue(row, ['UMUR']),
+                placeOfBirth: findValue(row, ['TEMPAT_LAHIR', 'TempatLahir']),
+                address: findValue(row, ['ALAMAT']),
+                rt: findValue(row, ['NO_RT', 'RT']),
+                rw: findValue(row, ['NO_RW', 'RW']),
+                kelurahan: findValue(row, ['KELURAHAN', 'Kecamatan']),
+                relationshipToHeadOfFamily: findValue(row, ['SHDK', 'HUBUNGAN']),
+                maritalStatus: findValue(row, ['STATUS_KAWIN', 'STATUS']),
+                educationLevel: findValue(row, ['PENDIDIKAN']),
+                religion: findValue(row, ['AGAMA']),
+                occupation: findValue(row, ['PEKERJAAN']),
+                bloodType: findValue(row, ['GOLONGAN_DARAH', 'GOL_DARAH']),
+                hasBirthCertificate: findValue(row, ['AKTA_LAHIR']),
+                birthCertificateNumber: findValue(row, ['NO_AKTA_LAHIR']),
+                hasMarriageCertificate: findValue(row, ['AKTA_KAWIN']),
+                marriageCertificateNumber: findValue(row, ['NO_AKTA_KAWIN']),
+                hasDivorceCertificate: findValue(row, ['AKTA_CERAI']),
+                divorceCertificateNumber: findValue(row, ['NO_AKTA_CERAI']),
+                fatherName: findValue(row, ['NAMA_AYAH']),
+                motherName: findValue(row, ['NAMA_IBU']),
+                updatedAt: serverTimestamp(),
+                createdAt: serverTimestamp(),
+              };
+              batch.set(docRef, residentData, { merge: true });
+              cacheResident(residentData as any);
+              count++;
+
+            }
+          });
+          await batch.commit();
         }
 
         // Recalculate demographics stats document to avoid reading all resident documents on client pages

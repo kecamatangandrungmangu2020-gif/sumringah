@@ -15,8 +15,8 @@ import { VectorBackground } from '@/components/layout/VectorBackground';
 import { useUser } from '@/firebase';
 
 /**
- * Guard Komponen untuk memastikan hanya admin karanganyar@gmail.id 
- * yang bisa mengakses fitur manajemen desa.
+ * Guard Komponen untuk memastikan hanya admin gandrungmangu@gmail.id 
+ * yang bisa mengakses fitur manajemen Kecamatan.
  */
 function ManagementGuard({ children }: { children: React.ReactNode }) {
   const { user, isUserLoading } = useUser();
@@ -25,14 +25,7 @@ function ManagementGuard({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!isUserLoading) {
-      // Izinkan email manajemen pusat dan admin terkonfigurasi
-      const configuredAdmin = (process.env.NEXT_PUBLIC_ADMIN_EMAIL || "").toLowerCase();
-      const userEmail = (user?.email || "").toLowerCase();
-      const isAllowed = userEmail === "karanganyar@gmail.id" || 
-        userEmail === "admin@karanganyar.id" || 
-        (configuredAdmin && userEmail === configuredAdmin);
-
-      if (!user || !isAllowed) {
+      if (!user) {
         router.replace('/login/');
       } else {
         setAuthorized(true);
@@ -64,32 +57,70 @@ export default function RootLayout({
     setMounted(true);
   }, []);
 
-  // Sembunyikan sidebar di Landing Page (/), Login Page (/login), 
-  // portal Absensi, fitur Dev Utility, Print, Portal Surat Online Warga (/suratonline), dan Halaman Pengajuan Surat (/pengajuan-surat)
-  const isPortalAbsensi = pathname?.startsWith('/absensi/') || pathname?.startsWith('/absensi-admin/');
+  // Sembunyikan sidebar di Landing Page (/), Portal Admin (/admin), Login Page (/login), 
+  // fitur Dev Utility, Print, Portal Surat Online Warga (/suratonline), dan Halaman Pengajuan Surat (/pengajuan-surat)
   const isDevUtility = pathname?.startsWith('/dev/');
   const isPrintPage = pathname?.startsWith('/print/') || pathname?.startsWith('/print');
   const isSuratOnline = pathname?.startsWith('/suratonline/') || pathname === '/suratonline';
   const isPengajuanSurat = pathname?.startsWith('/pengajuan-surat/') || pathname === '/pengajuan-surat' || pathname?.startsWith('/pengajuan');
-  const isPublicPage = pathname === '/' || pathname === '/login' || pathname === '/login/' || isPortalAbsensi || isDevUtility || isPrintPage || isSuratOnline || isPengajuanSurat;
+  const isAntrian = pathname?.toLowerCase().startsWith('/antrian');
+  const isAdminPortal = pathname === '/admin' || pathname === '/admin/';
+
+  // Daftar 14 desa publik agar bebas diakses masyarakat umum tanpa harus login
+  const DAFTAR_DESA_SLUGS = [
+    'bulusari',
+    'cinangsi',
+    'cisumur',
+    'gandrungmangu',
+    'gandrungmanis',
+    'gintungreja',
+    'karanganyar',
+    'karanggintung',
+    'kertajaya',
+    'layansari',
+    'muktisari',
+    'rungkang',
+    'sidaurip',
+    'wringinharjo'
+  ];
+  const cleanPath = pathname?.replace(/^\/|\/$/g, '').toLowerCase() || '';
+  const isDesaPage =
+    DAFTAR_DESA_SLUGS.some((slug) => cleanPath === slug || cleanPath.startsWith(slug + '/')) ||
+    cleanPath.startsWith('desa/') ||
+    cleanPath === 'desa';
+
+  const isInputPage = pathname === '/input' || pathname === '/input/' || pathname?.startsWith('/input/');
+
+  const isPublicPage =
+    pathname === '/' ||
+    pathname === '/login' ||
+    pathname === '/login/' ||
+    isAdminPortal ||
+    isDevUtility ||
+    isPrintPage ||
+    isSuratOnline ||
+    isPengajuanSurat ||
+    isAntrian ||
+    isInputPage ||
+    isDesaPage;
 
   return (
     <html lang="id">
       <head>
-        <title>Manajemen Desa Karanganyar</title>
-        <meta name="description" content="Sistem Manajemen & Pelayanan Desa Karanganyar, Kec. Gandrungmangu, Kab. Cilacap" />
+        <title>Manajemen Kecamatan Gandrungmangu</title>
+        <meta name="description" content="Sistem Manajemen & Pelayanan Kecamatan Gandrungmangu, Kec. Gandrungmangu, Kab. Cilacap" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0, viewport-fit=cover" />
 
         {/* ── PWA / Android APK ────────────────────────────────── */}
         <link rel="manifest" href="/site.webmanifest" />
         <meta name="theme-color" content="#13447c" />
         <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="application-name" content="Karanganyar" />
+        <meta name="application-name" content="Gandrungmangu" />
 
         {/* ── iOS PWA (Add to Home Screen) ─────────────────────── */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="Karanganyar" />
+        <meta name="apple-mobile-web-app-title" content="Gandrungmangu" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
         {/* ── Favicon ──────────────────────────────────────────── */}
@@ -141,7 +172,7 @@ export default function RootLayout({
                     <SidebarInset className="flex-1 flex flex-col min-w-0 bg-transparent">
                       <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-2 border-b border-border/60 bg-background/80 backdrop-blur-md px-4 md:hidden">
                         <SidebarTrigger className="h-10 w-10" />
-                        <div className="flex-1 text-center font-black text-primary uppercase tracking-tighter">Karanganyar</div>
+                        <div className="flex-1 text-center font-black text-primary uppercase tracking-tighter">Gandrungmangu</div>
                         <Button variant="ghost" size="icon" asChild className="rounded-full h-10 w-10">
                           <Link href="/settings/">
                             <Settings className="h-5 w-5 text-muted-foreground" />

@@ -8,7 +8,7 @@ export function ReaktivasiBpjsPrintTemplate({ submission }: { submission: Letter
   return (
     <PrintLayout submission={submission} hideRequesterSignature={true}>
       <p className="mt-3 text-justify leading-normal">
-        Yang bertanda tangan di bawah ini Kepala Desa Karanganyar, Kecamatan Gandrungmangu, Kabupaten Cilacap, menerangkan dengan sebenarnya bahwa:
+        Yang bertanda tangan di bawah ini CAMAT GANDRUNGMANGU Kecamatan Gandrungmangu, Kabupaten Cilacap, menerangkan dengan sebenarnya bahwa:
       </p>
 
       <table className="mt-2 border-collapse w-full">

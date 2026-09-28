@@ -10,21 +10,21 @@ import {
   LogOut,
   Home,
   Loader2,
-  CircleDollarSign,
   Files,
   Calendar,
   Archive,
   FileText,
   Hash,
   HeartPulse,
-  FileStack,
-  FileSpreadsheet,
   Users,
-  Receipt,
-  BarChart3,
   ChevronDown,
   FileCheck,
-  FilePlus
+  FilePlus,
+  Ticket,
+  Newspaper,
+  Landmark,
+  MapPin,
+  MessageSquare
 } from "lucide-react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
@@ -63,8 +63,19 @@ const menuGroups: MenuGroupType[] = [
     label: "MENU UTAMA",
     items: [
       { label: "Dashboard", icon: LayoutDashboard, href: "/dashboard" },
-      { label: "Informasi APBDes", icon: CircleDollarSign, href: "/apbdes" },
       { label: "Agenda Kegiatan", icon: Calendar, href: "/agenda" },
+      { label: "Sistem Antrian", icon: Ticket, href: "/Antrian" },
+    ],
+  },
+  {
+    label: "PELAYANAN",
+    items: [
+      { label: "Kelola Pengajuan", icon: FileCheck, href: "/pelayanan" },
+      { label: "Data Penduduk", icon: Users, href: "/penduduk" },
+      { label: "Informasi Terkini", icon: Newspaper, href: "/pelayanan/informasi" },
+      { label: "Profil & Layanan Desa", icon: Landmark, href: "/pelayanan/desa" },
+      { label: "Wilayah", icon: MapPin, href: "/pelayanan/wilayah" },
+      { label: "Pengaduan & Informasi", icon: MessageSquare, href: "/pelayanan/pengaduan" },
     ],
   },
   {
@@ -72,41 +83,15 @@ const menuGroups: MenuGroupType[] = [
     items: [
       { label: "Arsip Digital", icon: Archive, href: "/arsip-dokumen" },
       { label: "Register Surat", icon: Hash, href: "/arsip-nomor-surat" },
-      { label: "Naskah Dinas", icon: FileText, href: "/naskah-dinas" },
       { label: "Manajemen SPPD", icon: Map, href: "/sppd" },
-      { label: "Dokumentasi Kegiatan", icon: FileUp, href: "/kegiatan" },
+      { label: "Laporan Kegiatan", icon: FileUp, href: "/kegiatan" },
       { label: "Cetak Dokumen", icon: Files, href: "/dokumen-penunjang" },
-      { label: "Inventaris Dokumen Fisik", icon: FileStack, href: "/dokumen-fisik" },
-    ],
-  },
-  {
-    label: "PELAYANAN",
-    items: [
-      {
-        label: "Manajemen Surat",
-        icon: FileText,
-        href: "/pelayanan",
-        subItems: [
-          { label: "Kelola Surat", icon: FileCheck, href: "/pelayanan" },
-          { label: "Pengajuan Baru", icon: FilePlus, href: "/pelayanan/pengajuan" },
-        ]
-      },
-      { label: "Data Penduduk", icon: Users, href: "/penduduk" },
-    ],
-  },
-  {
-    label: "PBB-P2",
-    items: [
-      { label: "Data PBB", icon: FileSpreadsheet, href: "/pbb-p2/master-data" },
-      { label: "Penarik PBB", icon: Users, href: "/pbb-p2/penarik" },
-      { label: "Pembayaran PBB", icon: Receipt, href: "/pbb-p2/pembayaran" },
-      { label: "Monitoring", icon: BarChart3, href: "/pbb-p2/monitoring" },
     ],
   },
   {
     label: "DATA & INFORMASI",
     items: [
-      { label: "Data Perangkat Desa", icon: User, href: "/profile" },
+      { label: "Data Karyawan Kecamatan", icon: User, href: "/profile" },
       { label: "Data Kesehatan", icon: HeartPulse, href: "/data-kesehatan" },
     ],
   },
@@ -164,10 +149,10 @@ export function AppSidebar() {
       <SidebarHeader className="p-6">
         <div className="flex items-center gap-4">
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-background shadow-lg shadow-primary/10 border border-border overflow-hidden shrink-0">
-            {configData?.logoBase64 ? (
+            {configData?.logoUrl || configData?.logoKecamatanUrl || configData?.logoBase64 ? (
               <Image
-                src={configData.logoBase64}
-                alt="Logo Desa"
+                src={configData.logoUrl || configData.logoKecamatanUrl || configData.logoBase64}
+                alt="Logo Kecamatan"
                 width={48}
                 height={48}
                 className="object-contain p-1.5"
@@ -180,7 +165,7 @@ export function AppSidebar() {
             )}
           </div>
           <div className="flex flex-col overflow-hidden">
-            <span className="font-black text-xl leading-tight tracking-tighter text-foreground">Karanganyar</span>
+            <span className="font-black text-xl leading-tight tracking-tighter text-foreground">Gandrungmangu</span>
             <span className="text-[10px] text-muted-foreground uppercase tracking-[0.1em] font-bold">DATABASE TERPADU</span>
           </div>
         </div>
@@ -200,8 +185,9 @@ export function AppSidebar() {
                   const subPath = sub.href.replace(/\/$/, "")
                   return currentPath === subPath || (subPath !== "/pelayanan" && currentPath.startsWith(subPath))
                 })
+                const isExactMatch = itemPath === "/pelayanan" || itemPath === "/dashboard"
                 const isActive = mounted && !item.subItems && (
-                  currentPath === itemPath || (itemPath !== "" && currentPath.startsWith(itemPath + "/"))
+                  currentPath === itemPath || (!isExactMatch && itemPath !== "" && currentPath.startsWith(itemPath + "/"))
                 )
 
                 if (item.subItems) {
@@ -338,7 +324,7 @@ export function AppSidebar() {
               </div>
               <div className="flex flex-col text-left overflow-hidden flex-1">
                 <span className="text-sm font-black text-foreground truncate">{user?.email?.split('@')[0].toUpperCase() || 'Pengguna'}</span>
-                <span className="text-[10px] text-muted-foreground font-bold uppercase truncate">Perangkat Desa</span>
+                <span className="text-[10px] text-muted-foreground font-bold uppercase truncate">Karyawan Kecamatan</span>
               </div>
               <button
                 onClick={handleLogout}

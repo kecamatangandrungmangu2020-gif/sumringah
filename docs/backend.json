@@ -1,17 +1,31 @@
-
 {
   "entities": {
     "Kegiatan": {
       "title": "Kegiatan",
       "type": "object",
       "properties": {
-        "id": { "type": "string" },
-        "userId": { "type": "string" },
-        "title": { "type": "string" },
-        "description": { "type": "string" },
-        "location": { "type": "string" },
-        "date": { "type": "string" },
-        "uploadDate": { "type": "string", "format": "date-time" }
+        "id": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "location": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string"
+        },
+        "uploadDate": {
+          "type": "string",
+          "format": "date-time"
+        }
       }
     },
     "PhysicalActivity": {
@@ -19,74 +33,168 @@
       "description": "Data kegiatan/proyek fisik untuk otomatisasi dokumen.",
       "type": "object",
       "properties": {
-        "id": { "type": "string" },
-        "userId": { "type": "string" },
-        "namaKegiatan": { "type": "string" },
-        "tahunAnggaran": { "type": "string" },
-        "lokasi": { "type": "string" },
-        "volume": { "type": "string" },
-        "sumberDana": { "type": "string" },
-        "anggaran": { "type": "number" },
-        "pelaksanaKegiatan": { "type": "string" },
-        "penyedia": { "type": "string" },
-        "tanggalKegiatan": { "type": "string" },
-        "namaKepalaDesa": { "type": "string" },
-        "namaTpk": { "type": "string" },
-        "namaBendahara": { "type": "string" },
-        "createdAt": { "type": "string", "format": "date-time" },
-        "updatedAt": { "type": "string", "format": "date-time" }
+        "id": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "namaKegiatan": {
+          "type": "string"
+        },
+        "tahunAnggaran": {
+          "type": "string"
+        },
+        "lokasi": {
+          "type": "string"
+        },
+        "volume": {
+          "type": "string"
+        },
+        "sumberDana": {
+          "type": "string"
+        },
+        "anggaran": {
+          "type": "number"
+        },
+        "pelaksanaKegiatan": {
+          "type": "string"
+        },
+        "penyedia": {
+          "type": "string"
+        },
+        "tanggalKegiatan": {
+          "type": "string"
+        },
+        "namaKepalaKecamatan": {
+          "type": "string"
+        },
+        "namaTpk": {
+          "type": "string"
+        },
+        "namaBendahara": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
       },
-      "required": ["namaKegiatan", "tahunAnggaran", "anggaran"]
+      "required": [
+        "namaKegiatan",
+        "tahunAnggaran",
+        "anggaran"
+      ]
     },
     "BukuAgenda": {
       "title": "BukuAgenda",
       "type": "object",
       "properties": {
-        "id": { "type": "string" },
-        "kategori": { "type": "string", "enum": ["surat_keluar", "surat_masuk", "perdes", "perkades", "sk", "sppd", "surat_tugas_sppd"] },
-        "nomor": { "type": "string" },
-        "perihal": { "type": "string" },
-        "tanggal": { "type": "string" },
-        "userId": { "type": "string" },
-        "createdAt": { "type": "string", "format": "date-time" }
+        "id": {
+          "type": "string"
+        },
+        "kategori": {
+          "type": "string",
+          "enum": [
+            "surat_keluar",
+            "surat_masuk",
+            "perdes",
+            "perkades",
+            "sk",
+            "sppd",
+            "surat_tugas_sppd"
+          ]
+        },
+        "nomor": {
+          "type": "string"
+        },
+        "perihal": {
+          "type": "string"
+        },
+        "tanggal": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
       }
     },
     "Apbdes": {
       "title": "Apbdes",
       "type": "object",
       "properties": {
-        "id": { "type": "string" },
-        "tahun": { "type": "string" },
-        "bidang": { "type": "number" },
-        "kode": { "type": "string" },
-        "uraian": { "type": "string" },
-        "volume": { "type": "string" },
-        "satuan": { "type": "string" },
-        "nominal": { "type": "number" },
-        "sumber": { "type": "string" }
+        "id": {
+          "type": "string"
+        },
+        "tahun": {
+          "type": "string"
+        },
+        "bidang": {
+          "type": "number"
+        },
+        "kode": {
+          "type": "string"
+        },
+        "uraian": {
+          "type": "string"
+        },
+        "volume": {
+          "type": "string"
+        },
+        "satuan": {
+          "type": "string"
+        },
+        "nominal": {
+          "type": "number"
+        },
+        "sumber": {
+          "type": "string"
+        }
       }
     },
     "User": {
       "title": "User",
       "type": "object",
       "properties": {
-        "id": { "type": "string" },
-        "name": { "type": "string" },
-        "email": { "type": "string" },
-        "role": { "type": "string" }
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string"
+        }
       }
     }
   },
   "auth": {
-    "providers": ["password"]
+    "providers": [
+      "password"
+    ]
   },
   "firestore": {
     "/users/{userId}": {
-      "schema": { "$ref": "#/backend/entities/User" },
+      "schema": {
+        "$ref": "#/backend/entities/User"
+      },
       "description": "User profiles and settings."
     },
     "/buku_agenda/{docId}": {
-      "schema": { "$ref": "#/backend/entities/BukuAgenda" },
+      "schema": {
+        "$ref": "#/backend/entities/BukuAgenda"
+      },
       "description": "Log of official document numbers."
     },
     "/naskah_dinas/{docId}": {
@@ -94,11 +202,15 @@
       "description": "Official village documents."
     },
     "/physical_activities/{docId}": {
-      "schema": { "$ref": "#/backend/entities/PhysicalActivity" },
+      "schema": {
+        "$ref": "#/backend/entities/PhysicalActivity"
+      },
       "description": "Activities for physical document automation."
     },
     "/apbdes/{docId}": {
-      "schema": { "$ref": "#/backend/entities/Apbdes" },
+      "schema": {
+        "$ref": "#/backend/entities/Apbdes"
+      },
       "description": "Village budget records."
     }
   }

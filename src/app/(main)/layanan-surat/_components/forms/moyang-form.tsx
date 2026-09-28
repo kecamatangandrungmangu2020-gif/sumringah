@@ -322,7 +322,7 @@ export function MoyangForm({ isAdmin = false }: { isAdmin?: boolean }) {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
             <GoogleFileUploader label="Foto KTP Moyang" fieldName="ktpMoyang" onFileSelect={handleFileSelect} isRequired={!isAdmin} disabled={isSubmitting} />
             <GoogleFileUploader label="Foto KTP Anak" fieldName="ktpAnak" onFileSelect={handleFileSelect} isRequired={!isAdmin} disabled={isSubmitting} />
-            <GoogleFileUploader label="Surat Pengantar RT/RW" fieldName="pengantarRt" onFileSelect={handleFileSelect} isRequired={false} disabled={isSubmitting} />
+            <GoogleFileUploader label="Surat Pengantar KEPALA Kecamatan" fieldName="pengantarRt" onFileSelect={handleFileSelect} isRequired={false} disabled={isSubmitting} />
           </div>
         </FormSection>
 

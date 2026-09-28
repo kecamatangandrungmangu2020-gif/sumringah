@@ -1,11 +1,25 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600;1,700;1,800;1,900&family=Outfit:wght@500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+.font-editorial {
+  font-family: 'Playfair Display', Georgia, Cambria, serif;
+}
+
+.font-heading {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+}
+
+.font-display {
+  font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+}
+
 @layer base {
   :root {
     /* =========================================================
-       TEMA KEDESAN NUSANTARA: BIRU SAMUDERA PAMONG PRAJA & EMAS PADI
+       TEMA KEKecamatanN NUSANTARA: BIRU SAMUDERA PAMONG PRAJA & EMAS PADI
        Palet: Biru Samudera Pamong Praja (Royal Maritime Navy), 
        Emas Bulir Padi Siap Panen (Harvest Amber/Gold), 
        dan Putih Pualam Sejuk (Pure Porcelain White)
@@ -23,7 +37,7 @@
     --popover-foreground: 215 35% 14%;
 
     /* Warna Utama: Biru Samudera Pamong Praja (Royal Navy Pamong Praja) */
-    --primary: 215 75% 30%;             /* #13447C - Biru resmi pemerintahan desa & kementerian */
+    --primary: 215 75% 30%;             /* #13447C - Biru resmi pemerintahan Kecamatan & kementerian */
     --primary-foreground: 0 0% 100%;
 
     /* Warna Sekunder: Slate Navy (Maritime Slate) */
@@ -34,8 +48,8 @@
     --muted: 210 25% 95%;               /* #EEF2F6 - Abu kebiruan sejuk */
     --muted-foreground: 215 20% 45%;    /* #5C6E84 - Teks sekunder presisi */
 
-    /* Warna Aksen: Emas Bulir Padi / Hasil Panen Desa (Golden Paddy / Harvest Amber) */
-    --accent: 38 92% 50%;              /* #F59E0B - Kuning emas lumbung pangan desa */
+    /* Warna Aksen: Emas Bulir Padi / Hasil Panen Kecamatan (Golden Paddy / Harvest Amber) */
+    --accent: 38 92% 50%;              /* #F59E0B - Kuning emas lumbung pangan Kecamatan */
     --accent-foreground: 0 0% 100%;
 
     /* Status & Batas */
@@ -46,7 +60,7 @@
     --ring: 215 75% 35%;
     --radius: 1.25rem;
 
-    /* Sidebar Sistem Desa */
+    /* Sidebar Sistem Kecamatan */
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 215 30% 22%;
     --sidebar-primary: 215 75% 30%;
@@ -124,24 +138,24 @@
 
 @layer components {
   /* Utilitas Tipografi Gradien Modern */
-  .text-gradient-desa {
+  .text-gradient-Kecamatan {
     @apply bg-gradient-to-r from-blue-950 via-blue-800 to-indigo-900 dark:from-sky-200 dark:via-blue-300 dark:to-amber-200 bg-clip-text text-transparent;
   }
   .text-gradient-amber {
     @apply bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-600 dark:from-amber-400 dark:to-yellow-300 bg-clip-text text-transparent;
   }
 
-  /* Utilitas Kartu Nuansa Pedesaan Modern (Glassmorphism) */
-  .card-desa {
+  /* Utilitas Kartu Nuansa PeKecamatanan Modern (Glassmorphism) */
+  .card-Kecamatan {
     @apply rounded-2xl md:rounded-3xl border border-blue-950/10 dark:border-blue-500/20 bg-white/85 dark:bg-card/90 backdrop-blur-md text-card-foreground shadow-sm shadow-blue-950/5 transition-all duration-300 hover:shadow-xl hover:shadow-blue-950/10 hover:border-blue-600/30 hover:-translate-y-1;
   }
-  .card-desa-header {
+  .card-Kecamatan-header {
     @apply p-5 md:p-6 bg-gradient-to-r from-blue-50/70 via-blue-50/30 to-transparent dark:from-blue-950/40 dark:via-blue-950/10 dark:to-transparent border-b border-blue-950/10 dark:border-blue-500/20;
   }
   .badge-padi {
     @apply inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-black uppercase bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/25 shadow-sm;
   }
-  .badge-desa {
+  .badge-Kecamatan {
     @apply inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-black uppercase bg-blue-800/15 text-blue-900 dark:text-sky-300 border border-blue-800/25 shadow-sm;
   }
 
@@ -270,4 +284,56 @@
   100% {
     background-position: -200% 0;
   }
+}
+
+/* ── Animasi Khas Semringah (Senyuman Bahagia & Berseri-seri) ────────────── */
+@keyframes smileBloom {
+  0%, 100% {
+    transform: scaleY(1) translateY(0);
+    filter: drop-shadow(0 2px 8px rgba(245, 158, 11, 0.6));
+  }
+  50% {
+    transform: scaleY(1.22) translateY(2px);
+    filter: drop-shadow(0 4px 18px rgba(253, 224, 71, 0.95));
+  }
+}
+
+@keyframes sparkleTwinkle {
+  0%, 100% {
+    transform: scale(0.8) rotate(0deg);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.25) rotate(20deg);
+    opacity: 1;
+    filter: drop-shadow(0 0 12px rgba(253, 224, 71, 0.95));
+  }
+}
+
+@keyframes semringahRadiance {
+  0%, 100% {
+    filter: drop-shadow(0 0 16px rgba(245, 158, 11, 0.45)) drop-shadow(0 4px 14px rgba(0, 0, 0, 0.75));
+    transform: translateY(0px);
+  }
+  50% {
+    filter: drop-shadow(0 0 32px rgba(253, 224, 71, 0.85)) drop-shadow(0 4px 18px rgba(0, 0, 0, 0.85));
+    transform: translateY(-2px);
+  }
+}
+
+.animate-smile-bloom {
+  transform-origin: center top;
+  animation: smileBloom 3.5s ease-in-out infinite;
+}
+
+.animate-sparkle-twinkle {
+  animation: sparkleTwinkle 2.5s ease-in-out infinite;
+}
+
+.animate-sparkle-twinkle-delay {
+  animation: sparkleTwinkle 2.5s ease-in-out infinite 1.25s;
+}
+
+.animate-semringah-radiance {
+  animation: semringahRadiance 4s ease-in-out infinite;
 }

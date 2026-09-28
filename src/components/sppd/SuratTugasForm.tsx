@@ -44,16 +44,16 @@ export function SuratTugasForm() {
   const [isSyncing, setIsSyncing] = useState(false)
   const [agendas, setAgendas] = useState<AgendaItem[]>([])
   const [selectedCalendarDate, setSelectedCalendarDate] = useState("")
-  
+
   const { toast } = useToast()
   const { user } = useUser()
   const db = useFirestore()
-  
+
   const userDocRef = useMemoFirebase(() => {
     if (!db || !user) return null
     return doc(db, "users", user.uid)
   }, [db, user])
-  
+
   const { data: userData } = useDoc(userDocRef)
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -129,9 +129,9 @@ export function SuratTugasForm() {
   }
 
   const personnelCategories = [
-    { id: "Pemerintah Desa", label: "Perangkat" },
-    { id: "BPD", label: "BPD" },
-    { id: "RT/RW", label: "RT/RW" },
+    { id: "Karyawan Kecamatan", label: "Karyawan" },
+    { id: "SKRETARIS Kecamatan", label: "SKRETARIS Kecamatan" },
+    { id: "KEPALA Kecamatan", label: "KEPALA Kecamatan" },
     { id: "Kader", label: "Kader" },
     { id: "Lainnya", label: "Lainnya" }
   ]
@@ -161,8 +161,8 @@ export function SuratTugasForm() {
             <div className="flex items-end gap-2 p-3 border rounded-xl bg-muted/20">
               <div className="flex-1">
                 <label className="text-[9px] font-black uppercase text-muted-foreground mb-1 block">Tanggal Kegiatan</label>
-                <Input 
-                  type="date" 
+                <Input
+                  type="date"
                   value={selectedCalendarDate}
                   onChange={(e) => {
                     setSelectedCalendarDate(e.target.value);
@@ -171,18 +171,18 @@ export function SuratTugasForm() {
                   className="h-10 text-sm font-bold bg-white"
                 />
               </div>
-              <Button 
-                type="button" 
-                variant="outline" 
-                size="icon" 
-                onClick={() => handleSync(new Date(selectedCalendarDate))} 
-                disabled={isSyncing} 
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={() => handleSync(new Date(selectedCalendarDate))}
+                disabled={isSyncing}
                 className="h-10 w-10 shrink-0 bg-white"
               >
                 <RefreshCw className={cn("h-4 w-4 text-primary", isSyncing && "animate-spin")} />
               </Button>
             </div>
-            
+
             <ScrollArea className="h-[250px] border rounded-xl p-2 bg-white">
               {isSyncing ? (
                 <div className="flex flex-col items-center justify-center py-12 gap-2">
@@ -202,7 +202,7 @@ export function SuratTugasForm() {
                         <p className="text-xs font-bold group-hover:text-primary leading-snug">{agenda.title}</p>
                         <div className="flex items-center gap-1.5 mt-1">
                           <MapPin className="h-2.5 w-2.5 text-muted-foreground" />
-                          <p className="text-[9px] text-muted-foreground truncate uppercase font-medium">{agenda.location || "Luar Desa"}</p>
+                          <p className="text-[9px] text-muted-foreground truncate uppercase font-medium">{agenda.location || "Luar Kecamatan"}</p>
                         </div>
                       </div>
                       <ChevronRight className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary shrink-0" />
@@ -339,9 +339,9 @@ export function SuratTugasForm() {
                   />
                 </div>
 
-                <Button 
-                  type="button" 
-                  onClick={handlePrint} 
+                <Button
+                  type="button"
+                  onClick={handlePrint}
                   className="w-full h-12 gap-2 text-base font-black uppercase shadow-lg bg-primary hover:bg-primary/90 rounded-xl"
                   disabled={isGenerating}
                 >

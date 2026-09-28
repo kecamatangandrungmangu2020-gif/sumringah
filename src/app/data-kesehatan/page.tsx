@@ -170,7 +170,7 @@ export default function DataKesehatanPage() {
     const ws = XLSX.utils.json_to_sheet(exportData)
     const wb = XLSX.utils.book_new()
     XLSX.utils.book_append_sheet(wb, ws, activeTab)
-    XLSX.writeFile(wb, `Data_Kesehatan_${activeTab.replace(/\s+/g, '_')}_KARANGANYAR.xlsx`)
+    XLSX.writeFile(wb, `Data_Kesehatan_${activeTab.replace(/\s+/g, '_')}_GANDRUNGMANGU.xlsx`)
   }
 
   const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -355,7 +355,7 @@ export default function DataKesehatanPage() {
               <Input
                 value={formData.address}
                 onChange={(e) => setFormData(p => ({ ...p, address: e.target.value }))}
-                placeholder="CONTOH: RT 04 RW 05 DESA KARANGANYAR"
+                placeholder="CONTOH: RT 04 RW 05 KECAMATAN GANDRUNGMANGU"
                 className="h-12 rounded-xl uppercase"
               />
             </div>

@@ -8,7 +8,7 @@ export function DomisiliPrintTemplate({ submission }: { submission: LetterSubmis
   return (
     <PrintLayout submission={submission} hideRequesterSignature={true}>
       <p className="mt-3 text-justify leading-normal">
-        Yang bertanda tangan dibawah ini, Kepala Desa Karanganyar, Kecamatan
+        Yang bertanda tangan dibawah ini, CAMAT GANDRUNGMANGU Kecamatan
         Gandrungmangu, Kabupaten Cilacap, menerangkan dengan sebenarnya bahwa :
       </p>
 
@@ -25,7 +25,7 @@ export function DomisiliPrintTemplate({ submission }: { submission: LetterSubmis
       </table>
 
       <p className="mt-2.5 text-justify leading-normal">
-        Adalah benar penduduk Desa Karanganyar, Kecamatan Gandrungmangu, Kabupaten Cilacap dan saat ini berdomisili di :
+        Adalah benar penduduk Kecamatan Gandrungmangu, Kecamatan Gandrungmangu, Kabupaten Cilacap dan saat ini berdomisili di :
       </p>
 
       <table className="mt-1.5 border-collapse w-full">

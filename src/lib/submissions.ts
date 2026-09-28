@@ -1,15 +1,15 @@
-import { 
-  Firestore, 
-  doc, 
-  getDoc, 
-  getDocs, 
-  collection, 
-  addDoc, 
-  updateDoc, 
-  deleteDoc, 
-  query, 
-  orderBy, 
-  serverTimestamp 
+import {
+  Firestore,
+  doc,
+  getDoc,
+  getDocs,
+  collection,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  query,
+  orderBy,
+  serverTimestamp
 } from 'firebase/firestore';
 import { LetterSubmission } from './types';
 
@@ -18,7 +18,7 @@ import { LetterSubmission } from './types';
  * Mendapatkan pengajuan surat berdasarkan ID Dokumen
  */
 export const getSubmissionById = async (
-  db: Firestore, 
+  db: Firestore,
   id: string
 ): Promise<LetterSubmission | null> => {
   if (!id) return null;
@@ -57,7 +57,7 @@ export const getAllSubmissions = async (db: Firestore): Promise<LetterSubmission
  * Membuat pengajuan surat baru
  */
 export const createLetterSubmission = async (
-  db: Firestore, 
+  db: Firestore,
   submissionData: Omit<LetterSubmission, 'id'>
 ): Promise<string> => {
   try {
@@ -77,9 +77,9 @@ export const createLetterSubmission = async (
  * Memperbarui status pengajuan surat atau nomor surat
  */
 export const updateSubmissionStatus = async (
-  db: Firestore, 
-  id: string, 
-  status: string, 
+  db: Firestore,
+  id: string,
+  status: string,
   documentNumber?: string
 ): Promise<void> => {
   try {
@@ -101,14 +101,14 @@ export const updateSubmissionStatus = async (
 
 /**
  * Mendapatkan Nomor Surat Otomatis Berurutan
- * Format: 400 / [urutan] / 04 / 2026
+ * Format: 400 / [urutan] / 49 / 2026
  */
 export const getNextDocumentNumber = async (db: Firestore): Promise<string> => {
   try {
     const q = collection(db, 'submissions');
     const snapshot = await getDocs(q);
     let maxSeq = 0;
-    
+
     snapshot.forEach((docSnap) => {
       const data = docSnap.data();
       if (data.documentNumber && typeof data.documentNumber === 'string') {
@@ -126,10 +126,10 @@ export const getNextDocumentNumber = async (db: Firestore): Promise<string> => {
     const seqStr = String(nextSeq).padStart(3, '0');
     const year = new Date().getFullYear();
 
-    return `400 / ${seqStr} / 04 / ${year}`;
+    return `400 / ${seqStr} / 49 / ${year}`;
   } catch (error) {
     console.error("Error generating document number:", error);
-    return `400 / 001 / 04 / ${new Date().getFullYear()}`;
+    return `400 / 001 / 49 / ${new Date().getFullYear()}`;
   }
 };
 

@@ -18,6 +18,14 @@ const nextConfig: NextConfig = {
         source: '/pengajuansurat',
         destination: '/pengajuan-surat/',
       },
+      {
+        source: '/desa/:slug/',
+        destination: '/:slug/',
+      },
+      {
+        source: '/desa/:slug',
+        destination: '/:slug/',
+      },
     ];
   },
 };

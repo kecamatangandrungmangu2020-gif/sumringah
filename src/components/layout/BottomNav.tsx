@@ -18,7 +18,7 @@ export function BottomNav() {
     { label: "Beranda", icon: LayoutDashboard, href: "/dashboard/" },
     { label: "Dokumentasi", icon: FileUp, href: "/kegiatan/" },
     { label: "SPPD", icon: Map, href: "/sppd/" },
-    { label: "Data Desa", icon: User, href: "/profile/" },
+    { label: "Data Kecamatan", icon: User, href: "/profile/" },
   ]
 
   if (!mounted) return null;
@@ -28,7 +28,7 @@ export function BottomNav() {
       <div className="flex justify-around py-3">
         {navItems.map((item) => {
           const isActive = pathname === item.href || (item.href !== "/dashboard/" && pathname.startsWith(item.href))
-          
+
           return (
             <Link
               key={item.href}

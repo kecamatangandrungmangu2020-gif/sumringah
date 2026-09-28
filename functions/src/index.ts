@@ -1,6 +1,6 @@
 /**
  * =================================================================================
- * BACKEND GOOGLE APPS SCRIPT - DESA DIGITAL (VERSI 7.5 - STABLE CALENDAR)
+ * BACKEND GOOGLE APPS SCRIPT - Kecamatan DIGITAL (VERSI 7.5 - STABLE CALENDAR)
  * =================================================================================
  * 
  * PETUNJUK DEPLOY (WAJIB):
@@ -13,7 +13,7 @@
  * =================================================================================
  */
 
-const GEMINI_API_KEY = "AIzaSyC14sMFsIWhjaZHEv8BzMyAQJtYqUxp6Xo"; 
+const GEMINI_API_KEY = "AIzaSyC14sMFsIWhjaZHEv8BzMyAQJtYqUxp6Xo";
 
 function doPost(e) {
   try {
@@ -33,15 +33,15 @@ function doPost(e) {
       case 'askAI':
         result = handleAskAI(data);
         break;
-      
+
       case 'createEventAndUpload':
         result = handleCreateEventAndUpload(data);
         break;
-      
+
       case 'uploadArchiveFile':
         result = handleArchiveUpload(data);
         break;
-        
+
       case 'getCalendar':
         result = handleGetCalendar(data);
         break;
@@ -57,7 +57,7 @@ function doPost(e) {
       default:
         throw new Error("Aksi tidak dikenal: " + action);
     }
-    
+
     return ContentService.createTextOutput(JSON.stringify({ success: true, ...result }))
       .setMimeType(ContentService.MimeType.JSON);
 
@@ -74,7 +74,7 @@ function doPost(e) {
 function handleSaveToDrive(data) {
   const { folderName, parentFolderId, files } = data;
   let parentFolder;
-  
+
   try {
     parentFolder = DriveApp.getFolderById(parentFolderId);
   } catch (e) {
@@ -98,14 +98,14 @@ function handleSaveToDrive(data) {
       if (url) fileUrls.photos.push(url);
     });
   }
-  
+
   if (files.materials) {
     files.materials.forEach(material => {
       const url = saveFile(material, newFolder);
       if (url) fileUrls.materials.push(url);
     });
   }
-  
+
   fileUrls.undangan = saveFile(files.undangan, newFolder);
   fileUrls.notulen = saveFile(files.notulen, newFolder);
   fileUrls.bast = saveFile(files.bast, newFolder);
@@ -122,7 +122,7 @@ function handleSaveToDrive(data) {
 function handleCreateEventAndUpload(data) {
   const { eventData, fileData, folderId } = data;
   let fileUrl = null;
-  
+
   if (fileData && fileData.base64) {
     try {
       let targetFolder;
@@ -131,7 +131,7 @@ function handleCreateEventAndUpload(data) {
       } catch (e) {
         targetFolder = DriveApp.getRootFolder();
       }
-      
+
       const decoded = Utilities.base64Decode(fileData.base64);
       const blob = Utilities.newBlob(decoded, fileData.type, fileData.name);
       fileUrl = targetFolder.createFile(blob).getUrl();
@@ -147,7 +147,7 @@ function handleCreateEventAndUpload(data) {
     start: { dateTime: eventData.start, timeZone: 'Asia/Jakarta' },
     end: { dateTime: eventData.end, timeZone: 'Asia/Jakarta' }
   };
-  
+
   try {
     const createdEvent = Calendar.Events.insert(eventResource, eventData.calendarId || "primary");
     return { eventUrl: createdEvent.htmlLink, fileUrl: fileUrl };
@@ -178,18 +178,18 @@ function handleGetCalendar(data) {
     const { calendarId, date } = data;
     const targetDate = new Date(date);
     if (isNaN(targetDate.getTime())) throw new Error("Format tanggal tidak valid.");
-    
+
     const timeMin = targetDate.toISOString();
     const timeMax = new Date(targetDate.getTime() + 24 * 60 * 60 * 1000).toISOString();
-    
+
     const calId = (calendarId && calendarId.includes("@")) ? calendarId : "primary";
-    const response = Calendar.Events.list(calId, { 
-      timeMin: timeMin, 
-      timeMax: timeMax, 
-      singleEvents: true, 
-      orderBy: 'startTime' 
+    const response = Calendar.Events.list(calId, {
+      timeMin: timeMin,
+      timeMax: timeMax,
+      singleEvents: true,
+      orderBy: 'startTime'
     });
-    
+
     return { items: response.items || [] };
   } catch (err) {
     throw new Error("Gagal mengambil agenda: " + err.message);
@@ -215,7 +215,7 @@ function handleArchiveUpload(data) {
   } catch (e) {
     targetFolder = DriveApp.getRootFolder();
   }
-  
+
   const decoded = Utilities.base64Decode(fileData.base64);
   const blob = Utilities.newBlob(decoded, fileData.type, fileName);
   const file = targetFolder.createFile(blob);
@@ -228,7 +228,7 @@ function forceGrantAllPermissions() {
   const cal = CalendarApp.getDefaultCalendar();
   Logger.log("Akses Kalender OK: " + cal.getName());
   try {
-    Calendar.Events.list("primary", {maxResults: 1});
+    Calendar.Events.list("primary", { maxResults: 1 });
     Logger.log("API Advanced Calendar OK");
   } catch (e) {
     Logger.log("API Advanced Calendar ERROR: " + e.message);

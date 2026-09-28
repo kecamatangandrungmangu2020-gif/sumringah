@@ -9,15 +9,15 @@ export type NaskahType = 'UND' | 'SK' | 'BA' | 'ST';
 export const CLASSIFICATION_CODES = [
   { code: "000", label: "Umum" },
   { code: "100", label: "Pemerintahan" },
-  { code: "140", label: "Pemerintahan Desa/Kelurahan" },
-  { code: "141", label: "Perangkat Desa" },
-  { code: "142", label: "BPD" },
+  { code: "140", label: "Pemerintahan Kecamatan/Kelurahan" },
+  { code: "141", label: "Karyawan Kecamatan" },
+  { code: "142", label: "SKRETARIS Kecamatan" },
   { code: "143", label: "Lembaga Kemasyarakatan" },
-  { code: "145", label: "Administrasi Desa" },
-  { code: "146", label: "Kekayaan Desa" },
-  { code: "147", label: "Pembangunan Desa" },
-  { code: "148", label: "Pemilihan Kepala Desa" },
-  { code: "149", label: "Pertanahan Desa" },
+  { code: "145", label: "Administrasi Kecamatan" },
+  { code: "146", label: "Kekayaan Kecamatan" },
+  { code: "147", label: "Pembangunan Kecamatan" },
+  { code: "148", label: "Pemilihan Kepala Kecamatan" },
+  { code: "149", label: "Pertanahan Kecamatan" },
   { code: "200", label: "Politik" },
   { code: "300", label: "Keamanan & Ketertiban" },
   { code: "400", label: "Kesejahteraan Rakyat" },
@@ -40,7 +40,7 @@ export const CLASSIFICATION_CODES = [
   { code: "800", label: "Kepegawaian" },
   { code: "900", label: "Keuangan" },
   { code: "910", label: "APBDes" },
-  { code: "912", label: "Pengelolaan Keuangan Desa" },
+  { code: "912", label: "Pengelolaan Keuangan Kecamatan" },
 ];
 
 /**
@@ -48,7 +48,7 @@ export const CLASSIFICATION_CODES = [
  */
 export async function getNextSequenceNumber(db: Firestore, kategori: string, classification: string = "000"): Promise<string> {
   const currentYear = new Date().getFullYear().toString();
-  
+
   // Gunakan kategori 'sppd' sebagai acuan urutan untuk 'surat_tugas_sppd' agar sinkron
   const targetCategory = kategori === 'surat_tugas_sppd' ? 'surat_keluar' : kategori;
 
@@ -56,7 +56,7 @@ export async function getNextSequenceNumber(db: Firestore, kategori: string, cla
     collection(db, "buku_agenda"),
     where("kategori", "==", targetCategory),
     orderBy("createdAt", "desc"),
-    limit(20) 
+    limit(20)
   );
 
   const snapshot = await getDocs(q);
@@ -65,17 +65,17 @@ export async function getNextSequenceNumber(db: Firestore, kategori: string, cla
   if (!snapshot.empty) {
     // Cari dokumen terbaru yang dibuat pada tahun berjalan
     const yearDocs = snapshot.docs.filter(d => (d.data().createdAt || "").substring(0, 4) === currentYear);
-    
+
     if (yearDocs.length > 0) {
       const latestDoc = yearDocs[0].data();
       const lastNomor = latestDoc.nomor || "";
-      
+
       // Bedah nomor berdasarkan pemisah miring (/)
       // Contoh: 027 / 001 / BA / 2026 -> parts: ["027", "001", "BA", "2026"]
       const parts = lastNomor.split(/[\/\s]+/).filter(Boolean);
-      
+
       if (parts.length >= 2) {
-        // Pada standar penomoran desa, nomor urut biasanya berada di segmen kedua
+        // Pada standar penomoran Kecamatan, nomor urut biasanya berada di segmen kedua
         const possibleSeq = parts[1];
         const seqInt = parseInt(possibleSeq);
         if (!isNaN(seqInt)) {
@@ -97,11 +97,11 @@ export async function getNextSequenceNumber(db: Firestore, kategori: string, cla
   if (kategori === "sppd") {
     return `000.1.2.3/${paddedNum}/04/${currentYear}`;
   }
-  
+
   if (kategori === "surat_tugas_sppd") {
     return `800.1.11.1/${paddedNum}/04/${currentYear}`;
   }
-  
+
   return `${classification}/${paddedNum}/04/${currentYear}`;
 }
 

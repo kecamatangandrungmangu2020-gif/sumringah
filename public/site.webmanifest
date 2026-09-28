@@ -1,7 +1,7 @@
 {
-  "name": "Manajemen Desa Karanganyar",
-  "short_name": "Karanganyar",
-  "description": "Sistem Manajemen & Pelayanan Desa Karanganyar, Kecamatan Gandrungmangu, Kabupaten Cilacap",
+  "name": "Manajemen Kecamatan Gandrungmangu",
+  "short_name": "Gandrungmangu",
+  "description": "Sistem Manajemen & Pelayanan Kecamatan Gandrungmangu, Kecamatan Gandrungmangu, Kabupaten Cilacap",
   "id": "/",
   "start_url": "/dashboard/",
   "scope": "/",
@@ -62,7 +62,7 @@
     {
       "name": "Dashboard",
       "short_name": "Dashboard",
-      "description": "Halaman utama manajemen desa",
+      "description": "Halaman utama manajemen Kecamatan",
       "url": "/dashboard/",
       "icons": [
         {
@@ -86,7 +86,7 @@
     {
       "name": "Agenda Kegiatan",
       "short_name": "Agenda",
-      "description": "Manajemen kalender agenda desa",
+      "description": "Manajemen kalender agenda Kecamatan",
       "url": "/agenda/",
       "icons": [
         {
@@ -98,7 +98,7 @@
     {
       "name": "Data Penduduk",
       "short_name": "Penduduk",
-      "description": "Database kependudukan desa",
+      "description": "Database kependudukan Kecamatan",
       "url": "/pelayanan/penduduk/",
       "icons": [
         {

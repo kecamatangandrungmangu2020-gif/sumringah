@@ -12,7 +12,7 @@ export function PindahPrintTemplate({ submission }: { submission: LetterSubmissi
       fontSize="12pt"
     >
       <p className="mt-3 text-justify leading-normal">
-        Yang bertanda tangan di bawah ini Kepala Desa Karanganyar, Kecamatan
+        Yang bertanda tangan di bawah ini CAMAT GANDRUNGMANGU Kecamatan
         Gandrungmangu, Kabupaten Cilacap, menerangkan bahwa:
       </p>
 
@@ -25,7 +25,7 @@ export function PindahPrintTemplate({ submission }: { submission: LetterSubmissi
           <DataRow
             compact="tight"
             label="Alamat Asal"
-            value={`Desa Karanganyar, RT ${formData.currentAddressRt} / RW ${formData.currentAddressRw}, Kecamatan Gandrungmangu, Kabupaten Cilacap, Provinsi Jawa Tengah`}
+            value={`Kecamatan Gandrungmangu, RT ${formData.currentAddressRt} / RW ${formData.currentAddressRw}, Kecamatan Gandrungmangu, Kabupaten Cilacap, Provinsi Jawa Tengah`}
           />
         </tbody>
       </table>
@@ -39,7 +39,7 @@ export function PindahPrintTemplate({ submission }: { submission: LetterSubmissi
           <DataRow
             compact="tight"
             label="Alamat Tujuan"
-            value={`Desa ${formData.destinationAddress}, RT ${formData.destinationAddressRt} / RW ${formData.destinationAddressRw}, Kecamatan ${formData.destinationKecamatan}, Kabupaten ${formData.destinationKabupaten}, Provinsi ${formData.destinationProvinsi}`}
+            value={`Kecamatan ${formData.destinationAddress}, RT ${formData.destinationAddressRt} / RW ${formData.destinationAddressRw}, Kecamatan ${formData.destinationKecamatan}, Kabupaten ${formData.destinationKabupaten}, Provinsi ${formData.destinationProvinsi}`}
           />
           <DataRow compact="tight" label="Jumlah Keluarga" value={`${formData.familyCount} orang`} />
         </tbody>
