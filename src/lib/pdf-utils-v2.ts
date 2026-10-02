@@ -9,7 +9,11 @@ const LOGO_CILACAP_FALLBACK = "https://upload.wikimedia.org/wikipedia/commons/th
 interface Participant {
     name: string;
     jabatan: string;
-    category: string;
+    category?: string;
+    gender?: string;
+    lp?: string;
+    jenisKelamin?: string;
+    [key: string]: any;
 }
 
 interface PDFData {
@@ -60,37 +64,79 @@ export const generateDaftarHadirPDF = async (values: PDFData, logoBase64?: strin
     addHeaderDetail("Tempat", values.location || "Balai Kecamatan Gandrungmangu");
 
     currentY += 8;
-    const colW = [12, 75, 55, 38];
-    const baseRowHeight = 12;
-    const tableHeaders = ["NO", "NAMA", "JABATAN", "TTD"];
+    // Lebar kolom total: 180mm (pageWidth 210 - margin 2x15)
+    // NO: 10, NAMA: 62, L/P: 10, JABATAN: 66, TTD: 32
+    const colW = [10, 62, 10, 66, 32];
+    const headerHeight = 10;
+    const tableHeaders = ["NO", "NAMA", "L/P", "JABATAN", "TTD"];
+
+    const tableFontSize = 9;
+    const lineSpacing = 3.8;
+    const fontCapHeight = 2.4;
+    const minRowHeight = 11;
+    const verticalPadding = 5.2;
 
     const drawTableHeader = () => {
         doc.setFont("helvetica", "bold");
-        doc.setFontSize(10);
+        doc.setFontSize(9.5);
         let hX = margin;
         tableHeaders.forEach((header, i) => {
-            doc.rect(hX, currentY, colW[i], 12);
-            doc.text(header, hX + colW[i] / 2, currentY + 8, { align: "center" });
+            doc.rect(hX, currentY, colW[i], headerHeight);
+            doc.text(header, hX + colW[i] / 2, currentY + (headerHeight / 2) + 1.2, { align: "center" });
             hX += colW[i];
         });
-        currentY += 12;
+        currentY += headerHeight;
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(tableFontSize);
     };
+
+    const getRankWeight = (jabatan?: string) => {
+        const j = (jabatan || "").toUpperCase().trim();
+        if (!j) return 999;
+        if (
+            (j === "CAMAT" || j.startsWith("CAMAT") || j.includes("CAMAT GANDRUNGMANGU") || j.includes("PLT. CAMAT") || j.includes("PJ. CAMAT")) &&
+            !j.includes("SEKRETARIS") && !j.includes("SEKCAM") && !j.includes("AJUDAN") && !j.includes("PENGEMUDI") && !j.includes("SOPIR") && !j.includes("DRIVER") && !j.includes("STAF")
+        ) return 1;
+        if (j.includes("SEKRETARIS KECAMATAN") || j.includes("SEKCAM") || j.includes("SEKRETARIS")) return 2;
+        if ((j.startsWith("KASI ") || j === "KASI" || j.includes("KASI ") || j.includes("KEPALA SEKSI")) && !j.includes("KASUBBAG") && !j.includes("KASUBAG")) return 3;
+        if (j.includes("KASUBBAG") || j.includes("KASUBAG") || j.includes("KEPALA SUB BAGIAN") || j.includes("KEPALA SUBBAGIAN") || j.includes("KEPALA SUB")) return 4;
+        return 10;
+    };
+
+    // Urutkan participants: Camat, Sekretaris, Kasi, Kasubbag, lalu staf/lainnya
+    const sortedParticipants = [...values.participants].sort((a, b) => {
+        const hasNameA = Boolean(a && a.name && a.name.trim() !== "");
+        const hasNameB = Boolean(b && b.name && b.name.trim() !== "");
+        if (!hasNameA && !hasNameB) return 0;
+        if (!hasNameA) return 1;
+        if (!hasNameB) return -1;
+        const wA = getRankWeight(a.jabatan);
+        const wB = getRankWeight(b.jabatan);
+        if (wA !== wB) return wA - wB;
+        return (a.name || "").localeCompare(b.name || "");
+    });
 
     drawTableHeader();
 
-    for (let i = 0; i < values.participants.length; i++) {
-        const p = values.participants[i];
+    for (let i = 0; i < sortedParticipants.length; i++) {
+        const p = sortedParticipants[i];
 
-        const nameLines = doc.splitTextToSize((p.name || "").toUpperCase(), colW[1] - 4);
-        const positionLines = doc.splitTextToSize((p.jabatan || "").toUpperCase(), colW[2] - 4);
-        const lineCount = Math.max(nameLines.length, positionLines.length, 1);
-        const rowHeight = Math.max(baseRowHeight, (lineCount * 5) + 2);
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(tableFontSize);
+
+        const nameLines: string[] = doc.splitTextToSize((p.name || "").toUpperCase(), colW[1] - 4);
+        const positionLines: string[] = doc.splitTextToSize((p.jabatan || "").toUpperCase(), colW[3] - 4);
+        const maxLines = Math.max(nameLines.length, positionLines.length, 1);
+        const textBlockHeight = (maxLines - 1) * lineSpacing + fontCapHeight;
+        const rowHeight = Math.max(minRowHeight, textBlockHeight + verticalPadding);
 
         if (currentY + rowHeight > pageHeight - 20) {
             doc.addPage();
             addKopSuratSync(doc, logoImg, margin, pageWidth);
             currentY = 40;
             drawTableHeader();
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(tableFontSize);
         }
 
         const startY = currentY;
@@ -100,29 +146,69 @@ export const generateDaftarHadirPDF = async (values: PDFData, logoBase64?: strin
             rX += w;
         });
 
-        const textY = startY + rowHeight / 2;
+        // Helper render teks presisi di tengah-tengah kolom secara vertikal
+        const renderCenteredLines = (lines: string[], x: number, align: "left" | "center" = "left") => {
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(tableFontSize);
+            const n = Math.max(lines.length, 1);
+            const blockH = (n - 1) * lineSpacing + fontCapHeight;
+            const topY = startY + (rowHeight - blockH) / 2;
+            const firstBaseline = topY + fontCapHeight - 0.2;
+            for (let k = 0; k < lines.length; k++) {
+                doc.text(lines[k], x, firstBaseline + (k * lineSpacing), { align });
+            }
+        };
+
         let cX = margin;
 
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(10);
-
-        doc.text((i + 1).toString(), cX + colW[0] / 2, textY, { align: "center", baseline: "middle" });
+        // NO
+        renderCenteredLines([(i + 1).toString()], cX + colW[0] / 2, "center");
         cX += colW[0];
 
-        doc.text(nameLines, cX + 2, textY, { baseline: "middle" });
+        // NAMA
+        renderCenteredLines(nameLines, cX + 2, "left");
         cX += colW[1];
 
-        doc.text(positionLines, cX + 2, textY, { maxWidth: colW[2] - 4, baseline: "middle" });
+        // L/P
+        const rawLp = String(
+            p.gender ||
+            p.lp ||
+            p.jenisKelamin ||
+            p["Jenis Kelamin"] ||
+            p["jenis kelamin"] ||
+            p.jk ||
+            ""
+        ).trim().toUpperCase();
+        let displayLp = "";
+        if (rawLp === "L" || rawLp.startsWith("LAKI") || rawLp === "PRIA" || rawLp === "MALE" || rawLp === "M") {
+            displayLp = "L";
+        } else if (rawLp === "P" || rawLp.startsWith("PEREMPUAN") || rawLp.startsWith("WANITA") || rawLp === "FEMALE" || rawLp === "F") {
+            displayLp = "P";
+        } else if (rawLp.startsWith("L")) {
+            displayLp = "L";
+        } else if (rawLp.startsWith("P")) {
+            displayLp = "P";
+        } else {
+            displayLp = rawLp;
+        }
+        renderCenteredLines([displayLp], cX + colW[2] / 2, "center");
         cX += colW[2];
 
-        const signX = (i % 2 === 0) ? cX + 2 : cX + (colW[3] / 2);
+        // JABATAN
+        renderCenteredLines(positionLines, cX + 2, "left");
+        cX += colW[3];
+
+        // TTD
+        const signX = (i % 2 === 0) ? cX + 2 : cX + (colW[4] / 2);
+        doc.setFont("helvetica", "normal");
         doc.setFontSize(8);
-        doc.text(`${i + 1}. .......`, signX, textY, { baseline: "middle" });
+        const signY = startY + (rowHeight / 2) + 1.0;
+        doc.text(`${i + 1}. .......`, signX, signY);
 
         currentY += rowHeight;
     }
 
-    if (currentY > pageHeight - 60) {
+    if (currentY > pageHeight - 65) {
         doc.addPage();
         addKopSuratSync(doc, logoImg, margin, pageWidth);
         currentY = 40;
@@ -139,6 +225,9 @@ export const generateDaftarHadirPDF = async (values: PDFData, logoBase64?: strin
     doc.text("FATHAN ADY CHANDRA, S.STP., M.M.", sigX, currentY);
     const nW = doc.getTextWidth("FATHAN ADY CHANDRA, S.STP., M.M.");
     doc.line(sigX, currentY + 1, sigX + nW, currentY + 1);
+    doc.setFont("helvetica", "normal");
+    doc.text("Pembina Tingkat I", sigX, currentY + 5);
+    doc.text("NIP. 19810509 199912 1 001", sigX, currentY + 9.5);
 
     return doc.output("blob");
 }
@@ -179,20 +268,28 @@ export const generateDaftarHadirPesertaPDF = async (values: PDFData, logoBase64?
     addHeaderDetail("Tempat", values.location || "Balai Kecamatan Gandrungmangu");
 
     currentY += 8;
-    const colW = [12, 75, 60, 33]; // NO, NAMA PESERTA, ALAMAT, TTD
-    const baseRowHeight = 10;
+    const colW = [10, 75, 63, 32]; // NO, NAMA PESERTA, ALAMAT, TTD
+    const headerHeight = 10;
     const tableHeaders = ["NO", "NAMA PESERTA", "ALAMAT", "TTD"];
+
+    const tableFontSize = 9;
+    const lineSpacing = 3.8;
+    const fontCapHeight = 2.4;
+    const minRowHeight = 10;
+    const verticalPadding = 5.2;
 
     const drawTableHeader = () => {
         doc.setFont("helvetica", "bold");
-        doc.setFontSize(10);
+        doc.setFontSize(9.5);
         let hX = margin;
         tableHeaders.forEach((header, i) => {
-            doc.rect(hX, currentY, colW[i], 10);
-            doc.text(header, hX + colW[i] / 2, currentY + 6.5, { align: "center" });
+            doc.rect(hX, currentY, colW[i], headerHeight);
+            doc.text(header, hX + colW[i] / 2, currentY + (headerHeight / 2) + 1.2, { align: "center" });
             hX += colW[i];
         });
-        currentY += 10;
+        currentY += headerHeight;
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(tableFontSize);
     };
 
     drawTableHeader();
@@ -203,42 +300,68 @@ export const generateDaftarHadirPesertaPDF = async (values: PDFData, logoBase64?
     for (let i = 0; i < totalItems; i++) {
         const p = values.participants[i] || { name: "", jabatan: "" };
 
-        const nameLines = doc.splitTextToSize((p.name || "").toUpperCase(), colW[1] - 4);
-        const addressLines = doc.splitTextToSize((p.jabatan || "").toUpperCase(), colW[2] - 4);
-        const lineCount = Math.max(nameLines.length, addressLines.length, 1);
-        const rowHeight = Math.max(baseRowHeight, (lineCount * 5) + 2);
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(tableFontSize);
+
+        const nameLines: string[] = doc.splitTextToSize((p.name || "").toUpperCase(), colW[1] - 4);
+        const addressLines: string[] = doc.splitTextToSize((p.jabatan || "").toUpperCase(), colW[2] - 4);
+        const maxLines = Math.max(nameLines.length, addressLines.length, 1);
+        const textBlockHeight = (maxLines - 1) * lineSpacing + fontCapHeight;
+        const rowHeight = Math.max(minRowHeight, textBlockHeight + verticalPadding);
 
         if (currentY + rowHeight > pageHeight - 20) {
             doc.addPage();
             addKopSuratSync(doc, logoImg, margin, pageWidth);
             currentY = 40;
             drawTableHeader();
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(tableFontSize);
         }
 
+        const startY = currentY;
         let rX = margin;
-        doc.rect(rX, currentY, colW[0], rowHeight);
+        colW.forEach(w => {
+            doc.rect(rX, startY, w, rowHeight);
+            rX += w;
+        });
+
+        const renderCenteredLines = (lines: string[], x: number, align: "left" | "center" = "left") => {
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(tableFontSize);
+            const n = Math.max(lines.length, 1);
+            const blockH = (n - 1) * lineSpacing + fontCapHeight;
+            const topY = startY + (rowHeight - blockH) / 2;
+            const firstBaseline = topY + fontCapHeight - 0.2;
+            for (let k = 0; k < lines.length; k++) {
+                doc.text(lines[k], x, firstBaseline + (k * lineSpacing), { align });
+            }
+        };
+
+        let cX = margin;
+
+        // NO
+        renderCenteredLines([(i + 1).toString()], cX + colW[0] / 2, "center");
+        cX += colW[0];
+
+        // NAMA
+        renderCenteredLines(nameLines, cX + 2, "left");
+        cX += colW[1];
+
+        // ALAMAT
+        renderCenteredLines(addressLines, cX + 2, "left");
+        cX += colW[2];
+
+        // TTD
+        const signX = (i % 2 === 0) ? cX + 2 : cX + (colW[3] / 2);
         doc.setFont("helvetica", "normal");
-        doc.setFontSize(10);
-        doc.text((i + 1).toString(), rX + colW[0] / 2, currentY + rowHeight / 2 + 1.5, { align: "center" });
-        rX += colW[0];
-
-        doc.rect(rX, currentY, colW[1], rowHeight);
-        doc.text(nameLines, rX + 2, currentY + 5);
-        rX += colW[1];
-
-        doc.rect(rX, currentY, colW[2], rowHeight);
-        doc.text(addressLines, rX + 2, currentY + 5);
-        rX += colW[2];
-
-        doc.rect(rX, currentY, colW[3], rowHeight);
-        const signX = (i % 2 === 0) ? rX + 2 : rX + (colW[3] / 2);
         doc.setFontSize(8);
-        doc.text(`${i + 1}. .......`, signX, currentY + rowHeight / 2 + 1.5);
+        const signY = startY + (rowHeight / 2) + 1.0;
+        doc.text(`${i + 1}. .......`, signX, signY);
 
         currentY += rowHeight;
     }
 
-    if (currentY > pageHeight - 60) {
+    if (currentY > pageHeight - 65) {
         doc.addPage();
         addKopSuratSync(doc, logoImg, margin, pageWidth);
         currentY = 40;
@@ -255,6 +378,9 @@ export const generateDaftarHadirPesertaPDF = async (values: PDFData, logoBase64?
     doc.text("FATHAN ADY CHANDRA, S.STP., M.M.", sigX, currentY);
     const nW = doc.getTextWidth("FATHAN ADY CHANDRA, S.STP., M.M.");
     doc.line(sigX, currentY + 1, sigX + nW, currentY + 1);
+    doc.setFont("helvetica", "normal");
+    doc.text("Pembina Tingkat I", sigX, currentY + 5);
+    doc.text("NIP. 19810509 199912 1 001", sigX, currentY + 9.5);
 
     return doc.output("blob");
 }
@@ -416,6 +542,9 @@ export const generateUangSakuPDF = async (values: PDFData, logoBase64?: string |
     doc.text("FATHAN ADY CHANDRA, S.STP., M.M.", sigX, currentY);
     const nW = doc.getTextWidth("FATHAN ADY CHANDRA, S.STP., M.M.");
     doc.line(sigX, currentY + 1, sigX + nW, currentY + 1);
+    doc.setFont("helvetica", "normal");
+    doc.text("Pembina Tingkat I", sigX, currentY + 5);
+    doc.text("NIP. 19810509 199912 1 001", sigX, currentY + 9.5);
 
     return doc.output("blob");
 }

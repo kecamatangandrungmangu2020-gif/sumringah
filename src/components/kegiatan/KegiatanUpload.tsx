@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { ImagePlus, Loader2, FileText, Upload, Calendar as CalendarIcon, RefreshCw, Printer, FileCheck, Sparkles, BookOpen, AlertCircle, ChevronRight, CheckCircle, Save, Clock, ListOrdered, MessageSquare, Copy, Check, Send } from "lucide-react"
+import { ImagePlus, Loader2, FileText, Upload, Calendar as CalendarIcon, RefreshCw, Printer, FileCheck, Sparkles, BookOpen, AlertCircle, ChevronRight, CheckCircle, Save, Clock, ListOrdered, MessageSquare, Copy, Check, Send, UploadCloud, Paperclip, X } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { format } from "date-fns"
@@ -120,9 +120,12 @@ export function KegiatanUpload({ onSuccess, initialData }: { onSuccess?: () => v
 
   const [selectedMaterials, setSelectedMaterials] = useState<File[]>([])
   const [selectedUndangan, setSelectedUndangan] = useState<File | null>(null)
+  const [isAnalyzingAcuan, setIsAnalyzingAcuan] = useState(false)
+  const [uploadedAcuanName, setUploadedAcuanName] = useState<string | null>(null)
 
   const undanganInputRef = useRef<HTMLInputElement>(null)
   const materiInputRef = useRef<HTMLInputElement>(null)
+  const acuanFileInputRef = useRef<HTMLInputElement>(null)
 
   const { toast } = useToast()
   const { user } = useUser()
@@ -215,10 +218,11 @@ export function KegiatanUpload({ onSuccess, initialData }: { onSuccess?: () => v
       reader.readAsDataURL(file);
       reader.onload = () => {
         const result = reader.result as string;
-        const base64 = result.split(',')[1];
+        const commaIdx = result.indexOf(',');
+        const base64 = commaIdx !== -1 ? result.substring(commaIdx + 1) : '';
         resolve({
           name: file.name,
-          type: file.type,
+          type: file.type || "application/octet-stream",
           base64: base64
         });
       };
@@ -231,7 +235,8 @@ export function KegiatanUpload({ onSuccess, initialData }: { onSuccess?: () => v
     return new Promise((resolve, reject) => {
       reader.onloadend = () => {
         const result = reader.result as string;
-        const base64 = result.split(',')[1];
+        const commaIdx = result.indexOf(',');
+        const base64 = commaIdx !== -1 ? result.substring(commaIdx + 1) : '';
         resolve(base64);
       };
       reader.onerror = reject;
@@ -421,6 +426,69 @@ export function KegiatanUpload({ onSuccess, initialData }: { onSuccess?: () => v
     window.open(url, "_blank");
   }
 
+  const handleAcuanFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // 1. Otomatis masukkan berkas ke list Upload Materi (tanpa batasan ukuran untuk arsip Drive)
+    setSelectedMaterials(prev => {
+      const exists = prev.some(f => f.name === file.name && f.size === file.size);
+      if (exists) return prev;
+      return [...prev, file];
+    });
+
+    setUploadedAcuanName(file.name);
+    setIsAnalyzingAcuan(true);
+
+    try {
+      // Mengirim via FormData streaming agar browser tidak mengonversi ke base64 string di memori (bebas call stack overflow)
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("title", form.getValues("title") || "");
+      formData.append("location", form.getValues("location") || "");
+      formData.append("date", form.getValues("date") || "");
+      formData.append("time", form.getValues("time") || "");
+      formData.append("activityType", form.getValues("activityType") || "Eksternal");
+
+      const res = await fetch("/api/analyze-acuan", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (!data.success) {
+        throw new Error(data.error || "Gagal memproses berkas acuan.");
+      }
+
+      if (data.aiPromptNotes) {
+        form.setValue("aiPromptNotes", data.aiPromptNotes, { shouldDirty: true, shouldValidate: true });
+      }
+      if (data.notulen) {
+        form.setValue("description", data.notulen, { shouldDirty: true, shouldValidate: true });
+      }
+      if (data.notulenWa) {
+        form.setValue("notulenWa", data.notulenWa, { shouldDirty: true, shouldValidate: true });
+      }
+
+      toast({
+        title: "Berkas Berhasil Dibaca AI!",
+        description: `Berkas "${file.name}" berhasil dibaca. Catatan acuan, Isi Notulen, dan Notulen WA telah otomatis terisi, serta berkas dilampirkan ke Upload Materi.`,
+      });
+    } catch (err: any) {
+      console.error("Error analyze acuan:", err);
+      toast({
+        variant: "destructive",
+        title: "Gagal Menganalisis Berkas",
+        description: err?.message || "Terjadi kesalahan saat membaca berkas dengan AI.",
+      });
+    } finally {
+      setIsAnalyzingAcuan(false);
+      if (acuanFileInputRef.current) {
+        acuanFileInputRef.current.value = "";
+      }
+    }
+  }
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     if (cloudinaryUrls.kegiatan.length === 0) {
       toast({ variant: "destructive", title: "Foto Wajib", description: "Minimal upload 1 foto kegiatan ke Cloudinary." });
@@ -568,6 +636,7 @@ export function KegiatanUpload({ onSuccess, initialData }: { onSuccess?: () => v
       form.reset();
       setCloudinaryUrls({ kegiatan: [], atk: [], konsumsi: [] });
       setSelectedMaterials([]); setSelectedUndangan(null);
+      setUploadedAcuanName(null);
       onSuccess?.();
     } catch (err: any) {
       toast({ variant: "destructive", title: "Gagal Mengirim", description: err.message });
@@ -769,36 +838,84 @@ export function KegiatanUpload({ onSuccess, initialData }: { onSuccess?: () => v
                 )} />
               </div>
 
-              {watchActivityType === "Eksternal" && (
-                <FormField
-                  control={form.control}
-                  name="aiPromptNotes"
-                  render={({ field }) => (
-                    <FormItem className="p-4 border rounded-2xl bg-amber-50/50 border-amber-200/80 space-y-2">
-                      <div className="flex items-center justify-between">
-                        <FormLabel className="text-xs font-black uppercase text-amber-900 flex items-center gap-1.5">
-                          <Sparkles className="h-3.5 w-3.5 text-amber-600" />
+              <FormField
+                control={form.control}
+                name="aiPromptNotes"
+                render={({ field }) => (
+                  <FormItem className="p-4 sm:p-5 border rounded-2xl bg-amber-50/40 border-amber-200/90 space-y-3 shadow-sm">
+                    {/* Baris Judul & Tombol Upload */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <FormLabel className="text-xs font-black uppercase text-amber-950 flex items-center gap-1.5 tracking-tight">
+                          <Sparkles className="h-4 w-4 text-amber-600 shrink-0" />
                           Prompt / Catatan Acuan AI (Opsional)
                         </FormLabel>
-                        <Badge variant="outline" className="text-[9px] font-bold border-amber-300 text-amber-800 bg-amber-100/60">
-                          Khusus Eksternal
-                        </Badge>
+                        <span className="text-[10px] font-bold border border-amber-300 text-amber-900 bg-amber-100/80 rounded-full px-2.5 py-0.5 whitespace-nowrap shadow-2xs">
+                          {watchActivityType === "Eksternal" ? "Acuan Notulen & WA" : "Acuan Rapat"}
+                        </span>
                       </div>
-                      <p className="text-[11px] text-amber-800/80 leading-snug">
-                        Tuliskan catatan, poin-poin rapat, atau tamu yang hadir sebagai acuan jika di-generate oleh AI untuk menyusun notulen dan format laporan WA otomatis.
-                      </p>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Contoh: Hadir Danramil 10 Gdm, Polsek/yg mewakili, Sekcam, Kades, Pengurus Karang Taruna. Rapat bahas persiapan Pordes Sepak Bola & Voli tgl 13-27 Sept di Desa Cinangsi..."
-                          className="min-h-[85px] text-xs leading-relaxed bg-white border-amber-200 focus-visible:ring-amber-400 placeholder:text-muted-foreground/60"
-                          {...field}
+
+                      <div className="flex items-center shrink-0">
+                        <input
+                          type="file"
+                          ref={acuanFileInputRef}
+                          className="hidden"
+                          accept="image/*,.pdf,.ppt,.pptx,.doc,.docx"
+                          onChange={handleAcuanFileUpload}
                         />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          disabled={isAnalyzingAcuan}
+                          onClick={() => acuanFileInputRef.current?.click()}
+                          className="h-8 px-3 text-[11px] font-bold uppercase rounded-xl border-amber-300 bg-amber-100/90 hover:bg-amber-200/90 text-amber-950 shadow-sm gap-1.5 transition-all max-w-full"
+                        >
+                          {isAnalyzingAcuan ? (
+                            <>
+                              <Loader2 className="h-3.5 w-3.5 animate-spin text-amber-700 shrink-0" />
+                              <span className="truncate">Membaca Berkas...</span>
+                            </>
+                          ) : (
+                            <>
+                              <UploadCloud className="h-3.5 w-3.5 text-amber-700 shrink-0" />
+                              <span className="truncate">Upload Berkas (Foto / PDF / PPT)</span>
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+
+                    <p className="text-[11px] text-amber-800/80 leading-relaxed">
+                      Tulis catatan rapat atau unggah berkas acuan (foto tulis tangan, PDF, materi PPT) untuk dibaca AI secara otomatis menjadi Notulen & Draf WA.
+                    </p>
+
+                    {/* Badge Berkas Aktif */}
+                    {uploadedAcuanName && (
+                      <div className="flex flex-wrap items-center justify-between gap-2 p-2.5 rounded-xl bg-emerald-50 border border-emerald-200/90 text-emerald-900 text-xs">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <CheckCircle className="h-4 w-4 text-emerald-600 shrink-0" />
+                          <span className="truncate font-medium text-[11px]">
+                            Acuan Aktif: <strong className="font-bold text-emerald-950">{uploadedAcuanName}</strong>
+                          </span>
+                        </div>
+                        <span className="text-[9px] font-extrabold uppercase bg-emerald-100/90 text-emerald-800 px-2.5 py-0.5 rounded-md border border-emerald-300/80 shrink-0">
+                          Tersimpan di Upload Materi
+                        </span>
+                      </div>
+                    )}
+
+                    <FormControl>
+                      <Textarea
+                        placeholder="Contoh: Hadir Danramil 10 Gdm, Polsek/yg mewakili, Sekcam, Kades, Pengurus Karang Taruna. Rapat bahas persiapan Pordes Sepak Bola & Voli tgl 13-27 Sept di Desa Cinangsi..."
+                        className="min-h-[90px] text-xs leading-relaxed bg-white border-amber-200 focus-visible:ring-amber-400 placeholder:text-muted-foreground/60 rounded-xl"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               <FormField
                 control={form.control}
@@ -834,7 +951,7 @@ export function KegiatanUpload({ onSuccess, initialData }: { onSuccess?: () => v
                 )}
               />
 
-              {watchActivityType === "Eksternal" && (
+              {(watchActivityType === "Eksternal" || !!form.watch("notulenWa")) && (
                 <Card className="border border-emerald-200/80 bg-gradient-to-b from-emerald-50/40 to-white rounded-3xl overflow-hidden shadow-sm">
                   <CardHeader className="p-4 sm:p-5 pb-3 border-b border-emerald-100 bg-emerald-50/60">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -979,16 +1096,91 @@ export function KegiatanUpload({ onSuccess, initialData }: { onSuccess?: () => v
               <div className="h-px bg-slate-100 my-6" />
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div onClick={() => undanganInputRef.current?.click()} className={cn("h-20 border-2 border-dashed rounded-xl flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors", selectedUndangan ? "bg-primary/5 border-primary/50" : "bg-muted/30")}>
-                  <input type="file" ref={undanganInputRef} className="hidden" accept=".pdf" onChange={(e) => setSelectedUndangan(e.target.files?.[0] || null)} />
-                  {selectedUndangan ? <CheckCircle className="h-4 w-4 text-primary" /> : <FileText className="h-4 w-4 text-muted-foreground" />}
-                  <span className="text-[8px] font-black uppercase">Upload Undangan (PDF)</span>
+                <div className="space-y-2">
+                  <div onClick={() => undanganInputRef.current?.click()} className={cn("h-20 border-2 border-dashed rounded-xl flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors", selectedUndangan ? "bg-primary/5 border-primary/50" : "bg-muted/30")}>
+                    <input type="file" ref={undanganInputRef} className="hidden" accept=".pdf" onChange={(e) => setSelectedUndangan(e.target.files?.[0] || null)} />
+                    {selectedUndangan ? <CheckCircle className="h-4 w-4 text-primary" /> : <FileText className="h-4 w-4 text-muted-foreground" />}
+                    <span className="text-[8px] font-black uppercase">Upload Undangan (PDF)</span>
+                  </div>
+                  {selectedUndangan && (
+                    <div className="flex items-center justify-between gap-2 p-2 rounded-lg bg-slate-100/80 border border-slate-200 text-xs">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <FileText className="h-3.5 w-3.5 text-primary shrink-0" />
+                        <span className="truncate font-medium text-slate-700">{selectedUndangan.name}</span>
+                        <span className="text-[10px] text-muted-foreground shrink-0">
+                          ({(selectedUndangan.size / 1024).toFixed(0)} KB)
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedUndangan(null);
+                        }}
+                        className="text-muted-foreground hover:text-destructive p-1 rounded transition-colors"
+                        title="Hapus undangan"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  )}
                 </div>
 
-                <div onClick={() => materiInputRef.current?.click()} className={cn("h-20 border-2 border-dashed rounded-xl flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors", selectedMaterials.length > 0 ? "bg-primary/5 border-primary/50" : "bg-muted/30")}>
-                  <input type="file" ref={materiInputRef} className="hidden" accept=".pdf,.doc,.docx,.ppt,.pptx" multiple onChange={(e) => setSelectedMaterials(Array.from(e.target.files || []))} />
-                  {selectedMaterials.length > 0 ? <CheckCircle className="h-4 w-4 text-primary" /> : <BookOpen className="h-4 w-4 text-muted-foreground" />}
-                  <span className="text-[8px] font-black uppercase">Upload Materi</span>
+                <div className="space-y-2">
+                  <div onClick={() => materiInputRef.current?.click()} className={cn("h-20 border-2 border-dashed rounded-xl flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors", selectedMaterials.length > 0 ? "bg-primary/5 border-primary/50" : "bg-muted/30")}>
+                    <input
+                      type="file"
+                      ref={materiInputRef}
+                      className="hidden"
+                      accept=".pdf,.doc,.docx,.ppt,.pptx,image/*"
+                      multiple
+                      onChange={(e) => {
+                        const newFiles = Array.from(e.target.files || []);
+                        setSelectedMaterials(prev => {
+                          const existingNames = new Set(prev.map(f => f.name));
+                          const uniqueNew = newFiles.filter(f => !existingNames.has(f.name));
+                          return [...prev, ...uniqueNew];
+                        });
+                      }}
+                    />
+                    {selectedMaterials.length > 0 ? <CheckCircle className="h-4 w-4 text-primary" /> : <BookOpen className="h-4 w-4 text-muted-foreground" />}
+                    <span className="text-[8px] font-black uppercase">
+                      Upload Materi {selectedMaterials.length > 0 ? `(${selectedMaterials.length} File)` : ""}
+                    </span>
+                  </div>
+
+                  {selectedMaterials.length > 0 && (
+                    <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1">
+                      {selectedMaterials.map((file, idx) => (
+                        <div
+                          key={`${file.name}-${idx}`}
+                          className="flex items-center justify-between gap-2 p-2 rounded-lg bg-slate-100/80 border border-slate-200 text-xs"
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            <Paperclip className="h-3.5 w-3.5 text-primary shrink-0" />
+                            <span className="truncate font-medium text-slate-700">{file.name}</span>
+                            <span className="text-[10px] text-muted-foreground shrink-0">
+                              ({(file.size / 1024).toFixed(0)} KB)
+                            </span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedMaterials(prev => prev.filter((_, i) => i !== idx));
+                              if (uploadedAcuanName === file.name) {
+                                setUploadedAcuanName(null);
+                              }
+                            }}
+                            className="text-muted-foreground hover:text-destructive p-1 rounded transition-colors"
+                            title="Hapus berkas materi ini"
+                          >
+                            <X className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 

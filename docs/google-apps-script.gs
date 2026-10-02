@@ -1,6 +1,6 @@
 /**
  * BACKEND GOOGLE APPS SCRIPT - Kecamatan DIGITAL
- * Versi 3.0: Menambahkan kemampuan untuk mengambil data kalender dan memperbarui deskripsi acara (notulensi).
+ * Versi 3.1: Menambahkan kemampuan menghapus acara dari Google Calendar.
  * Logika Terpadu: Agenda, Arsip, Google Drive, & Google Kalender.
  */
 
@@ -34,6 +34,10 @@ function doPost(e) {
 
       case 'updateEventDisposition':
         result = handleUpdateDisposition(data);
+        break;
+
+      case 'deleteEvent':
+        result = handleDeleteEvent(data);
         break;
 
       default:
@@ -158,6 +162,24 @@ function handleUpdateDisposition(data) {
     return { message: "Disposisi acara berhasil diperbarui.", updatedEvent: result };
   } catch (e) {
     throw new Error('Gagal memperbarui disposisi acara: ' + e.message);
+  }
+}
+
+
+/**
+ * Menghapus acara dari Google Calendar berdasarkan eventId.
+ */
+function handleDeleteEvent(data) {
+  const { calendarId, eventId } = data;
+  if (!calendarId || !eventId) {
+    throw new Error("calendarId dan eventId diperlukan.");
+  }
+
+  try {
+    Calendar.Events.remove(calendarId, eventId);
+    return { message: "Acara berhasil dihapus dari Google Calendar." };
+  } catch (e) {
+    throw new Error('Gagal menghapus acara: ' + e.message);
   }
 }
 

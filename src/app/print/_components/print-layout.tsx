@@ -342,6 +342,8 @@ export function PrintLayout({
             <p>CAMAT GANDRUNGMANGU</p>
             <div className={inlineSignatures ? "h-16" : isTight ? "h-11" : compactSpacing ? "h-14" : "h-16"}></div>
             <p className="font-bold underline tracking-wider uppercase">FATHAN ADY CHANDRA, S.STP., M.M.</p>
+            <p className="text-xs">Pembina Tingkat I</p>
+            <p className="text-xs">NIP. 19810509 199912 1 001</p>
           </>
         )}
       </div>

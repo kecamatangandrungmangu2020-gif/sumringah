@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -52,6 +52,27 @@ interface SppdUploadProps {
   initialData?: any
 }
 
+// Helper: Memastikan data kategori lama dan custom tabs tetap cocok
+const isCategoryMatch = (officialCat?: string, selectedCat?: string) => {
+  if (!officialCat || !selectedCat) return false;
+  if (officialCat.toLowerCase() === selectedCat.toLowerCase()) return true;
+
+  if (selectedCat === "PKK KECAMATAN" && (
+    officialCat === "SKRETARIS Kecamatan" ||
+    officialCat === "PKK KECAMATAN" ||
+    officialCat.toLowerCase() === "pkk"
+  )) return true;
+
+  if (selectedCat === "Darmawanita kecamatan" && (
+    officialCat === "KEPALA Kecamatan" ||
+    officialCat === "Darmawanita kecamatan" ||
+    officialCat.toLowerCase().includes("darmawanita") ||
+    officialCat.toLowerCase().includes("dharma wanita")
+  )) return true;
+
+  return false;
+};
+
 export function SppdUpload({ onSuccess, initialData }: SppdUploadProps) {
   const [isUploading, setIsUploading] = useState(false)
   const [isFetchingStNumber, setIsFetchingStNumber] = useState(false)
@@ -71,6 +92,10 @@ export function SppdUpload({ onSuccess, initialData }: SppdUploadProps) {
 
   const personnelRef = useMemoFirebase(() => (db && user) ? collection(db, "personnel") : null, [db, user])
   const { data: dbOfficials } = useCollection(personnelRef)
+
+  // Baca pengaturan custom tab dari Firestore (settings/personnel_custom_tabs)
+  const customTabsRef = useMemoFirebase(() => (db && user) ? doc(db, "settings", "personnel_custom_tabs") : null, [db, user])
+  const { data: customTabsDoc } = useDoc(customTabsRef)
 
   // Baca googleCalendarId dari user settings (sama seperti RincianKegiatan & Dashboard)
   const userDocRef = useMemoFirebase(() => (db && user) ? doc(db, "users", user.uid) : null, [db, user])
@@ -264,13 +289,70 @@ export function SppdUpload({ onSuccess, initialData }: SppdUploadProps) {
     }
   }
 
-  const personnelCategories = [
-    { id: "Karyawan Kecamatan", label: "Karyawan" },
-    { id: "SKRETARIS Kecamatan", label: "SKRETARIS Kecamatan" },
-    { id: "KEPALA Kecamatan", label: "KEPALA Kecamatan" },
-    { id: "Kader", label: "Kader" },
-    { id: "Lainnya", label: "Lainnya" }
-  ]
+  // Kategori dinamis tersinkronisasi otomatis dengan /profile/ dan database
+  const personnelCategories = useMemo(() => {
+    const list: { id: string; label: string }[] = [];
+    const added = new Set<string>();
+
+    const add = (id: string, label: string) => {
+      const key = id.toLowerCase().trim();
+      if (!added.has(key)) {
+        added.add(key);
+        list.push({ id, label });
+      }
+    };
+
+    const tabs: any[] = customTabsDoc?.tabs || [];
+
+    // Helper cek apakah tab aktif untuk SPPD
+    const isSppdActive = (catName: string) => {
+      const found = tabs.find(t => t?.title?.toLowerCase()?.trim() === catName.toLowerCase()?.trim());
+      if (!found) return true; // Default true jika belum pernah disetel
+      return found.includeInSppd !== false;
+    };
+
+    // 1. Kategori default profil (hanya jika includeInSppd !== false)
+    if (isSppdActive("Karyawan Kecamatan")) {
+      add("Karyawan Kecamatan", "Karyawan Kecamatan");
+    }
+    if (isSppdActive("PKK KECAMATAN")) {
+      add("PKK KECAMATAN", "PKK KECAMATAN");
+    }
+    if (isSppdActive("Darmawanita kecamatan")) {
+      add("Darmawanita kecamatan", "Darmawanita kecamatan");
+    }
+
+    // 2. Kategori dari custom tabs profil (/profile/) yang includeInSppd !== false
+    tabs.forEach((t) => {
+      if (t?.title?.trim() && t.includeInSppd !== false) {
+        add(t.title.trim(), t.title.trim());
+      }
+    });
+
+    // 3. Kategori unik dari database personnel (hanya jika diaktifkan untuk SPPD)
+    (dbOfficials || []).forEach((o: any) => {
+      const cat = o.category?.trim();
+      if (!cat) return;
+      const lower = cat.toLowerCase();
+      if (
+        lower === "skretaris kecamatan" ||
+        lower === "kepala kecamatan" ||
+        lower === "pkk" ||
+        lower.includes("darmawanita") ||
+        lower.includes("dharma wanita")
+      ) {
+        return;
+      }
+      if (isSppdActive(cat)) {
+        add(cat, cat);
+      }
+    });
+
+    // 4. Pilihan manual
+    add("Lainnya", "Lainnya");
+
+    return list;
+  }, [customTabsDoc, dbOfficials]);
 
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -399,11 +481,17 @@ export function SppdUpload({ onSuccess, initialData }: SppdUploadProps) {
                           </FormControl>
                           <SelectContent>
                             <ScrollArea className="h-[180px]">
-                              {(dbOfficials || []).filter(o => o.category === selectedCategory).map((o: any) => (
-                                <SelectItem key={`${o.name}-${o.jabatan}`} value={`${o.name} - ${o.jabatan}`}>
-                                  {o.name}
-                                </SelectItem>
-                              ))}
+                              {(dbOfficials || [])
+                                .filter(o => isCategoryMatch(o.category, selectedCategory))
+                                .map((o: any) => {
+                                  const job = o.jabatan || selectedCategory;
+                                  const val = `${o.name} - ${job}`;
+                                  return (
+                                    <SelectItem key={o.id || `${o.name}-${job}`} value={val}>
+                                      {o.name} {o.jabatan && o.jabatan !== '-' ? `(${o.jabatan})` : ''}
+                                    </SelectItem>
+                                  );
+                                })}
                             </ScrollArea>
                           </SelectContent>
                         </Select>
@@ -551,11 +639,17 @@ export function SppdUpload({ onSuccess, initialData }: SppdUploadProps) {
                           </SelectTrigger>
                           <SelectContent>
                             <ScrollArea className="h-[150px]">
-                              {(dbOfficials || []).filter(o => o.category === comp.category).map((o: any) => (
-                                <SelectItem key={`${o.name}-${o.jabatan}`} value={`${o.name} - ${o.jabatan}`}>
-                                  {o.name}
-                                </SelectItem>
-                              ))}
+                              {(dbOfficials || [])
+                                .filter(o => isCategoryMatch(o.category, comp.category))
+                                .map((o: any) => {
+                                  const job = o.jabatan || comp.category;
+                                  const val = `${o.name} - ${job}`;
+                                  return (
+                                    <SelectItem key={o.id || `${o.name}-${job}`} value={val}>
+                                      {o.name} {o.jabatan && o.jabatan !== '-' ? `(${o.jabatan})` : ''}
+                                    </SelectItem>
+                                  );
+                                })}
                             </ScrollArea>
                           </SelectContent>
                         </Select>

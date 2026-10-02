@@ -56,6 +56,7 @@ interface Participant {
   name: string;
   jabatan: string;
   category: string;
+  gender?: string;
 }
 
 const HEALTH_CATEGORIES = [
@@ -117,15 +118,56 @@ const CATEGORY_ORDER = [
   "Guru TK & Paud"
 ];
 
+// Helper: Weighting for Karyawan Kecamatan hierarchy (Camat -> Sekretaris -> Kasi -> Kasubbag -> Lainnya)
 const getRankWeight = (jabatan: string) => {
-  const j = jabatan.toUpperCase();
-  if (j.includes("KEPALA Kecamatan")) return 1;
-  if (j.includes("SEKRETARIS Kecamatan")) return 2;
-  if (j.includes("KASI") || j.includes("KEPALA SEKSI")) return 3;
-  if (j.includes("KAUR") || j.includes("KEPALA URUSAN")) return 4;
-  if (j.includes("KASI KESRA") || j.includes("KADUS")) return 5;
-  if (j.includes("STAF")) return 6;
-  return 100;
+  const j = (jabatan || "").toUpperCase().trim();
+  if (!j) return 999;
+
+  // 1. Camat
+  if (
+    (j === "CAMAT" || j.startsWith("CAMAT") || j.includes("CAMAT GANDRUNGMANGU") || j.includes("PLT. CAMAT") || j.includes("PJ. CAMAT")) &&
+    !j.includes("SEKRETARIS") &&
+    !j.includes("SEKCAM") &&
+    !j.includes("AJUDAN") &&
+    !j.includes("PENGEMUDI") &&
+    !j.includes("SOPIR") &&
+    !j.includes("DRIVER") &&
+    !j.includes("STAF")
+  ) {
+    return 1;
+  }
+
+  // 2. Sekretaris (Sekretaris Kecamatan / Sekcam)
+  if (
+    j.includes("SEKRETARIS KECAMATAN") ||
+    j.includes("SEKCAM") ||
+    j.includes("SEKRETARIS")
+  ) {
+    return 2;
+  }
+
+  // 3. Kasi (Kepala Seksi)
+  if (
+    (j.startsWith("KASI ") || j === "KASI" || j.includes("KASI ") || j.includes("KEPALA SEKSI")) &&
+    !j.includes("KASUBBAG") &&
+    !j.includes("KASUBAG")
+  ) {
+    return 3;
+  }
+
+  // 4. Kasubbag (Kepala Sub Bagian)
+  if (
+    j.includes("KASUBBAG") ||
+    j.includes("KASUBAG") ||
+    j.includes("KEPALA SUB BAGIAN") ||
+    j.includes("KEPALA SUBBAGIAN") ||
+    j.includes("KEPALA SUB")
+  ) {
+    return 4;
+  }
+
+  // 5. Baru yang lainnya
+  return 10;
 };
 
 const getRtRwWeight = (jabatan: string) => {
@@ -151,23 +193,53 @@ const getKaderWeight = (jabatan: string) => {
 
 const sortParticipants = (list: any[]) => {
   return list.sort((a, b) => {
-    const catA = a.category;
-    const catB = b.category;
+    const catA = String(a.category || "").trim();
+    const catB = String(b.category || "").trim();
 
     if (catA !== catB) {
-      return CATEGORY_ORDER.indexOf(catA) - CATEGORY_ORDER.indexOf(catB);
+      const idxA = CATEGORY_ORDER.indexOf(catA);
+      const idxB = CATEGORY_ORDER.indexOf(catB);
+      const orderA = idxA !== -1 ? idxA : 999;
+      const orderB = idxB !== -1 ? idxB : 999;
+      if (orderA !== orderB) return orderA - orderB;
     }
 
-    if (catA === "Karyawan Kecamatan") {
-      return getRankWeight(a.jabatan) - getRankWeight(b.jabatan);
+    const isKaryawanA = catA.toLowerCase() === "karyawan kecamatan" || getRankWeight(a.jabatan) < 10;
+    const isKaryawanB = catB.toLowerCase() === "karyawan kecamatan" || getRankWeight(b.jabatan) < 10;
+
+    if (isKaryawanA || isKaryawanB) {
+      const wA = getRankWeight(a.jabatan);
+      const wB = getRankWeight(b.jabatan);
+      if (wA !== wB) return wA - wB;
     } else if (catA === "KEPALA Kecamatan") {
       return getRtRwWeight(a.jabatan) - getRtRwWeight(b.jabatan);
     } else if (catA === "Kader") {
       return getKaderWeight(a.jabatan) - getKaderWeight(b.jabatan);
     }
 
-    return a.name.localeCompare(b.name);
+    return (a.name || "").localeCompare(b.name || "");
   });
+};
+
+// Helper: Memastikan pencocokan kategori lama & custom tabs
+const isCategoryMatch = (officialCat?: string, currentCat?: string) => {
+  if (!officialCat || !currentCat) return false;
+  if (officialCat.toLowerCase() === currentCat.toLowerCase()) return true;
+
+  if (currentCat === "PKK KECAMATAN" && (
+    officialCat === "SKRETARIS Kecamatan" ||
+    officialCat === "PKK KECAMATAN" ||
+    officialCat.toLowerCase() === "pkk"
+  )) return true;
+
+  if (currentCat === "Darmawanita kecamatan" && (
+    officialCat === "KEPALA Kecamatan" ||
+    officialCat === "Darmawanita kecamatan" ||
+    officialCat.toLowerCase().includes("darmawanita") ||
+    officialCat.toLowerCase().includes("dharma wanita")
+  )) return true;
+
+  return false;
 };
 
 function DokumenContent() {
@@ -193,6 +265,10 @@ function DokumenContent() {
   // Mengambil data personil dari Firestore
   const personnelRef = useMemoFirebase(() => (db && user) ? collection(db, "personnel") : null, [db, user])
   const { data: dbOfficials } = useCollection(personnelRef)
+
+  // Pengaturan Custom Tabs Profil dari Firestore
+  const customTabsRef = useMemoFirebase(() => (db && user) ? doc(db, "settings", "personnel_custom_tabs") : null, [db, user])
+  const { data: customTabsDoc } = useDoc(customTabsRef)
 
   // GLOBAL CONFIG: Ambil Logo dari Pengaturan Kecamatan
   const villageSettingsRef = useMemoFirebase(() => {
@@ -432,9 +508,25 @@ function DokumenContent() {
     setParticipantSelections(newSelections);
   };
 
-  const participantCategories = useMemo(() =>
-    Array.from(new Set((dbOfficials || []).map(o => o.category).filter(c => c && c.trim() !== '')))
-    , [dbOfficials]);
+  const participantCategories = useMemo(() => {
+    const tabs: any[] = customTabsDoc?.tabs || [];
+    const isCetakActive = (catName: string) => {
+      const found = tabs.find(t => t?.title?.toLowerCase()?.trim() === catName.toLowerCase()?.trim());
+      if (!found) return true; // Default true jika belum pernah disetel
+      return found.includeInCetakDokumen !== false;
+    };
+
+    const categoriesFromOfficials = Array.from(
+      new Set((dbOfficials || []).map((o: any) => o.category).filter((c: any) => c && c.trim() !== ''))
+    );
+    const customCategoryTitles = tabs
+      .filter((t: any) => t?.title && t.includeInCetakDokumen !== false)
+      .map((t: any) => t.title.trim());
+
+    // Gabungkan kategori dari custom tab profil dan personel database
+    const all = Array.from(new Set([...customCategoryTitles, ...categoriesFromOfficials]));
+    return all.filter(cat => isCetakActive(cat));
+  }, [dbOfficials, customTabsDoc]);
 
   const filteredSources = useMemo(() => {
     if (!bidang || !currentApbData) return []
@@ -468,18 +560,105 @@ function DokumenContent() {
         let allParticipants: any[] = [];
 
         selectedCats.forEach(cat => {
-          const members = (dbOfficials || []).filter(o => o.category === cat).map(o => ({
-            name: String(o.name || ""),
-            jabatan: String(o.jabatan || ""),
-            category: String(o.category || "")
-          }));
+          const members = (dbOfficials || []).filter(o => isCategoryMatch(o.category, cat)).map(o => {
+            const extractGender = (item: any): string => {
+              if (!item) return "";
+              const candidates = [
+                item["Jenis Kelamin"],
+                item["jenis kelamin"],
+                item["JENIS KELAMIN"],
+                item["Jenis_Kelamin"],
+                item["jenis_kelamin"],
+                item.gender,
+                item.jenisKelamin,
+                item.sex,
+                item["L/P"],
+                item["l/p"],
+                item.lp,
+                item.jk,
+                item["JK"]
+              ];
+              for (const c of candidates) {
+                if (c !== undefined && c !== null && String(c).trim() !== "") {
+                  return String(c).trim();
+                }
+              }
+
+              if (item.customFields && typeof item.customFields === "object") {
+                const cfCandidates = [
+                  item.customFields["Jenis Kelamin"],
+                  item.customFields["jenis kelamin"],
+                  item.customFields["JENIS KELAMIN"],
+                  item.customFields["Jenis_Kelamin"],
+                  item.customFields["jenis_kelamin"],
+                  item.customFields.gender,
+                  item.customFields.jenisKelamin,
+                  item.customFields.sex,
+                  item.customFields["L/P"],
+                  item.customFields["l/p"],
+                  item.customFields.lp,
+                  item.customFields.jk,
+                  item.customFields["JK"]
+                ];
+                for (const c of cfCandidates) {
+                  if (c !== undefined && c !== null && String(c).trim() !== "") {
+                    return String(c).trim();
+                  }
+                }
+                for (const k of Object.keys(item.customFields)) {
+                  const lk = k.toLowerCase().replace(/[^a-z]/g, "");
+                  if (lk.includes("kelamin") || lk.includes("gender") || lk === "lp" || lk === "jk") {
+                    const val = item.customFields[k];
+                    if (val !== undefined && val !== null && String(val).trim() !== "") {
+                      return String(val).trim();
+                    }
+                  }
+                }
+              }
+
+              for (const k of Object.keys(item)) {
+                const lk = k.toLowerCase().replace(/[^a-z]/g, "");
+                if (lk.includes("kelamin") || lk.includes("gender") || lk === "lp" || lk === "jk") {
+                  const val = item[k];
+                  if (val !== undefined && val !== null && String(val).trim() !== "") {
+                    return String(val).trim();
+                  }
+                }
+              }
+              return "";
+            };
+
+            const rawGender = extractGender(o);
+            let normalizedLp = "";
+            const upper = rawGender.toUpperCase();
+            if (upper === "L" || upper.startsWith("LAKI") || upper === "PRIA" || upper === "MALE" || upper === "M") {
+              normalizedLp = "L";
+            } else if (upper === "P" || upper.startsWith("PEREMPUAN") || upper.startsWith("WANITA") || upper === "FEMALE" || upper === "F") {
+              normalizedLp = "P";
+            } else if (upper.startsWith("L")) {
+              normalizedLp = "L";
+            } else if (upper.startsWith("P")) {
+              normalizedLp = "P";
+            } else {
+              normalizedLp = rawGender;
+            }
+
+            return {
+              name: String(o.name || ""),
+              jabatan: String(o.jabatan || ""),
+              category: String(o.category || ""),
+              gender: normalizedLp,
+              lp: normalizedLp,
+              jenisKelamin: normalizedLp
+            };
+          });
           allParticipants.push(...members);
         });
 
         const sorted = sortParticipants(allParticipants);
         const uniqueParticipants = Array.from(new Map(sorted.map(item => [item.name, item])).values());
         const finalParticipants = Array.from({ length: quota }, (_, i) =>
-          uniqueParticipants[i] || { name: "", jabatan: "", category: "" }
+          uniqueParticipants[i] || { name: "", jabatan: "", category: "", gender: "" }
         );
 
         const pdfData = {

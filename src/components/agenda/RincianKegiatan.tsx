@@ -18,7 +18,8 @@ import {
   MessageSquare,
   Share2,
   Sparkles,
-  Tag
+  Tag,
+  Trash2
 } from "lucide-react"
 import { format, parseISO, addDays, isValid } from "date-fns"
 import { id as localeID } from "date-fns/locale"
@@ -27,7 +28,7 @@ import { cn } from "@/lib/utils"
 import { GOOGLE_CONFIG } from "@/lib/google-config"
 import { callAppsScript } from "@/app/agenda/actions"
 import { useUser, useDoc, useFirestore, useMemoFirebase, useCollection } from "@/firebase"
-import { doc, collection, setDoc } from "firebase/firestore"
+import { doc, collection, setDoc, deleteDoc } from "firebase/firestore"
 import {
   Dialog,
   DialogContent,
@@ -60,6 +61,8 @@ export function RincianKegiatan() {
   const [isSaving, setIsSaving] = useState(false)
   const [isUpdatingType, setIsUpdatingType] = useState(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const { toast } = useToast()
 
   // Modal WhatsApp Rengiat
@@ -319,6 +322,46 @@ export function RincianKegiatan() {
     }
   }
 
+  const handleDeleteEvent = async () => {
+    if (!selectedEvent || !db) return;
+    setIsDeleting(true);
+    try {
+      const calendarId = userData?.googleCalendarId || GOOGLE_CONFIG.calendarId;
+      const result = await callAppsScript({
+        action: 'deleteEvent',
+        calendarId,
+        eventId: selectedEvent.id,
+      });
+
+      if (!result.success) {
+        throw new Error(result.error || 'Gagal menghapus acara dari Google Calendar.');
+      }
+
+      // Hapus data lokal Firestore (agenda_types)
+      try {
+        await deleteDoc(doc(db, 'agenda_types', selectedEvent.id));
+      } catch {
+        // Tidak masalah jika tidak ada dokumen lokal
+      }
+
+      toast({
+        title: "Agenda Dihapus",
+        description: `"${selectedEvent.summary}" berhasil dihapus dari Google Calendar.`,
+      });
+      setIsDeleteDialogOpen(false);
+      setSelectedEvent(null);
+      fetchAgendaData(searchDate);
+    } catch (e: any) {
+      toast({
+        variant: "destructive",
+        title: "Gagal Menghapus",
+        description: e.message || "Terjadi kesalahan saat menghapus agenda.",
+      });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
       <div className="space-y-6">
@@ -576,6 +619,18 @@ export function RincianKegiatan() {
                 {isSaving ? <Loader2 className="h-4 w-4 animate-spin"/> : <Send className="h-4 w-4"/>}
                 Simpan Notulensi ke Kalender
               </Button>
+
+              {/* Tombol Hapus Agenda */}
+              <div className="pt-2 border-t border-red-100">
+                <Button
+                  variant="outline"
+                  onClick={() => setIsDeleteDialogOpen(true)}
+                  className="w-full gap-2 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-300 font-bold"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  Hapus Agenda Ini
+                </Button>
+              </div>
             </div>
           ) : (
             <div className="text-center py-20 space-y-2">
@@ -644,6 +699,53 @@ export function RincianKegiatan() {
                 Kirim ke WA
               </Button>
             </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ── DIALOG KONFIRMASI HAPUS ──────────────────────────────────────────────── */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="max-w-md rounded-[2rem] p-6 sm:p-8 bg-white border border-red-100 shadow-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-black uppercase text-red-700 flex items-center gap-2">
+              <Trash2 className="h-5 w-5 text-red-500" />
+              Hapus Agenda?
+            </DialogTitle>
+            <DialogDescription className="text-sm text-slate-600 mt-2 leading-relaxed">
+              Tindakan ini akan menghapus{" "}
+              <strong className="text-slate-800">
+                &ldquo;{selectedEvent?.summary}&rdquo;
+              </strong>{" "}
+              dari <strong>Google Calendar</strong> secara permanen dan tidak dapat dibatalkan.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="my-4 p-4 bg-red-50 rounded-2xl border border-red-200 text-xs text-red-700 font-semibold flex items-start gap-2">
+            <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 text-red-500" />
+            <span>Data notulensi, disposisi, dan seluruh informasi agenda yang terkait juga akan terhapus dari sistem.</span>
+          </div>
+
+          <DialogFooter className="flex flex-col sm:flex-row gap-2 pt-2">
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteDialogOpen(false)}
+              disabled={isDeleting}
+              className="rounded-xl h-11 font-bold flex-1"
+            >
+              Batal
+            </Button>
+            <Button
+              onClick={handleDeleteEvent}
+              disabled={isDeleting}
+              className="rounded-xl h-11 font-black gap-2 flex-1 bg-red-600 hover:bg-red-700 text-white shadow-md shadow-red-600/20"
+            >
+              {isDeleting ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Trash2 className="h-4 w-4" />
+              )}
+              {isDeleting ? "Menghapus..." : "Ya, Hapus Agenda"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

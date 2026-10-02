@@ -5,6 +5,13 @@ import { id as localeID } from "date-fns/locale"
 
 const LOGO_CILACAP_FALLBACK = "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Lambang_Kabupaten_Cilacap.png/120px-Lambang_Kabupaten_Cilacap.png";
 
+export const CAMAT_INFO = {
+  jabatan: "CAMAT GANDRUNGMANGU",
+  nama: "FATHAN ADY CHANDRA, S.STP., M.M.",
+  pangkat: "Pembina Tingkat I",
+  nip: "NIP. 19810509 199912 1 001",
+};
+
 export const getRomanMonth = (dateStr: string) => {
   if (!dateStr) return "I";
   const month = new Date(dateStr).getMonth() + 1
@@ -157,7 +164,7 @@ export const generateNotulenPDF = async (values: any, logoBase64?: string | null
   const displayDate = formatDateIndo(values.date);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(18);
-  doc.text("NOTULEN", pageWidth / 2, 60, { align: "center" });
+  doc.text("NOTA DINAS", pageWidth / 2, 60, { align: "center" });
   doc.setFontSize(11);
   let currentY = 75;
   const addLabeledRow = (label: string, text: string) => {
@@ -317,7 +324,11 @@ export const generateBASTPDF = async (values: any, logoBase64?: string | null): 
   doc.text("FATHAN ADY CHANDRA, S.STP., M.M.", margin + 35, nameY, { align: "center" });
   const w1 = doc.getTextWidth("FATHAN ADY CHANDRA, S.STP., M.M.");
   doc.line(margin + 35 - w1 / 2, nameY + 1, margin + 35 + w1 / 2, nameY + 1);
+  doc.setFont("helvetica", "normal");
+  doc.text("Pembina Tingkat I", margin + 35, nameY + 5, { align: "center" });
+  doc.text("NIP. 19810509 199912 1 001", margin + 35, nameY + 9.5, { align: "center" });
   const sigName = officialName.toUpperCase();
+  doc.setFont("helvetica", "bold");
   doc.text(sigName, pageWidth - margin - 35, nameY, { align: "center" });
   const w2 = doc.getTextWidth(sigName);
   doc.line(pageWidth - margin - 35 - w2 / 2, nameY + 1, pageWidth - margin - 35 + w2 / 2, nameY + 1);
@@ -505,7 +516,7 @@ export const generateSiltapPDF = async (values: any, logoBase64?: string | null)
   doc.rect(margin + totalLabelW + colW[3], startTotalY, colW[4], totalH);
   currentY += totalH;
 
-  if (currentY > pageHeight - 60) {
+  if (currentY > pageHeight - 65) {
     doc.addPage();
     addKopSuratSync(doc, logoImg, margin, pageWidth);
     currentY = 40;
@@ -521,6 +532,9 @@ export const generateSiltapPDF = async (values: any, logoBase64?: string | null)
   doc.text("FATHAN ADY CHANDRA, S.STP., M.M.", sigX, currentY);
   const nW = doc.getTextWidth("FATHAN ADY CHANDRA, S.STP., M.M.");
   doc.line(sigX, currentY + 1, sigX + nW, currentY + 1);
+  doc.setFont("helvetica", "normal");
+  doc.text("Pembina Tingkat I", sigX, currentY + 5);
+  doc.text("NIP. 19810509 199912 1 001", sigX, currentY + 9.5);
 
   return doc.output("blob");
 }
@@ -669,7 +683,7 @@ export const generateInsentifPDF = async (values: any, logoBase64?: string | nul
   doc.rect(totalCX, startTotalY, colW[6], totalH);
   currentY += totalH;
 
-  if (currentY > pageHeight - 60) {
+  if (currentY > pageHeight - 65) {
     doc.addPage();
     addKopSuratSync(doc, logoImg, margin, pageWidth);
     currentY = 40;
@@ -686,6 +700,9 @@ export const generateInsentifPDF = async (values: any, logoBase64?: string | nul
   doc.text("FATHAN ADY CHANDRA, S.STP., M.M.", sigX, currentY);
   const nW = doc.getTextWidth("FATHAN ADY CHANDRA, S.STP., M.M.");
   doc.line(sigX, currentY + 1, sigX + nW, currentY + 1);
+  doc.setFont("helvetica", "normal");
+  doc.text("Pembina Tingkat I", sigX, currentY + 5);
+  doc.text("NIP. 19810509 199912 1 001", sigX, currentY + 9.5);
   return doc.output("blob");
 }
 
@@ -781,7 +798,7 @@ export const generateHonorNarasumberPDF = async (values: any, logoBase64?: strin
     doc.setFontSize(9);
     currentY += itemHeight;
   });
-  if (currentY > pageHeight - 60) {
+  if (currentY > pageHeight - 65) {
     doc.addPage();
     addKopSuratSync(doc, logoImg, margin, pageWidth);
     currentY = 40;
@@ -795,6 +812,9 @@ export const generateHonorNarasumberPDF = async (values: any, logoBase64?: strin
   doc.text("FATHAN ADY CHANDRA, S.STP., M.M.", sigX, currentY);
   const nW = doc.getTextWidth("FATHAN ADY CHANDRA, S.STP., M.M.");
   doc.line(sigX, currentY + 1, sigX + nW, currentY + 1);
+  doc.setFont("helvetica", "normal");
+  doc.text("Pembina Tingkat I", sigX, currentY + 5);
+  doc.text("NIP. 19810509 199912 1 001", sigX, currentY + 9.5);
   return doc.output("blob");
 }
 
@@ -920,8 +940,8 @@ export const generateSuratTugasPDF = async (values: any, logoBase64?: string | n
     currentY += 4;
   };
   const drawSignature = () => {
-    ensurePageSpace(40);
-    const sigX = pageWidth - margin - 60;
+    ensurePageSpace(45);
+    const sigX = pageWidth - margin - 65;
     doc.setFont("helvetica", "normal");
     doc.text(`Gandrungmangu, ${format(d, "d MMMM yyyy", { locale: localeID })}`, sigX, currentY);
     doc.setFont("helvetica", "bold");
@@ -930,6 +950,9 @@ export const generateSuratTugasPDF = async (values: any, logoBase64?: string | n
     doc.text("FATHAN ADY CHANDRA, S.STP., M.M.", sigX, currentY);
     const width = doc.getTextWidth("FATHAN ADY CHANDRA, S.STP., M.M.");
     doc.line(sigX, currentY + 1, sigX + width, currentY + 1);
+    doc.setFont("helvetica", "normal");
+    doc.text("Pembina Tingkat I", sigX, currentY + 5);
+    doc.text("NIP. 19810509 199912 1 001", sigX, currentY + 9.5);
   };
   addHeader();
   drawDasar();
@@ -1014,10 +1037,13 @@ export const generateSPPDPDF = async (values: any, logoBase64?: string | null): 
   doc.text("FATHAN ADY CHANDRA, S.STP., M.M.", sigX, currentY);
   const nW = doc.getTextWidth("FATHAN ADY CHANDRA, S.STP., M.M.");
   doc.line(sigX, currentY + 1, sigX + nW, currentY + 1);
+  doc.setFont("helvetica", "normal");
+  doc.text("Pembina Tingkat I", sigX, currentY + 5);
+  doc.text("NIP. 19810509 199912 1 001", sigX, currentY + 9.5);
   doc.addPage();
   currentY = margin;
   const colW2 = (pageWidth - (margin * 2)) / 2;
-  const rowH2 = 45;
+  const rowH2 = 48;
   doc.setLineWidth(0.2);
   doc.rect(margin, margin, pageWidth - (margin * 2), rowH2 * 4 + 10 + 30);
   doc.line(midX, margin, midX, margin + (rowH2 * 4));
@@ -1037,11 +1063,15 @@ export const generateSPPDPDF = async (values: any, logoBase64?: string | null): 
   doc.text(":", midX + 28, margin + 19);
   doc.text(formatDateIndo(values.startDate), midX + 31, margin + 19);
   doc.setFont("helvetica", "bold");
-  doc.text("CAMAT GANDRUNGMANGU", midX + colW2 / 2, margin + 27, { align: "center" });
-  doc.text("FATHAN ADY CHANDRA, S.STP., M.M.", midX + colW2 / 2, margin + 40, { align: "center" });
+  doc.text("CAMAT GANDRUNGMANGU", midX + colW2 / 2, margin + 23, { align: "center" });
+  doc.text("FATHAN ADY CHANDRA, S.STP., M.M.", midX + colW2 / 2, margin + 35, { align: "center" });
   const wH1 = doc.getTextWidth("FATHAN ADY CHANDRA, S.STP., M.M.");
-  doc.line(midX + colW2 / 2 - wH1 / 2, margin + 41, midX + colW2 / 2 + wH1 / 2, margin + 41);
+  doc.line(midX + colW2 / 2 - wH1 / 2, margin + 36, midX + colW2 / 2 + wH1 / 2, margin + 36);
   doc.setFont("helvetica", "normal");
+  doc.setFontSize(8.5);
+  doc.text("Pembina Tingkat I", midX + colW2 / 2, margin + 40, { align: "center" });
+  doc.text("NIP. 19810509 199912 1 001", midX + colW2 / 2, margin + 44, { align: "center" });
+  doc.setFontSize(9);
   const noX = margin + 2;
   const labelX = margin + 6;
   const dotX = margin + 28;
@@ -1100,10 +1130,14 @@ export const generateSPPDPDF = async (values: any, logoBase64?: string | null): 
   doc.text(":", ivDotX, y2 + 15);
   doc.text(formatDateIndo(values.endDate), ivValueX, y2 + 15);
   doc.setFont("helvetica", "bold");
-  doc.text("CAMAT GANDRUNGMANGU", margin + colW2 / 2, y2 + 25, { align: "center" });
-  doc.text("FATHAN ADY CHANDRA, S.STP., M.M.", margin + colW2 / 2, y2 + 38, { align: "center" });
+  doc.text("CAMAT GANDRUNGMANGU", margin + colW2 / 2, y2 + 23, { align: "center" });
+  doc.text("FATHAN ADY CHANDRA, S.STP., M.M.", margin + colW2 / 2, y2 + 35, { align: "center" });
   const wH2 = doc.getTextWidth("FATHAN ADY CHANDRA, S.STP., M.M.");
-  doc.line(margin + colW2 / 2 - wH2 / 2, y2 + 39, margin + colW2 / 2 + wH2 / 2, y2 + 39);
+  doc.line(margin + colW2 / 2 - wH2 / 2, y2 + 36, margin + colW2 / 2 + wH2 / 2, y2 + 36);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8.5);
+  doc.text("Pembina Tingkat I", margin + colW2 / 2, y2 + 40, { align: "center" });
+  doc.text("NIP. 19810509 199912 1 001", margin + colW2 / 2, y2 + 44, { align: "center" });
   doc.setFont("helvetica", "normal");
   doc.setFontSize(9);
   const verifyText = "Telah diperiksa with keterangan bahwa perjalanan tersebut di atas benar-benar dilakukan atas perintahnya dan semata-mata untuk kepentingan jabatan dalam waktu yang sesingkat-singkatnya.";
