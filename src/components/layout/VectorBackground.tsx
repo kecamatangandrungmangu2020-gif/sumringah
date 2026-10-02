@@ -12,7 +12,8 @@ export function VectorBackground() {
   return (
     <div
       aria-hidden="true"
-      className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none"
+      className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none print:hidden d-print-none"
+      style={{ printColorAdjust: 'exact' }}
     >
       {/* ── 1. Gradient Base Layer ────────────────────────────────── */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#ffffff] via-[#f8fafc] to-[#f1f5f9] dark:from-[#080e1a] dark:via-[#0e1728] dark:to-[#0a1220] transition-colors duration-500" />

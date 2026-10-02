@@ -31,6 +31,26 @@ function getAdminDb() {
   }
 }
 
+export async function GET(req: Request) {
+  try {
+    const db = getAdminDb();
+    if (!db) {
+      return NextResponse.json({ success: false, message: 'Database admin tidak dapat diakses.' }, { status: 500 });
+    }
+    const snap = await db.collection('settings').get();
+    const settings: Record<string, string> = {};
+    snap.forEach(doc => {
+      const val = doc.data()?.value;
+      if (val !== undefined && val !== null) {
+        settings[doc.id] = String(val);
+      }
+    });
+    return NextResponse.json({ success: true, settings });
+  } catch (error: any) {
+    return NextResponse.json({ success: false, message: error?.message || 'Gagal memuat pengaturan.' }, { status: 500 });
+  }
+}
+
 export async function POST(req: Request) {
   try {
     const db = getAdminDb();

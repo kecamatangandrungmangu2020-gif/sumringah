@@ -144,8 +144,18 @@ export default function Pengaturan() {
     instansi_alamat: '',
     running_text: '',
     display_video_url: '',
-    bell_sound_volume: '0.8'
+    bell_sound_volume: '0.8',
+    display_video_volume: '0.8'
   });
+
+  // ─── TV MODE STATE ───────────────────────────────────────
+  const [tvMode, setTvMode] = useState('antrian'); // 'antrian' | 'tv'
+  const [tvChannels, setTvChannels] = useState([]);
+  const [tvGroups, setTvGroups] = useState([]);
+  const [tvGroupFilter, setTvGroupFilter] = useState('Indonesia Channels');
+  const [tvSelectedChannel, setTvSelectedChannel] = useState(null);
+  const [tvLoadingChannels, setTvLoadingChannels] = useState(false);
+  const [tvSwitching, setTvSwitching] = useState(false);
 
   // Services State
   const [layananList, setLayananList] = useState([]);
@@ -178,6 +188,45 @@ export default function Pengaturan() {
     }, 4000);
   };
 
+  // Fetch TV channels from dhanytv API
+  const fetchTvChannels = async (group = '') => {
+    setTvLoadingChannels(true);
+    try {
+      const url = group ? `/api/antrian/tv-channels/?group=${encodeURIComponent(group)}` : '/api/antrian/tv-channels/';
+      const res = await fetch(url, { cache: 'no-store' });
+      const data = await res.json();
+      if (data.success) {
+        setTvChannels(data.channels || []);
+        if (data.groups && data.groups.length > 0 && tvGroups.length === 0) {
+          setTvGroups(data.groups);
+        }
+      }
+    } catch (err) {
+      console.warn('Gagal fetch TV channels:', err);
+    }
+    setTvLoadingChannels(false);
+  };
+
+  // Switch Display Mode (Antrian <-> TV)
+  const handleSwitchDisplayMode = async (mode) => {
+    setTvSwitching(true);
+    try {
+      const payload = { value: mode };
+      await setDoc(doc(db, 'settings', 'display_mode'), payload);
+      if (mode === 'tv' && tvSelectedChannel) {
+        await setDoc(doc(db, 'settings', 'tv_channel_url'), { value: tvSelectedChannel.url });
+        await setDoc(doc(db, 'settings', 'tv_channel_name'), { value: tvSelectedChannel.name });
+        await setDoc(doc(db, 'settings', 'tv_channel_logo'), { value: tvSelectedChannel.logo || '' });
+      }
+      setTvMode(mode);
+      showAlert(mode === 'tv' ? `📺 Mode TV diaktifkan: ${tvSelectedChannel?.name || ''}` : '🔢 Display kembali ke Mode Antrian', 'success');
+    } catch (err) {
+      console.error(err);
+      showAlert('Gagal switch mode display: ' + err.message, 'danger');
+    }
+    setTvSwitching(false);
+  };
+
   // Fetch all settings, services, and counters on mount
   useEffect(() => {
     // 1. Fetch general settings (Real-time)
@@ -187,10 +236,19 @@ export default function Pengaturan() {
         instansi_alamat: '',
         running_text: '',
         display_video_url: '',
-        bell_sound_volume: '0.8'
+        bell_sound_volume: '0.8',
+        display_video_volume: '0.8'
       };
       snap.forEach(docSnap => {
-        current[docSnap.id] = docSnap.data().value;
+        const id = docSnap.id;
+        const val = docSnap.data().value;
+        if (id === 'display_mode') {
+          setTvMode(val || 'antrian');
+        } else if (id === 'tv_channel_url' || id === 'tv_channel_name' || id === 'tv_channel_logo') {
+          // handled separately
+        } else {
+          current[id] = val;
+        }
       });
       setSettings(current);
     });
@@ -255,7 +313,7 @@ export default function Pengaturan() {
           }
           d.setHours(0, 0, 0, 0);
           start = d;
-          
+
           const de = new Date(filterDate);
           de.setHours(23, 59, 59, 999);
           end = de;
@@ -296,8 +354,8 @@ export default function Pengaturan() {
         snap.forEach(docSnap => {
           const d = docSnap.data();
           const isSentLocal = typeof window !== 'undefined' && localStorage.getItem(`wa_sent_${docSnap.id}`) === 'true';
-          list.push({ 
-            id: docSnap.id, 
+          list.push({
+            id: docSnap.id,
             ...d,
             wa_evaluasi_sent: Boolean(d.wa_evaluasi_sent || isSentLocal)
           });
@@ -332,12 +390,18 @@ export default function Pengaturan() {
     e.preventDefault();
     setLoading(true);
     try {
+      if (typeof window !== 'undefined' && settings.display_video_url) {
+        try {
+          localStorage.setItem('antrian_display_video_url', settings.display_video_url);
+        } catch (e) {}
+      }
       await Promise.all([
-        setDoc(doc(db, 'settings', 'instansi_nama'), { value: settings.instansi_nama }),
-        setDoc(doc(db, 'settings', 'instansi_alamat'), { value: settings.instansi_alamat }),
-        setDoc(doc(db, 'settings', 'running_text'), { value: settings.running_text }),
-        setDoc(doc(db, 'settings', 'display_video_url'), { value: settings.display_video_url }),
-        setDoc(doc(db, 'settings', 'bell_sound_volume'), { value: String(settings.bell_sound_volume) }),
+        setDoc(doc(db, 'settings', 'instansi_nama'), { value: settings.instansi_nama || '' }),
+        setDoc(doc(db, 'settings', 'instansi_alamat'), { value: settings.instansi_alamat || '' }),
+        setDoc(doc(db, 'settings', 'running_text'), { value: settings.running_text || '' }),
+        setDoc(doc(db, 'settings', 'display_video_url'), { value: settings.display_video_url || '' }),
+        setDoc(doc(db, 'settings', 'bell_sound_volume'), { value: String(settings.bell_sound_volume || '0.8') }),
+        setDoc(doc(db, 'settings', 'display_video_volume'), { value: String(settings.display_video_volume || '0.8') }),
       ]);
       showAlert('Pengaturan umum berhasil disimpan.');
     } catch (err) {
@@ -580,8 +644,8 @@ export default function Pengaturan() {
       if (item.loket) {
         const loketNum = String(item.loket).replace(/\D/g, '');
         if (loketNum) {
-          const matchLoket = operatorList.find(op => 
-            (op.nama && op.nama.includes(loketNum)) || 
+          const matchLoket = operatorList.find(op =>
+            (op.nama && op.nama.includes(loketNum)) ||
             (op.username && op.username.includes(loketNum))
           );
           if (matchLoket) return matchLoket.nama;
@@ -622,7 +686,7 @@ export default function Pengaturan() {
     const namaWarga = item.warga_nama && item.warga_nama.trim() !== '' ? item.warga_nama.trim() : 'Warga';
     const alamatWarga = item.warga_alamat && item.warga_alamat.trim() !== '' ? item.warga_alamat.trim() : 'Kecamatan Gandrungmangu';
     const jenisPelayanan = item.pelayanan_nama && item.pelayanan_nama.trim() !== '' ? item.pelayanan_nama.trim() : 'Pelayanan Terpadu';
-    
+
     let namaOperator = resolveOperatorName(item);
     if (!namaOperator || namaOperator === '-') {
       namaOperator = 'Petugas Pelayanan';
@@ -637,7 +701,7 @@ Terima kasih telah mempercayakan pengurusan dokumen ${jenisPelayanan} Anda di Pu
 
 Sebagai komitmen kami untuk terus berinovasi dan meningkatkan kualitas pelayanan publik, kami sangat membutuhkan evaluasi dari masyarakat. Oleh karena itu, kami memohon kesediaan Bapak/Ibu untuk memberikan tanggapan, kritik, maupun masukan terkait pelayanan kami hari ini.
 
-Bapak/Ibu dapat langsung membalas pesan WhatsApp ini dengan menyampaikan kesan, pengalaman, atau saran Bapak/Ibu secara bebas. Setiap masukan yang masuk akan sangat berarti bagi kemajuan pelayanan kami.
+Bapak/Ibu dapat langsung membalas pesan WhatsApp atau dapat mengisi form pada link : https://skm.go.id/share/instansi/804defd3-958e-48f9-b9db-10f0ef7a3d29/1 dengan menyampaikan kesan, pengalaman, atau saran Bapak/Ibu secara bebas. Setiap masukan yang masuk akan sangat berarti bagi kemajuan pelayanan kami.
 
 Terima kasih atas waktu, partisipasi, dan kepercayaan Bapak/Ibu. Sehat selalu.
 
@@ -655,7 +719,7 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
     if (typeof window !== 'undefined') {
       try {
         localStorage.setItem(`wa_sent_${item.id}`, 'true');
-      } catch (e) {}
+      } catch (e) { }
     }
 
     // Simpan status ke database Firestore antrian (dengan fallback API server)
@@ -680,11 +744,11 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
 
   const downloadExcel = () => {
     const dataToExport = historyList.filter(item => filterLayanan === 'semua' || item.pelayanan_id === filterLayanan);
-    
+
     // CSV headers (UTF-8 BOM to prevent Excel encoding issues)
     let csvContent = "\uFEFF";
     csvContent += "No,Waktu Ambil,Tipe Antrian,No. Antrian,Jenis Pelayanan,Nama Warga,Alamat,No Telepon,Nama Operator\n";
-    
+
     dataToExport.forEach((item, idx) => {
       const timeStr = item.created_at ? new Date(item.created_at.toMillis()).toLocaleString('id-ID') : '-';
       const tipe = item.tipe === 'online' ? 'ONLINE MOBILE' : 'KIOSK FISIK';
@@ -694,7 +758,7 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
       const alamat = item.warga_alamat || '-';
       const hp = item.warga_hp || '-';
       const operator = resolveOperatorName(item);
-      
+
       const row = [
         idx + 1,
         `"${timeStr.replace(/"/g, '""')}"`,
@@ -708,12 +772,12 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
       ].join(",");
       csvContent += row + "\n";
     });
-    
+
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.setAttribute("href", url);
-    
+
     const dateLabel = filterMode === 'hari' ? filterDate : filterMonth;
     link.setAttribute("download", `laporan_antrian_${dateLabel}.csv`);
     link.style.visibility = 'hidden';
@@ -774,13 +838,13 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
             </h3>
             <p className="text-white-50 small mb-0">Sistem Antrian Kecamatan Gandrungmangu</p>
           </div>
-          
+
           {loginError && (
             <div className="alert border-0 text-white p-3 mb-3 text-center rounded-3 small fw-semibold shadow-sm" style={{ background: 'rgba(239, 68, 68, 0.85)', backdropFilter: 'blur(8px)', border: '1px solid rgba(239, 68, 68, 0.5)' }}>
               <i className="bi bi-exclamation-triangle-fill me-1"></i> {loginError}
             </div>
           )}
-          
+
           <form onSubmit={handleAdminLogin}>
             <div className="mb-3">
               <label className="form-label text-white-50 small fw-bold mb-1.5">Alamat Email / Username</label>
@@ -788,10 +852,10 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                 <span className="input-group-text text-info" style={{ background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(255, 255, 255, 0.2)', borderRight: 'none', borderRadius: '12px 0 0 12px' }}>
                   <i className="bi bi-envelope"></i>
                 </span>
-                <input 
-                  type="text" 
-                  className="form-control text-white fw-medium" 
-                  placeholder="Email akun Masuk Sistem" 
+                <input
+                  type="text"
+                  className="form-control text-white fw-medium"
+                  placeholder="Email akun Masuk Sistem"
                   required
                   value={emailInput}
                   onChange={e => setEmailInput(e.target.value)}
@@ -802,17 +866,17 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                 *Gunakan email & kata sandi yang sama dengan <strong>Masuk Sistem</strong>
               </small>
             </div>
-            
+
             <div className="mb-4">
               <label className="form-label text-white-50 small fw-bold mb-1.5">Password</label>
               <div className="input-group">
                 <span className="input-group-text text-info" style={{ background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(255, 255, 255, 0.2)', borderRight: 'none', borderRadius: '12px 0 0 12px' }}>
                   <i className="bi bi-lock"></i>
                 </span>
-                <input 
-                  type="password" 
-                  className="form-control text-white fw-medium" 
-                  placeholder="Password" 
+                <input
+                  type="password"
+                  className="form-control text-white fw-medium"
+                  placeholder="Password"
                   required
                   value={passwordInput}
                   onChange={e => setPasswordInput(e.target.value)}
@@ -820,11 +884,11 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                 />
               </div>
             </div>
-            
+
             <button type="submit" className="btn w-100 py-3 fw-bold rounded-pill mb-3 text-white shadow-lg" style={{ background: 'linear-gradient(135deg, #0284c7, #2563eb)', border: '1px solid rgba(56, 189, 248, 0.5)', boxShadow: '0 8px 25px rgba(2, 132, 199, 0.35)', letterSpacing: '0.3px' }}>
               <i className="bi bi-box-arrow-in-right me-1.5"></i> Masuk Pengaturan
             </button>
-            
+
             <Link href="/Antrian" className="btn w-100 py-2.5 rounded-pill text-white-50 small text-decoration-none text-center d-block fw-semibold shadow-sm" style={{ backdropFilter: 'blur(8px)', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.15)', transition: 'all 0.2s ease' }}>
               <i className="bi bi-arrow-left me-1"></i> Kembali ke Portal Antrian
             </Link>
@@ -846,7 +910,7 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
       fontFamily: 'var(--font-outfit), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
     }}>
       <div className="container" style={{ maxWidth: '1080px' }}>
-        
+
         {/* Header Bar */}
         <div className="d-flex justify-content-between align-items-center mb-4 p-3.5 rounded-4 shadow-lg antrian-glass" style={{
           background: 'rgba(255, 255, 255, 0.06)',
@@ -881,7 +945,7 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
 
         {/* Tab Navigation */}
         <div className="d-flex gap-2 mb-4 overflow-x-auto pb-1">
-          <button 
+          <button
             onClick={() => setActiveTab('umum')}
             className={`btn flex-grow-1 py-2.5 px-3 fw-bold rounded-3 transition shadow-sm`}
             style={{
@@ -892,7 +956,7 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
           >
             <i className="bi bi-sliders me-1.5"></i> Pengaturan Umum
           </button>
-          <button 
+          <button
             onClick={() => setActiveTab('layanan')}
             className={`btn flex-grow-1 py-2.5 px-3 fw-bold rounded-3 transition shadow-sm`}
             style={{
@@ -903,7 +967,7 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
           >
             <i className="bi bi-card-list me-1.5"></i> Kategori Layanan
           </button>
-          <button 
+          <button
             onClick={() => setActiveTab('loket')}
             className={`btn flex-grow-1 py-2.5 px-3 fw-bold rounded-3 transition shadow-sm`}
             style={{
@@ -914,7 +978,7 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
           >
             <i className="bi bi-shop-window me-1.5"></i> Pengaturan Loket
           </button>
-          <button 
+          <button
             onClick={() => setActiveTab('daftar_pelayanan')}
             className={`btn flex-grow-1 py-2.5 px-3 fw-bold rounded-3 transition shadow-sm`}
             style={{
@@ -925,7 +989,7 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
           >
             <i className="bi bi-journal-text me-1.5"></i> Daftar Pelayanan
           </button>
-          <button 
+          <button
             onClick={() => setActiveTab('operator_config')}
             className={`btn flex-grow-1 py-2.5 px-3 fw-bold rounded-3 transition shadow-sm`}
             style={{
@@ -940,7 +1004,7 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
 
         {/* Main Content Area */}
         <div className="card text-white p-4 mb-4 antrian-glass" style={{ background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '24px', boxShadow: '0 20px 50px rgba(0,0,0,0.4)' }}>
-          
+
           {loading && (
             <div className="text-center py-5">
               <div className="spinner-border text-info" role="status"></div>
@@ -957,64 +1021,229 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                   <div className="row g-4">
                     <div className="col-md-6">
                       <label className="form-label fw-bold text-white-50">Nama Instansi</label>
-                      <input 
-                        type="text" 
-                        className="form-control bg-dark text-white border-secondary py-2" 
-                        required 
-                        value={settings.instansi_nama || ''} 
+                      <input
+                        type="text"
+                        className="form-control bg-dark text-white border-secondary py-2"
+                        required
+                        value={settings.instansi_nama || ''}
                         onChange={e => setSettings({ ...settings, instansi_nama: e.target.value })}
                       />
                     </div>
                     <div className="col-md-6">
                       <label className="form-label fw-bold text-white-50">Alamat Instansi</label>
-                      <input 
-                        type="text" 
-                        className="form-control bg-dark text-white border-secondary py-2" 
-                        required 
-                        value={settings.instansi_alamat || ''} 
+                      <input
+                        type="text"
+                        className="form-control bg-dark text-white border-secondary py-2"
+                        required
+                        value={settings.instansi_alamat || ''}
                         onChange={e => setSettings({ ...settings, instansi_alamat: e.target.value })}
                       />
                     </div>
-                    
+
                     <h4 className="fw-bold mb-1 mt-5 text-info border-bottom pb-2">Pengaturan Display & Media</h4>
-                    
+
                     <div className="col-12">
                       <label className="form-label fw-bold text-white-50">Teks Pengumuman Berjalan (Running Text)</label>
-                      <textarea 
-                        rows="3" 
-                        className="form-control bg-dark text-white border-secondary py-2" 
-                        required 
-                        value={settings.running_text || ''} 
+                      <textarea
+                        rows="3"
+                        className="form-control bg-dark text-white border-secondary py-2"
+                        required
+                        value={settings.running_text || ''}
                         onChange={e => setSettings({ ...settings, running_text: e.target.value })}
                       ></textarea>
                     </div>
 
                     <div className="col-md-8">
                       <label className="form-label fw-bold text-white-50">Display YouTube Video URL</label>
-                      <input 
-                        type="url" 
-                        className="form-control bg-dark text-white border-secondary py-2" 
-                        placeholder="https://youtu.be/FkbZshiiS-k atau https://youtube.com/watch?v=..." 
-                        value={settings.display_video_url || ''} 
+                      <input
+                        type="text"
+                        className="form-control bg-dark text-white border-secondary py-2"
+                        placeholder="Contoh: https://www.youtube.com/watch?v=h-z_t11jvPU atau https://youtu.be/..."
+                        value={settings.display_video_url || ''}
                         onChange={e => setSettings({ ...settings, display_video_url: e.target.value })}
                       />
-                      <small className="text-white-50 mt-1 d-block">Video ini akan diputar di halaman display utama secara loop.</small>
+                      <small className="text-white-50 mt-1 d-block">Mendukung link YouTube biasa (watch?v=), link pendek (youtu.be), Shorts, Live stream, Playlist, maupun file video (.mp4). Video diputar otomatis secara loop di Display Antrian.</small>
+                    </div>
+
+                    {/* ─── PANEL MODE DISPLAY TV ─────────────────────────── */}
+                    <div className="col-12 mt-2">
+                      <div
+                        style={{
+                          border: `2px solid ${tvMode === 'tv' ? 'rgba(239,68,68,0.55)' : 'rgba(251,191,36,0.35)'}`,
+                          borderRadius: '16px',
+                          padding: '18px 20px',
+                          background: tvMode === 'tv' ? 'rgba(239,68,68,0.07)' : 'rgba(251,191,36,0.04)',
+                          transition: 'all 0.3s ease'
+                        }}
+                      >
+                        {/* Header Panel */}
+                        <div className="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                          <div className="d-flex align-items-center gap-2">
+                            <i className="bi bi-tv-fill" style={{ fontSize: '1.3rem', color: tvMode === 'tv' ? '#ef4444' : '#fbbf24' }} />
+                            <div>
+                              <div className="fw-bold text-white" style={{ fontSize: '1rem' }}>Mode Siaran TV (IPTV)</div>
+                              <div className="text-white-50" style={{ fontSize: '0.8rem' }}>Sumber: dhasap/dhanytv — 920+ channel Indonesia gratis</div>
+                            </div>
+                          </div>
+                          {/* Badge status mode saat ini */}
+                          <span
+                            className="badge rounded-pill fw-bold px-3 py-2"
+                            style={{
+                              fontSize: '0.8rem',
+                              background: tvMode === 'tv' ? 'linear-gradient(135deg,#ef4444,#dc2626)' : 'rgba(251,191,36,0.2)',
+                              color: tvMode === 'tv' ? '#fff' : '#fbbf24',
+                              border: tvMode === 'tv' ? '1px solid rgba(239,68,68,0.5)' : '1px solid rgba(251,191,36,0.4)'
+                            }}
+                          >
+                            {tvMode === 'tv' ? '📺 Sedang Mode TV' : '🔢 Sedang Mode Antrian'}
+                          </span>
+                        </div>
+
+                        {/* Pilih Grup Channel */}
+                        <div className="row g-2 mb-3">
+                          <div className="col-md-4">
+                            <label className="form-label fw-semibold text-white-50 mb-1" style={{ fontSize: '0.82rem' }}>Grup Channel</label>
+                            <select
+                              className="form-select form-select-sm bg-dark text-white border-secondary"
+                              value={tvGroupFilter}
+                              onChange={e => {
+                                setTvGroupFilter(e.target.value);
+                                fetchTvChannels(e.target.value);
+                                setTvSelectedChannel(null);
+                              }}
+                              onClick={() => { if (tvChannels.length === 0) fetchTvChannels(tvGroupFilter); }}
+                            >
+                              {tvGroups.length === 0 && <option value="Indonesia Channels">Indonesia Channels</option>}
+                              {tvGroups.map(g => <option key={g} value={g}>{g}</option>)}
+                            </select>
+                          </div>
+                          <div className="col-md-6">
+                            <label className="form-label fw-semibold text-white-50 mb-1" style={{ fontSize: '0.82rem' }}>Pilih Channel</label>
+                            <select
+                              className="form-select form-select-sm bg-dark text-white border-secondary"
+                              value={tvSelectedChannel?.url || ''}
+                              onChange={e => {
+                                const ch = tvChannels.find(c => c.url === e.target.value);
+                                setTvSelectedChannel(ch || null);
+                              }}
+                              onClick={() => { if (tvChannels.length === 0) fetchTvChannels(tvGroupFilter); }}
+                            >
+                              <option value="">-- Pilih Channel --</option>
+                              {tvLoadingChannels && <option disabled>Memuat daftar channel...</option>}
+                              {tvChannels.map((ch, idx) => (
+                                <option key={idx} value={ch.url}>{ch.name}</option>
+                              ))}
+                            </select>
+                          </div>
+                          <div className="col-md-2 d-flex align-items-end">
+                            <button
+                              type="button"
+                              className="btn btn-sm btn-outline-secondary w-100"
+                              onClick={() => fetchTvChannels(tvGroupFilter)}
+                              disabled={tvLoadingChannels}
+                              title="Muat ulang daftar channel"
+                            >
+                              {tvLoadingChannels
+                                ? <span className="spinner-border spinner-border-sm" />
+                                : <i className="bi bi-arrow-clockwise" />}
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Preview channel terpilih */}
+                        {tvSelectedChannel && (
+                          <div
+                            className="d-flex align-items-center gap-3 p-2 mb-3 rounded-3"
+                            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}
+                          >
+                            {tvSelectedChannel.logo && (
+                              <img
+                                src={tvSelectedChannel.logo}
+                                alt={tvSelectedChannel.name}
+                                style={{ height: '32px', width: 'auto', objectFit: 'contain', borderRadius: '6px' }}
+                                onError={e => e.target.style.display = 'none'}
+                              />
+                            )}
+                            <div className="flex-grow-1">
+                              <div className="fw-bold text-white" style={{ fontSize: '0.9rem' }}>{tvSelectedChannel.name}</div>
+                              <div className="text-white-50" style={{ fontSize: '0.72rem', wordBreak: 'break-all' }}>{tvSelectedChannel.url.slice(0, 60)}...</div>
+                            </div>
+                            <span
+                              style={{
+                                fontSize: '0.65rem', fontWeight: 700, color: '#ef4444', background: 'rgba(239,68,68,0.15)',
+                                border: '1px solid rgba(239,68,68,0.4)', borderRadius: '6px', padding: '2px 7px', letterSpacing: '1px'
+                              }}
+                            >
+                              LIVE
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Tombol Switch Mode */}
+                        <div className="d-flex gap-2 flex-wrap">
+                          <button
+                            type="button"
+                            className="btn btn-sm fw-bold rounded-pill px-4"
+                            disabled={tvSwitching || !tvSelectedChannel || tvMode === 'tv'}
+                            onClick={() => handleSwitchDisplayMode('tv')}
+                            style={{
+                              background: tvMode !== 'tv' && tvSelectedChannel ? 'linear-gradient(135deg,#ef4444,#dc2626)' : 'rgba(100,116,139,0.3)',
+                              color: '#fff', border: 'none', opacity: (!tvSelectedChannel || tvMode === 'tv') ? 0.5 : 1
+                            }}
+                          >
+                            {tvSwitching && tvMode !== 'tv'
+                              ? <><span className="spinner-border spinner-border-sm me-1" />Mengganti...</>
+                              : <><i className="bi bi-tv-fill me-1" />Aktifkan Mode TV</>}
+                          </button>
+                          <button
+                            type="button"
+                            className="btn btn-sm fw-bold rounded-pill px-4"
+                            disabled={tvSwitching || tvMode === 'antrian'}
+                            onClick={() => handleSwitchDisplayMode('antrian')}
+                            style={{
+                              background: tvMode === 'tv' ? 'linear-gradient(135deg,#f59e0b,#d97706)' : 'rgba(100,116,139,0.3)',
+                              color: '#000', border: 'none', opacity: tvMode === 'antrian' ? 0.5 : 1
+                            }}
+                          >
+                            {tvSwitching && tvMode === 'tv'
+                              ? <><span className="spinner-border spinner-border-sm me-1" />Mengganti...</>
+                              : <><i className="bi bi-grid-3x3-gap-fill me-1" />Kembali ke Antrian</>}
+                          </button>
+                        </div>
+                      </div>
                     </div>
 
                     <div className="col-md-4">
                       <label className="form-label fw-bold text-white-50">Volume Suara Panggilan (Bell Chime)</label>
                       <div className="d-flex align-items-center gap-3">
-                        <input 
-                          type="range" 
-                          className="form-range" 
-                          min="0" 
-                          max="1" 
-                          step="0.1" 
-                          value={settings.bell_sound_volume || '0.8'} 
+                        <input
+                          type="range"
+                          className="form-range"
+                          min="0"
+                          max="1"
+                          step="0.1"
+                          value={settings.bell_sound_volume || '0.8'}
                           onChange={e => setSettings({ ...settings, bell_sound_volume: e.target.value })}
                         />
                         <span className="badge bg-secondary p-2">{Math.round((parseFloat(settings.bell_sound_volume) || 0) * 100)}%</span>
                       </div>
+                    </div>
+
+                    <div className="col-md-4">
+                      <label className="form-label fw-bold text-white-50">Volume Tampilan TV / Video</label>
+                      <div className="d-flex align-items-center gap-3">
+                        <input
+                          type="range"
+                          className="form-range"
+                          min="0"
+                          max="1"
+                          step="0.05"
+                          value={settings.display_video_volume || '0.8'}
+                          onChange={e => setSettings({ ...settings, display_video_volume: e.target.value })}
+                        />
+                        <span className="badge bg-secondary p-2">{Math.round((parseFloat(settings.display_video_volume) || 0) * 100)}%</span>
+                      </div>
+                      <small className="text-white-50 mt-1 d-block">Mengatur volume siaran TV / video yang diputar di Display Antrian.</small>
                     </div>
                   </div>
 
@@ -1035,38 +1264,38 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                   <form onSubmit={handleSaveLayanan} className="row g-3 mb-5 align-items-end p-3 rounded-3" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }}>
                     <div className="col-md-1">
                       <label className="form-label fw-bold text-white-50">Kode</label>
-                      <input 
-                        type="text" 
-                        className="form-control bg-dark text-white border-secondary" 
-                        placeholder="A" 
-                        maxLength="2" 
-                        required 
+                      <input
+                        type="text"
+                        className="form-control bg-dark text-white border-secondary"
+                        placeholder="A"
+                        maxLength="2"
+                        required
                         disabled={isEditingLayanan}
-                        value={layananForm.kode} 
+                        value={layananForm.kode}
                         onChange={e => setLayananForm({ ...layananForm, kode: e.target.value })}
                       />
                     </div>
                     <div className="col-md-4">
                       <label className="form-label fw-bold text-white-50">Nama Layanan</label>
-                      <input 
-                        type="text" 
-                        className="form-control bg-dark text-white border-secondary" 
-                        placeholder="Contoh: Pelayanan Kependudukan" 
-                        required 
-                        value={layananForm.nama} 
+                      <input
+                        type="text"
+                        className="form-control bg-dark text-white border-secondary"
+                        placeholder="Contoh: Pelayanan Kependudukan"
+                        required
+                        value={layananForm.nama}
                         onChange={e => setLayananForm({ ...layananForm, nama: e.target.value })}
                       />
                     </div>
                     <div className="col-md-3">
                       <label className="form-label fw-bold text-white-50">Loket Pelayanan</label>
-                      <select 
-                        className="form-select bg-dark text-white border-secondary" 
-                        required 
-                        value={layananForm.loket_id || ''} 
+                      <select
+                        className="form-select bg-dark text-white border-secondary"
+                        required
+                        value={layananForm.loket_id || ''}
                         onChange={e => {
                           const selectedLok = loketList.find(l => l.id === e.target.value);
-                          setLayananForm({ 
-                            ...layananForm, 
+                          setLayananForm({
+                            ...layananForm,
                             loket_id: e.target.value,
                             loket_nama: selectedLok ? selectedLok.nama : ''
                           });
@@ -1080,12 +1309,12 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                     </div>
                     <div className="col-md-2">
                       <label className="form-label fw-bold text-white-50">Estimasi (Mnt)</label>
-                      <input 
-                        type="number" 
-                        className="form-control bg-dark text-white border-secondary" 
-                        placeholder="15" 
-                        required 
-                        value={layananForm.estimasi_waktu} 
+                      <input
+                        type="number"
+                        className="form-control bg-dark text-white border-secondary"
+                        placeholder="15"
+                        required
+                        value={layananForm.estimasi_waktu}
                         onChange={e => setLayananForm({ ...layananForm, estimasi_waktu: e.target.value })}
                       />
                     </div>
@@ -1094,9 +1323,9 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                         {isEditingLayanan ? 'Update' : 'Simpan'}
                       </button>
                       {isEditingLayanan && (
-                        <button 
-                          type="button" 
-                          className="btn btn-outline-danger w-100 py-2" 
+                        <button
+                          type="button"
+                          className="btn btn-outline-danger w-100 py-2"
                           onClick={() => {
                             setLayananForm({ id: '', kode: '', nama: '', estimasi_waktu: '', loket_id: '', loket_nama: '' });
                             setIsEditingLayanan(false);
@@ -1159,12 +1388,12 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                   <form onSubmit={handleSaveLoket} className="row g-3 mb-5 align-items-end p-3 rounded-3" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }}>
                     <div className="col-md-9">
                       <label className="form-label fw-bold text-white-50">Nama Loket</label>
-                      <input 
-                        type="text" 
-                        className="form-control bg-dark text-white border-secondary py-2" 
-                        placeholder="Contoh: Loket 5, Loket Customer Service, dll." 
-                        required 
-                        value={loketForm.nama} 
+                      <input
+                        type="text"
+                        className="form-control bg-dark text-white border-secondary py-2"
+                        placeholder="Contoh: Loket 5, Loket Customer Service, dll."
+                        required
+                        value={loketForm.nama}
                         onChange={e => setLoketForm({ ...loketForm, nama: e.target.value })}
                       />
                     </div>
@@ -1210,7 +1439,7 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
               {activeTab === 'daftar_pelayanan' && (
                 <div>
                   <h4 className="fw-bold mb-4 text-info border-bottom pb-2">Histori Daftar Pelayanan</h4>
-                  
+
                   {/* Filter Controls */}
                   <div className="row g-3 mb-4 p-3 rounded-3" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }}>
                     <div className="col-md-2">
@@ -1224,21 +1453,21 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                     {filterMode === 'hari' ? (
                       <div className="col-md-3">
                         <label className="form-label fw-bold text-white-50">Pilih Hari</label>
-                        <input 
-                          type="date" 
-                          className="form-control bg-dark text-white border-secondary" 
-                          value={filterDate} 
-                          onChange={e => setFilterDate(e.target.value)} 
+                        <input
+                          type="date"
+                          className="form-control bg-dark text-white border-secondary"
+                          value={filterDate}
+                          onChange={e => setFilterDate(e.target.value)}
                         />
                       </div>
                     ) : (
                       <div className="col-md-3">
                         <label className="form-label fw-bold text-white-50">Pilih Bulan</label>
-                        <input 
-                          type="month" 
-                          className="form-control bg-dark text-white border-secondary" 
-                          value={filterMonth} 
-                          onChange={e => setFilterMonth(e.target.value)} 
+                        <input
+                          type="month"
+                          className="form-control bg-dark text-white border-secondary"
+                          value={filterMonth}
+                          onChange={e => setFilterMonth(e.target.value)}
                         />
                       </div>
                     )}
@@ -1254,8 +1483,8 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                     </div>
 
                     <div className="col-md-2 d-flex align-items-end">
-                      <button 
-                        type="button" 
+                      <button
+                        type="button"
                         className="btn btn-outline-info w-100 py-2 fw-semibold"
                         onClick={() => window.print()}
                       >
@@ -1264,8 +1493,8 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                     </div>
 
                     <div className="col-md-2 d-flex align-items-end">
-                      <button 
-                        type="button" 
+                      <button
+                        type="button"
                         className="btn btn-success w-100 py-2 fw-semibold text-dark"
                         onClick={downloadExcel}
                       >
@@ -1342,9 +1571,9 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                                         type="button"
                                         onClick={() => handleSendWaEvaluasi(item)}
                                         className="btn btn-sm rounded-pill px-2.5 py-1 d-inline-flex align-items-center gap-1.5 shadow-sm fw-bold border"
-                                        style={{ 
-                                          fontSize: '11px', 
-                                          background: '#0d6838', 
+                                        style={{
+                                          fontSize: '11px',
+                                          background: '#0d6838',
                                           borderColor: '#198754',
                                           color: '#ffffff'
                                         }}
@@ -1386,7 +1615,8 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                   )}
 
                   {/* Print custom stylesheet for report print */}
-                  <style dangerouslySetInnerHTML={{__html: `
+                  <style dangerouslySetInnerHTML={{
+                    __html: `
                     @media print {
                       @page {
                         size: A4 landscape;
@@ -1446,34 +1676,34 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                   <form onSubmit={handleSaveOperator} className="row g-3 mb-5 align-items-end p-3 rounded-3" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }}>
                     <div className="col-md-3">
                       <label className="form-label fw-bold text-white-50">Nama Lengkap</label>
-                      <input 
-                        type="text" 
-                        className="form-control bg-dark text-white border-secondary" 
-                        placeholder="Contoh: Budi Santoso" 
-                        required 
-                        value={operatorForm.nama} 
+                      <input
+                        type="text"
+                        className="form-control bg-dark text-white border-secondary"
+                        placeholder="Contoh: Budi Santoso"
+                        required
+                        value={operatorForm.nama}
                         onChange={e => setOperatorForm({ ...operatorForm, nama: e.target.value })}
                       />
                     </div>
                     <div className="col-md-3">
                       <label className="form-label fw-bold text-white-50">Username</label>
-                      <input 
-                        type="text" 
-                        className="form-control bg-dark text-white border-secondary" 
-                        placeholder="Contoh: budi" 
-                        required 
-                        value={operatorForm.username} 
+                      <input
+                        type="text"
+                        className="form-control bg-dark text-white border-secondary"
+                        placeholder="Contoh: budi"
+                        required
+                        value={operatorForm.username}
                         onChange={e => setOperatorForm({ ...operatorForm, username: e.target.value })}
                       />
                     </div>
                     <div className="col-md-3">
                       <label className="form-label fw-bold text-white-50">Password</label>
-                      <input 
-                        type="password" 
-                        className="form-control bg-dark text-white border-secondary" 
-                        placeholder="Password login" 
-                        required 
-                        value={operatorForm.password} 
+                      <input
+                        type="password"
+                        className="form-control bg-dark text-white border-secondary"
+                        placeholder="Password login"
+                        required
+                        value={operatorForm.password}
                         onChange={e => setOperatorForm({ ...operatorForm, password: e.target.value })}
                       />
                     </div>
@@ -1482,9 +1712,9 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                         {isEditingOperator ? 'Perbarui' : 'Tambah'}
                       </button>
                       {isEditingOperator && (
-                        <button 
-                          type="button" 
-                          className="btn btn-outline-danger w-100 py-2" 
+                        <button
+                          type="button"
+                          className="btn btn-outline-danger w-100 py-2"
                           onClick={() => {
                             setOperatorForm({ id: '', nama: '', username: '', password: '' });
                             setIsEditingOperator(false);

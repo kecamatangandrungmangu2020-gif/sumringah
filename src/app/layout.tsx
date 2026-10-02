@@ -158,7 +158,7 @@ export default function RootLayout({
           </div>
         ) : (
           <FirebaseClientProvider>
-            <VectorBackground />
+            {!isAntrian && <VectorBackground />}
             {isPublicPage ? (
               <main className="w-full min-h-screen relative z-10">
                 {children}

@@ -201,8 +201,8 @@ export default function Operator() {
 
       snap.forEach(docSnap => {
         const isSentLocal = typeof window !== 'undefined' && localStorage.getItem(`wa_sent_${docSnap.id}`) === 'true';
-        const data = { 
-          id: docSnap.id, 
+        const data = {
+          id: docSnap.id,
           ...docSnap.data(),
           wa_evaluasi_sent: Boolean(docSnap.data().wa_evaluasi_sent || isSentLocal)
         };
@@ -524,10 +524,10 @@ export default function Operator() {
 
     const namaWarga = item.warga_nama && item.warga_nama.trim() !== '' ? item.warga_nama.trim() : 'Warga';
     const alamatWarga = item.warga_alamat && item.warga_alamat.trim() !== '' ? item.warga_alamat.trim() : 'Kecamatan Gandrungmangu';
-    const jenisPelayanan = item.pelayanan_nama && item.pelayanan_nama.trim() !== '' 
-      ? item.pelayanan_nama.trim() 
+    const jenisPelayanan = item.pelayanan_nama && item.pelayanan_nama.trim() !== ''
+      ? item.pelayanan_nama.trim()
       : (pelayananList.find(p => p.id === item.pelayanan_id)?.nama || 'Pelayanan Terpadu');
-    
+
     let namaOp = item.operator_nama || getCurrentOperatorName();
     if (!namaOp || namaOp === '-' || namaOp === 'Operator Loket') {
       namaOp = operatorNama || 'Petugas Pelayanan';
@@ -542,7 +542,7 @@ Terima kasih telah mempercayakan pengurusan dokumen ${jenisPelayanan} Anda di Pu
 
 Sebagai komitmen kami untuk terus berinovasi dan meningkatkan kualitas pelayanan publik, kami sangat membutuhkan evaluasi dari masyarakat. Oleh karena itu, kami memohon kesediaan Bapak/Ibu untuk memberikan tanggapan, kritik, maupun masukan terkait pelayanan kami hari ini.
 
-Bapak/Ibu dapat langsung membalas pesan WhatsApp ini dengan menyampaikan kesan, pengalaman, atau saran Bapak/Ibu secara bebas. Setiap masukan yang masuk akan sangat berarti bagi kemajuan pelayanan kami.
+Bapak/Ibu dapat langsung membalas pesan WhatsApp atau dapat mengisi form pada link : https://skm.go.id/share/instansi/804defd3-958e-48f9-b9db-10f0ef7a3d29/1 dengan menyampaikan kesan, pengalaman, atau saran Bapak/Ibu secara bebas. Setiap masukan yang masuk akan sangat berarti bagi kemajuan pelayanan kami.
 
 Terima kasih atas waktu, partisipasi, dan kepercayaan Bapak/Ibu. Sehat selalu.
 
@@ -561,7 +561,7 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
     if (typeof window !== 'undefined') {
       try {
         localStorage.setItem(`wa_sent_${item.id}`, 'true');
-      } catch (e) {}
+      } catch (e) { }
     }
 
     // Simpan ke database Firestore antrian (dengan fallback API server)
@@ -1317,9 +1317,9 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                     type="button"
                     onClick={() => handleSendWaEvaluasi(completedForWa)}
                     className="btn w-100 py-3 fw-bold rounded-pill shadow-lg d-inline-flex align-items-center justify-content-center gap-2 border"
-                    style={{ 
-                      fontSize: '1rem', 
-                      background: '#0d6838', 
+                    style={{
+                      fontSize: '1rem',
+                      background: '#0d6838',
                       borderColor: '#198754',
                       color: '#ffffff'
                     }}
@@ -1334,10 +1334,10 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                     type="button"
                     onClick={() => handleSendWaEvaluasi(completedForWa)}
                     className="btn w-100 py-3 fw-bold text-white rounded-pill shadow-lg d-inline-flex align-items-center justify-content-center gap-2"
-                    style={{ 
-                      fontSize: '1rem', 
-                      background: '#25D366', 
-                      borderColor: '#22bf5b' 
+                    style={{
+                      fontSize: '1rem',
+                      background: '#25D366',
+                      borderColor: '#22bf5b'
                     }}
                   >
                     <i className="bi bi-whatsapp fs-5"></i>
@@ -1352,10 +1352,10 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
             </div>
 
             <div className="d-flex justify-content-end gap-2 pt-2 border-top border-white border-opacity-15">
-              <button 
-                type="button" 
-                onClick={() => setShowWaModal(false)} 
-                className="btn px-4 py-2 rounded-pill fw-semibold text-white" 
+              <button
+                type="button"
+                onClick={() => setShowWaModal(false)}
+                className="btn px-4 py-2 rounded-pill fw-semibold text-white"
                 style={{ background: 'rgba(255, 255, 255, 0.1)', border: '1px solid rgba(255, 255, 255, 0.2)' }}
               >
                 Tutup & Lanjut

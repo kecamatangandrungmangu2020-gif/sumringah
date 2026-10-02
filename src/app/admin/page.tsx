@@ -222,21 +222,32 @@ export default function AdminLandingPage() {
       {/* ── 2. HERO SECTION IDENTIK LANDING PAGE ────────────────────────────────── */}
       <main className="flex-1">
         <section className="relative w-full min-h-[calc(100vh-5rem)] flex items-center justify-center overflow-hidden py-16 md:py-24">
-          {/* Foto Halaman Utama & Vignette Hangat Alami */}
-          <div className="absolute inset-0 z-0 pointer-events-none">
-            {heroImage ? (
-              <Image
-                src={heroImage}
-                alt="Foto Utama Kecamatan Gandrungmangu"
-                fill
-                priority
-                className="object-cover object-center brightness-95 scale-100"
-                unoptimized
+          {/* Background Video Mascot Revealing Logo */}
+          <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover object-center brightness-90"
+              poster={heroImage}
+            >
+              <source
+                src="https://res.cloudinary.com/zqw5r6ay/video/upload/v1790613043/Mascot_revealing_logo_video_20260928232803.mp4"
+                type="video/mp4"
               />
-            ) : (
-              <div className="w-full h-full bg-gradient-to-b from-blue-900 via-sky-800 to-amber-900" />
-            )}
-            <div className="absolute inset-0 bg-gradient-to-b from-black/75 via-slate-950/70 to-slate-950/95" />
+              {heroImage && (
+                <Image
+                  src={heroImage}
+                  alt="Foto Utama Kecamatan Gandrungmangu"
+                  fill
+                  priority
+                  className="object-cover object-center brightness-95 scale-100"
+                  unoptimized
+                />
+              )}
+            </video>
+            <div className="absolute inset-0 bg-gradient-to-b from-black/65 via-slate-950/50 to-slate-950/90" />
             <div className="absolute inset-0 bg-radial from-transparent via-slate-950/20 to-black/60" />
           </div>
 

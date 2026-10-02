@@ -786,22 +786,33 @@ export default function HomePage() {
 
       {/* ── 2. HERO SECTION DENGAN GAYA EDITORIAL LEYCHERT & OMBAK EMAS ──────────────── */}
       <section className="relative w-full min-h-[580px] sm:min-h-[640px] md:min-h-[700px] flex flex-col justify-between overflow-hidden pt-28 sm:pt-36 pb-0">
-        {/* Foto Lanskap Alam & Suasana Golden Hour */}
-        <div className="absolute inset-0 z-0 pointer-events-none">
-          {heroImage ? (
-            <Image
-              src={heroImage}
-              alt="Bentang Alam Gandrungmangu"
-              fill
-              priority
-              className="object-cover object-center brightness-95 scale-100"
-              unoptimized
+        {/* Background Video Mascot Revealing Logo */}
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover object-center brightness-90"
+            poster={heroImage}
+          >
+            <source
+              src="https://res.cloudinary.com/zqw5r6ay/video/upload/v1790613043/Mascot_revealing_logo_video_20260928232803.mp4"
+              type="video/mp4"
             />
-          ) : (
-            <div className="w-full h-full bg-gradient-to-b from-blue-900 via-sky-800 to-amber-900" />
-          )}
+            {heroImage && (
+              <Image
+                src={heroImage}
+                alt="Bentang Alam Gandrungmangu"
+                fill
+                priority
+                className="object-cover object-center brightness-95 scale-100"
+                unoptimized
+              />
+            )}
+          </video>
           {/* Overlay Natural Warm Vignette */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/65 via-slate-950/60 to-slate-950/90" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-slate-950/50 to-slate-950/85" />
           <div className="absolute inset-0 bg-radial from-transparent via-slate-950/20 to-black/60" />
         </div>
 

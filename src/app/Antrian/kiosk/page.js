@@ -502,17 +502,6 @@ export default function Kiosk() {
             <div className="title">NOMOR ANTRIAN</div>
             <div className="nomor">{ticketToPrint.nomorLengkap}</div>
             <div className="layanan">{ticketToPrint.pelayananNama}</div>
-            {ticketToPrint.loketNama &&
-              ticketToPrint.kode?.toUpperCase() !== 'C' &&
-              ticketToPrint.kode?.toUpperCase() !== 'A' &&
-              !ticketToPrint.nomorLengkap?.toUpperCase()?.startsWith('C') &&
-              !ticketToPrint.nomorLengkap?.toUpperCase()?.startsWith('A') &&
-              !ticketToPrint.pelayananNama?.toLowerCase()?.includes('perekaman') &&
-              !ticketToPrint.loketNama?.toLowerCase()?.includes('loket a') && (
-                <div className="loket" style={{ fontSize: '13pt', fontWeight: 'bold', marginTop: '2mm', textTransform: 'uppercase', border: '1px dashed #000', padding: '1mm 0' }}>
-                  MENUJU: {ticketToPrint.loketNama}
-                </div>
-              )}
             <div className="sisa-antrian">
               Sisa Antrian Menunggu Saat Ini: {ticketToPrint.sisaAntrian}
             </div>
@@ -523,6 +512,8 @@ export default function Kiosk() {
             <div className="pesan">Silakan tunggu nomor Anda dipanggil.</div>
             <div className="terimakasih">Terima Kasih</div>
           </div>
+          {/* Stopper pembatas akhir struk thermal */}
+          <div className="ticket-stopper"></div>
         </div>
       )}
 
@@ -534,28 +525,71 @@ export default function Kiosk() {
             size: 80mm auto;
             margin: 0;
           }
+          *, *::before, *::after {
+            background-image: none !important;
+            box-shadow: none !important;
+            filter: none !important;
+            backdrop-filter: none !important;
+            text-shadow: none !important;
+          }
           html, body {
             background-color: #ffffff !important;
+            background: #ffffff !important;
             color: #000000 !important;
             margin: 0 !important;
             padding: 0 !important;
             width: 80mm !important;
-            min-height: auto !important;
+            max-width: 80mm !important;
+            height: auto !important;
+            min-height: 0 !important;
+            overflow: visible !important;
           }
-          #kiosk-main-container {
+          /* Reset parent layout containers from Next.js root layout */
+          body > div,
+          main,
+          .antrian-system {
+            min-height: 0 !important;
+            height: auto !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            position: static !important;
+            display: block !important;
+            background: #ffffff !important;
+            box-shadow: none !important;
+            border: none !important;
+          }
+          /* Hide all non-printable elements */
+          #kiosk-main-container,
+          [aria-hidden="true"],
+          .fixed,
+          nav,
+          header,
+          footer,
+          aside,
+          svg,
+          .toaster,
+          [data-sonner-toaster] {
             display: none !important;
           }
           #printable-ticket {
             display: block !important;
+            visibility: visible !important;
             width: 80mm !important;
             max-width: 80mm !important;
             margin: 0 auto !important;
-            padding: 5mm 6mm !important;
+            padding: 4mm 5mm 2mm 5mm !important;
             box-sizing: border-box !important;
             text-align: center !important;
             font-family: 'Courier New', Courier, monospace !important;
             background: #ffffff !important;
             color: #000000 !important;
+            page-break-after: avoid !important;
+            page-break-before: avoid !important;
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+            break-after: avoid !important;
+            height: auto !important;
+            min-height: 0 !important;
           }
           .instansi-nama {
             font-size: 11pt !important;
@@ -572,44 +606,46 @@ export default function Kiosk() {
           }
           .divider {
             font-size: 10pt !important;
-            margin: 3mm 0 !important;
+            margin: 2mm 0 !important;
             line-height: 1 !important;
           }
           .ticket-body {
-            margin: 4mm 0 !important;
+            margin: 2mm 0 !important;
           }
           .ticket-body .title {
             font-size: 10pt !important;
             font-weight: bold !important;
-            margin: 0 0 2mm 0 !important;
+            margin: 0 0 1mm 0 !important;
             letter-spacing: 0.5px !important;
           }
           .ticket-body .nomor {
-            font-size: 42pt !important;
+            font-size: 40pt !important;
             font-weight: bold !important;
-            margin: 2mm 0 !important;
+            margin: 1.5mm 0 !important;
             line-height: 1 !important;
           }
           .ticket-body .layanan {
             font-size: 11pt !important;
             font-weight: bold !important;
-            margin: 2mm 0 0 0 !important;
+            margin: 1.5mm 0 0 0 !important;
             text-transform: uppercase !important;
             line-height: 1.2 !important;
           }
           .sisa-antrian {
-            font-size: 10pt !important;
+            font-size: 9.5pt !important;
             font-weight: bold !important;
-            margin: 2mm 0 0 0 !important;
+            margin: 1.5mm 0 0 0 !important;
             line-height: 1.2 !important;
           }
           .ticket-footer {
             font-size: 8pt !important;
-            line-height: 1.4 !important;
-            margin-top: 3mm !important;
+            line-height: 1.3 !important;
+            margin-top: 2mm !important;
+            margin-bottom: 0 !important;
+            padding-bottom: 0 !important;
           }
           .ticket-footer .waktu {
-            margin: 0 0 2mm 0 !important;
+            margin: 0 0 1.5mm 0 !important;
           }
           .ticket-footer .pesan {
             margin: 0 !important;
@@ -618,6 +654,12 @@ export default function Kiosk() {
           .ticket-footer .terimakasih {
             margin: 1mm 0 0 0 !important;
             font-style: italic !important;
+          }
+          .ticket-stopper {
+            height: 1px !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            clear: both !important;
           }
         }
       `}} />
