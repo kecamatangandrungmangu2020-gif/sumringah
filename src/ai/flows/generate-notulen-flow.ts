@@ -5,7 +5,7 @@
  */
 
 import { z } from 'genkit';
-import { convertNotulenToWa } from '@/lib/wa-notulen-formatter';
+import { convertNotulenToWa, formatIndonesianDateWithDay, formatTimeWib } from '@/lib/wa-notulen-formatter';
 
 const GenerateNotulenInputSchema = z.object({
   title: z.string().describe('Judul atau nama kegiatan'),
@@ -24,20 +24,135 @@ const GenerateNotulenOutputSchema = z.object({
 export type GenerateNotulenOutput = z.infer<typeof GenerateNotulenOutputSchema>;
 
 /**
+ * Parser cerdas catatan manual (mendukung catatan bebas maupun berseksi Hadir / Hasil Rapat / Diskusi)
+ */
+function parseManualNotes(rawNotes?: string) {
+  const empty = { hadir: [] as string[], hasil: [] as string[], diskusi: [] as string[] };
+  if (!rawNotes || !rawNotes.trim()) return empty;
+
+  const lines = rawNotes.replace(/\r\n/g, '\n').split('\n').map(l => l.trim()).filter(Boolean);
+  let mode: 'auto' | 'hadir' | 'hasil' | 'diskusi' = 'auto';
+  const hadir: string[] = [];
+  const hasil: string[] = [];
+  const diskusi: string[] = [];
+
+  for (const line of lines) {
+    const cleanHeader = line.replace(/^[*#\s]*(?:(?:I|II|III|IV|V|\d+)[\.\)]\s*)?/i, '').trim();
+
+    if (/^(?:hadir|dihadiri|peserta|kehadiran)\b/i.test(cleanHeader)) {
+      mode = 'hadir';
+      const afterColon = cleanHeader.replace(/^(?:hadir|dihadiri(?:\s+oleh)?|peserta|kehadiran)\s*[:=\-]?\s*/i, '').trim();
+      if (afterColon) {
+        afterColon.split(/[,;]|(?:\s+dan\s+)/i).map(s => s.trim()).filter(Boolean).forEach(s => hadir.push(s));
+      }
+      continue;
+    }
+
+    if (/^(?:hasil\s+rapat|pembahasan|pokok\s+bahasan|materi|arahan|kegiatan|isi\s+rapat)\b/i.test(cleanHeader)) {
+      mode = 'hasil';
+      const afterColon = cleanHeader.replace(/^(?:hasil\s+rapat|pembahasan|pokok\s+bahasan|materi|arahan|kegiatan|isi\s+rapat)\s*[:=\-]?\s*/i, '').trim();
+      if (afterColon) hasil.push(afterColon);
+      continue;
+    }
+
+    if (/^(?:diskusi|tanya\s*jawab|masukan|usulan|kesepakatan|tindak\s+lanjut)\b/i.test(cleanHeader)) {
+      mode = 'diskusi';
+      const afterColon = cleanHeader.replace(/^(?:diskusi(?:\/tanya\s*jawab)?|tanya\s*jawab|masukan|usulan|kesepakatan|tindak\s+lanjut)\s*[:=\-]?\s*/i, '').trim();
+      if (afterColon) diskusi.push(afterColon);
+      continue;
+    }
+
+    const item = line.replace(/^[-•*\d\.\)\s]+/, '').trim();
+    if (!item) continue;
+
+    if (mode === 'hadir') {
+      hadir.push(item);
+    } else if (mode === 'diskusi') {
+      diskusi.push(item);
+    } else if (mode === 'hasil') {
+      hasil.push(item);
+    } else {
+      // Mode bebas: deteksi kata kunci per kalimat
+      if (/^(?:hadir|dihadiri)\b/i.test(item)) {
+        const rest = item.replace(/^(?:hadir|dihadiri(?:\s+oleh)?)\s*[:=\-]?\s*/i, '');
+        rest.split(/[,;]/).map(s => s.trim()).filter(Boolean).forEach(s => hadir.push(s));
+      } else if (/(?:tanya jawab|diskusi|mengusulkan|bertanya|masukan|disepakati|tindak lanjut)/i.test(item)) {
+        diskusi.push(item);
+      } else {
+        hasil.push(item);
+      }
+    }
+  }
+
+  return { hadir, hasil, diskusi };
+}
+
+/**
  * Fallback lokal cerdas jika layanan Google Gemini sedang 503 / mengalami lonjakan trafik (high demand).
- * Menghasilkan notulen formal dan pesan WhatsApp resmi sesuai standar Kecamatan Gandrungmangu.
+ * Tetap memetakan catatan manual user secara akurat ke II. Hadir, III. Hasil Rapat, dan IV. Diskusi/tanya jawab.
  */
 function generateLocalFallback(input: GenerateNotulenInput): GenerateNotulenOutput {
   const title = input.title || 'Kegiatan Dinas';
   const location = input.location || 'Balai Kecamatan Gandrungmangu';
-  const date = input.date || 'Hari ini';
-  const notesDetail = input.notes 
-    ? `Adapun pokok pembahasan khusus meliputi: ${input.notes}.` 
-    : 'Pembahasan difokuskan pada koordinasi lintas sektor, evaluasi kinerja kedinasan, serta peningkatan mutu pelayanan kepada masyarakat.';
+  const dateDisplay = formatIndonesianDateWithDay(input.date);
+  const timeDisplay = formatTimeWib(input.time);
+  const parsed = parseManualNotes(input.notes);
 
-  const notulen = `Pada hari ini, ${date}, bertempat di ${location}, telah diselenggarakan kegiatan "${title}". Pertemuan ini dihadiri oleh jajaran aparatur Kecamatan Gandrungmangu, perwakilan instansi terkait, dan tokoh masyarakat guna memperkuat koordinasi serta menyelaraskan pelaksanaan program kedinasan di wilayah Kecamatan Gandrungmangu.\n\nDalam pertemuan ini, pimpinan rapat menyampaikan arahan mengenai prioritas kerja dan langkah-langkah strategis yang perlu dijalankan. ${notesDetail} Seluruh peserta memberikan pandangan dan masukan yang konstruktif dalam sesi tanya jawab demi tercapainya hasil musyawarah yang mufakat.\n\nSebagai tindak lanjut, disepakati bahwa seluruh unit kerja akan segera menindaklanjuti hasil koordinasi ini sesuai dengan bidang tugas masing-masing. Kegiatan ditutup secara resmi dalam keadaan tertib, aman, dan lancar.`;
+  const hadirText = parsed.hadir.length > 0
+    ? parsed.hadir.join(', ')
+    : 'jajaran aparatur Kecamatan Gandrungmangu, perwakilan instansi terkait, dan unsur peserta undangan';
 
-  // notulenWa disarikan langsung dari teks notulen di atas
+  const hasilText = parsed.hasil.length > 0
+    ? parsed.hasil.join('. ') + '.'
+    : 'Pembahasan difokuskan pada koordinasi lintas sektor, arahan pimpinan, serta penyelarasan pelaksanaan program kerja di wilayah Kecamatan Gandrungmangu.';
+
+  const diskusiText = parsed.diskusi.length > 0
+    ? parsed.diskusi.join('. ') + '.'
+    : 'Peserta menyampaikan masukan dan tanggapan konstruktif serta menyepakati langkah tindak lanjut sesuai bidang tugas masing-masing.';
+
+  const notulen = `Pada hari ${dateDisplay}, bertempat di ${location}, telah dilaksanakan kegiatan "${title}" (${timeDisplay}). Kegiatan ini dihadiri oleh ${hadirText}.\n\nDalam pelaksanaan rapat, dibahas sejumlah pokok materi dan hasil pembahasan utama, antara lain: ${hasilText}\n\nPada sesi diskusi dan tanya jawab, ${diskusiText} Seluruh rangkaian kegiatan berjalan dengan tertib, aman, dan lancar.`;
+
+  if (parsed.hadir.length > 0 || parsed.hasil.length > 0 || parsed.diskusi.length > 0) {
+    const hadirBlock = (parsed.hadir.length > 0 ? parsed.hadir : [
+      'Sekcam Gandrungmangu / yang mewakili',
+      'Kasi & Kasubag Kecamatan Gandrungmangu',
+      'Peserta undangan terkait',
+    ]).map((h, idx) => `${idx + 1}. ${h}`).join('\n');
+
+    const hasilBlock = (parsed.hasil.length > 0 ? parsed.hasil : [
+      'Pelaksanaan koordinasi dan penyampaian arahan pimpinan terkait agenda kegiatan.',
+    ]).map(item => `- ${item}`).join('\n');
+
+    const diskusiBlock = (parsed.diskusi.length > 0 ? parsed.diskusi : [
+      'Peserta memberikan tanggapan dan masukan konstruktif serta menyepakati tindak lanjut bersama.',
+    ]).map(item => `- ${item}`).join('\n');
+
+    const notulenWa = `Kepada Yth.
+Camat Gandrungmangu
+
+Mohon ijin melaporkan kegiatan *${title}*, sbb :
+*I. Waktu Pelaksanaan*
+Hari/ Tgl : ${dateDisplay}
+Waktu : ${timeDisplay}
+Tempat : ${location}
+
+*II. Hadir*
+${hadirBlock}
+
+*III. Hasil Rapat*
+${hasilBlock}
+
+*IV. Diskusi/tanya jawab*
+${diskusiBlock}
+
+*V. Penutup*
+Demikian laporan kegiatan ini disampaikan, kegiatan berlangsung dengan tertib, aman, dan lancar.
+
+DUMP`;
+
+    return { notulen, notulenWa };
+  }
+
   const notulenWa = convertNotulenToWa({
     notulen,
     title: input.title,
@@ -57,64 +172,75 @@ function generateLocalFallback(input: GenerateNotulenInput): GenerateNotulenOutp
 function isCompleteWaFormat(text?: string): boolean {
   if (!text || text.length < 50) return false;
   return (
-    text.includes('*I. Waktu Pelaksanaan*') &&
-    text.includes('*II. Hadir*') &&
-    text.includes('*III. Hasil Rapat*') &&
-    text.includes('*IV. Diskusi') &&
-    text.includes('*V. Penutup*')
+    /I\.\s*Waktu\s+Pelaksanaan/i.test(text) &&
+    /II\.\s*Hadir/i.test(text) &&
+    /III\.\s*Hasil\s+Rapat/i.test(text) &&
+    /IV\.\s*Diskusi/i.test(text) &&
+    /V\.\s*Penutup/i.test(text)
   );
 }
 
 /**
- * Panggilan langsung ke Google Gemini API dengan timeout 4 detik per model dan prompt terstruktur.
+ * Panggilan langsung ke Google Gemini API dengan timeout 25 detik per model dan prompt terstruktur.
  */
 async function tryCallGeminiAPI(input: GenerateNotulenInput): Promise<GenerateNotulenOutput | null> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return null;
 
+  const hasManualNotes = Boolean(input.notes && input.notes.trim().length > 0);
+  const dateDisplay = formatIndonesianDateWithDay(input.date);
+  const timeDisplay = formatTimeWib(input.time);
+
   const promptText = `Anda adalah asisten administrasi profesional Pemerintah Kecamatan Gandrungmangu, Kabupaten Cilacap.
-Tugas Anda adalah menyusun draf Notulen Resmi DAN Laporan Notulen Kirim WhatsApp (WA) kepada Camat Gandrungmangu.
+Tugas Anda adalah menyusun draf Notulen Resmi DAN Laporan Notulen Kirim WhatsApp (WA) kepada Camat Gandrungmangu berdasarkan DATA KEGIATAN dan CATATAN RAPAT MANUAL di bawah ini.
 
 Data Kegiatan:
 - Judul Kegiatan: ${input.title}
 - Lokasi: ${input.location}
-- Tanggal: ${input.date}
-- Waktu: ${input.time || '09.00 WIB s.d selesai'}
+- Hari / Tanggal: ${dateDisplay} (${input.date})
+- Waktu: ${timeDisplay}
 - Jenis Kegiatan: ${input.activityType || 'Internal'}
-- Catatan/Arahan Utama: ${input.notes || '-'}
+
+CATATAN RAPAT MANUAL / ACUAN PETUGAS:
+${hasManualNotes ? input.notes : '(Tidak ada catatan manual tambahan — susun secara proporsional sesuai judul kegiatan)'}
+
+ATURAN KETAT PEMBACAAN CATATAN MANUAL:
+- WAJIB memetakan dan mempertahankan 100% fakta, nama orang/pejabat, instansi, angka, tanggal, keputusan, serta poin diskusi yang tertulis pada CATATAN RAPAT MANUAL di atas.
+- DILARANG mengarang nama pejabat, angka, atau fakta baru yang tidak disebutkan di catatan manual.
+- Rapikan bahasa catatan manual yang singkat/poin-poin menjadi bahasa dinas resmi yang jelas, runtut, dan informatif.
 
 PANDUAN KONTEN & STRUKTUR:
-1. "notulen":
-Tulis narasi formal kedinasan dalam 3 paragraf utuh (tanpa kop surat/judul):
-- Paragraf 1: Pembukaan (hari, tanggal, waktu, tempat, nama kegiatan, dan pihak-pihak/unsur pejabat/undangan yang hadir).
-- Paragraf 2: Isi rapat & arahan pimpinan (uraikan arahan pimpinan dan pokok bahasan kegiatan).
-- Paragraf 3: Diskusi, kesepakatan tindak lanjut, dan penutupan kegiatan dalam keadaan tertib dan lancar.
+1. "notulen" (KHUSUS UNTUK CETAK PDF NOTA DINAS / NOTULEN RESMI):
+Tulis narasi notulen kedinasan resmi berformat alinea paragraf siap cetak PDF (TANPA kop surat, TANPA judul "NOTA DINAS", TANPA tabel/baris "Kegiatan/Tanggal/Waktu/Tempat", TANPA format markdown *bintang*, TANPA "Kepada Yth." atau "DUMP"):
+- Pisahkan setiap alinea paragraf dengan satu baris kosong (\\n\\n) agar tercetak rapi dengan alinea menjorok dan rata kanan-kiri di PDF.
+- Alinea 1 (Pembukaan & Kehadiran): Kalimat pembuka resmi yang memuat hari, tanggal, waktu, tempat, nama kegiatan, serta daftar pejabat/unsur yang hadir persis sesuai catatan manual.
+- Alinea 2 (Jalannya Rapat & Pokok Hasil Rapat): Uraikan arahan pimpinan, pokok materi, dan hasil pembahasan secara runtut dengan bahasa dinas baku. Jika terdapat banyak butir keputusan/poin penting, boleh dilanjutkan dengan daftar bernomor rapi (1. ..., 2. ..., 3. ...) di bawah kalimat pengantar.
+- Alinea 3 (Diskusi / Tanya Jawab & Tindak Lanjut): Uraikan masukan, pertanyaan/tanggapan peserta, serta kesepakatan tindak lanjut sesuai catatan manual.
+- Alinea 4 (Penutup): Kalimat penutup resmi yang menyatakan seluruh rangkaian kegiatan telah selesai dilaksanakan dalam keadaan tertib, aman, dan lancar.
 
 2. "notulenWa":
-PENTING SEKALI: Bidang notulenWa WAJIB merupakan ringkasan poin-poin terstruktur yang disarikan LANGSUNG dari teks narasi "notulen" yang Anda buat.
-Hadir, Hasil Rapat, Diskusi/tanya jawab, dan Penutup harus 100% selaras dengan isi notulen di atas!
-Format Wajib WhatsApp:
+WAJIB mengikuti format resmi 5 butir di bawah ini, dan isinya WAJIB selaras 100% dengan catatan manual & teks "notulen":
+
 Kepada Yth.
 Camat Gandrungmangu
 
 Mohon ijin melaporkan kegiatan *${input.title}*, sbb :
 *I. Waktu Pelaksanaan*
-Hari/ Tgl : [Hari dan Tanggal lengkap bahasa Indonesia]
-Waktu : ${input.time ? `Pukul ${input.time.replace(/:/g, '.')} WIB s.d selesai` : 'Pukul 09.00 WIB s.d selesai'}
+Hari/ Tgl : ${dateDisplay}
+Waktu : ${timeDisplay}
 Tempat : ${input.location}
 
-*II. Hadir* 
-[Daftar nomor 1, 2, 3... pihak yang hadir, disarikan langsung dari peserta pada paragraf 1 notulen]
+*II. Hadir*
+[WAJIB daftar bernomor 1, 2, 3... sesuai persis pihak/pejabat/unsur yang tertulis di catatan manual. Jika catatan manual tidak menyebut peserta, isi secara umum sesuai konteks kegiatan.]
 
 *III. Hasil Rapat*
-[Butir-butir pokok hasil rapat dan arahan yang disarikan langsung dari paragraf 2 notulen, dikelompokkan dengan *A. Arahan Pimpinan* atau sub-topik terkait dan tanda -]
+[WAJIB butir-butir lengkap seluruh pokok pembahasan, materi, arahan, dan keputusan rapat yang tertulis di catatan manual, gunakan tanda - atau sub-judul ber-bintang jika terdiri dari beberapa pembicara/topik.]
 
 *IV. Diskusi/tanya jawab*
-[Poin-poin tanya jawab / masukan peserta / kesepakatan yang disarikan langsung dari paragraf 3 notulen]
+[WAJIB menyesuaikan dengan tanya jawab, usulan, masukan, atau kesepakatan tindak lanjut yang tertulis di catatan manual. Jika catatan manual tidak menyebut tanya jawab khusus, tuliskan ringkasan tanggapan/kesepakatan penutup secara singkat dan proporsional.]
 
 *V. Penutup*
-[Kalimat penutup sesuai akhir paragraf 3 notulen, kondisi aman dan lancar]
-selesai pada [waktu selesai kegiatan]
+[Kalimat penutup resmi, kondisi aman, tertib, dan lancar]
 
 DUMP
 
@@ -124,12 +250,12 @@ Keluarkan output dalam format JSON valid persis:
   "notulenWa": "..."
 }`;
 
-  const modelsToTry = ['gemini-flash-latest', 'gemini-3.8-flash'];
+  const modelsToTry = ['gemini-2.5-flash', 'gemini-flash-latest', 'gemini-2.0-flash'];
 
   for (const model of modelsToTry) {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 4000); // Max 4 detik timeout per model
+      const timeoutId = setTimeout(() => controller.abort(), 25000); // 25 detik agar tidak premature timeout
 
       const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
         method: 'POST',
@@ -138,7 +264,7 @@ Keluarkan output dalam format JSON valid persis:
         body: JSON.stringify({
           contents: [{ parts: [{ text: promptText }] }],
           generationConfig: {
-            temperature: 0.7,
+            temperature: 0.3,
             responseMimeType: 'application/json'
           }
         })
@@ -152,12 +278,13 @@ Keluarkan output dalam format JSON valid persis:
       }
 
       const data = await res.json();
-      const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+      const parts = data?.candidates?.[0]?.content?.parts || [];
+      const textPart = parts.find((p: any) => p.text && !p.thought) || parts[parts.length - 1];
+      const rawText = textPart?.text;
       if (rawText) {
         try {
           const parsed = JSON.parse(rawText);
           if (parsed && parsed.notulen) {
-            // Pastikan notulenWa valid dan selaras; jika tidak lengkap, sinkronkan dari parsed.notulen
             let finalWa = parsed.notulenWa;
             if (!isCompleteWaFormat(finalWa)) {
               finalWa = convertNotulenToWa({

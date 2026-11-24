@@ -36,6 +36,10 @@ function doPost(e) {
         result = handleUpdateDisposition(data);
         break;
 
+      case 'updateEvent':
+        result = handleUpdateEvent(data);
+        break;
+
       case 'deleteEvent':
         result = handleDeleteEvent(data);
         break;
@@ -162,6 +166,30 @@ function handleUpdateDisposition(data) {
     return { message: "Disposisi acara berhasil diperbarui.", updatedEvent: result };
   } catch (e) {
     throw new Error('Gagal memperbarui disposisi acara: ' + e.message);
+  }
+}
+
+/**
+ * FUNGSI BARU: Memperbarui detail lengkap acara (judul, waktu, lokasi, jenis, catatan) di Google Calendar.
+ */
+function handleUpdateEvent(data) {
+  const { calendarId, eventId, title, location, start, end, description } = data;
+  if (!calendarId || !eventId) {
+    throw new Error("calendarId dan eventId diperlukan.");
+  }
+
+  try {
+    const patchPayload = {};
+    if (title !== undefined) patchPayload.summary = title;
+    if (location !== undefined) patchPayload.location = location;
+    if (start) patchPayload.start = { dateTime: start, timeZone: 'Asia/Jakarta' };
+    if (end) patchPayload.end = { dateTime: end, timeZone: 'Asia/Jakarta' };
+    if (description !== undefined) patchPayload.description = description;
+
+    const result = Calendar.Events.patch(patchPayload, calendarId, eventId);
+    return { message: "Detail acara berhasil diperbarui di Google Calendar.", updatedEvent: result };
+  } catch (e) {
+    throw new Error('Gagal memperbarui detail acara: ' + e.message);
   }
 }
 

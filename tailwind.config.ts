@@ -12,9 +12,14 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        body: ['Inter', 'sans-serif'],
-        headline: ['Inter', 'sans-serif'],
-        code: ['monospace'],
+        sans: ['var(--font-sans)', 'Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
+        body: ['var(--font-sans)', 'Plus Jakarta Sans', 'Inter', 'sans-serif'],
+        headline: ['var(--font-hero)', 'Montserrat', 'Inter', 'sans-serif'],
+        display: ['var(--font-display)', 'Fraunces', 'Playfair Display', 'serif'],
+        condensed: ['var(--font-condensed)', 'Oswald', 'sans-serif'],
+        hero: ['var(--font-hero)', 'Montserrat', 'Plus Jakarta Sans', 'sans-serif'],
+        mono: ['var(--font-mono)', 'JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+        code: ['var(--font-mono)', 'JetBrains Mono', 'monospace'],
       },
       colors: {
         background: 'hsl(var(--background))',

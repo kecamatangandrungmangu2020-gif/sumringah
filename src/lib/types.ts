@@ -156,3 +156,30 @@ export type LetterTypeOption = {
   code: string;
   description: string;
 };
+
+export interface NewsImage {
+  url: string;
+  publicId?: string;
+  width?: number;
+  height?: number;
+  aspectRatio?: 'landscape' | 'portrait' | 'square';
+}
+
+export interface NewsItem {
+  id: string;
+  title: string;
+  category: string;
+  date: string;
+  imageUrl?: string;
+  imagePublicId?: string;
+  images?: NewsImage[];
+  youtubeVideoId?: string;
+  excerpt: string;
+  content: string;
+  author?: string;
+  isFeatured?: boolean;
+  status: 'published' | 'draft';
+  createdAt?: any;
+  updatedAt?: any;
+}
+

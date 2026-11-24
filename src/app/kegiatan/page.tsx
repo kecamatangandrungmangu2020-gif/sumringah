@@ -26,19 +26,24 @@ import {
   MessageSquare,
   Copy,
   Check,
-  Send
+  Send,
+  Printer,
+  RefreshCw
 } from "lucide-react"
 import Link from "next/link"
 import { KegiatanCard } from "@/components/kegiatan/KegiatanCard"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog"
 import { KegiatanUpload } from "@/components/kegiatan/KegiatanUpload"
-import { useCollection, useUser, useFirestore, useMemoFirebase } from "@/firebase"
+import { useCollection, useUser, useFirestore, useMemoFirebase, useDoc } from "@/firebase"
 import { collection, doc } from "firebase/firestore"
-import { deleteDocumentNonBlocking } from "@/firebase/non-blocking-updates"
+import { deleteDocumentNonBlocking, updateDocumentNonBlocking } from "@/firebase/non-blocking-updates"
 import { useToast } from "@/hooks/use-toast"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import Image from "next/image"
 import { Badge } from "@/components/ui/badge"
+import { generateDokumentasiPDF, generateNotulenPDF } from "@/lib/pdf-utils"
+import { callAppsScript } from "@/app/agenda/actions"
+import { GOOGLE_CONFIG } from "@/lib/google-config"
 
 export default function KegiatanPage() {
   const [searchTerm, setSearchTerm] = useState("")
@@ -47,10 +52,223 @@ export default function KegiatanPage() {
   const [selectedForDelete, setSelectedForDelete] = useState<any>(null)
   const [selectedActivity, setSelectedActivity] = useState<any>(null)
   const [editingActivity, setEditingActivity] = useState<any>(null)
+  const [printingCategory, setPrintingCategory] = useState<'notulen' | 'kegiatan' | 'atk' | 'konsumsi' | null>(null)
+  const [isSyncingDrivePdf, setIsSyncingDrivePdf] = useState(false)
 
   const { user, isUserLoading: isAuthLoading } = useUser()
   const db = useFirestore()
   const { toast } = useToast()
+
+  const villageSettingsRef = useMemoFirebase(() => {
+    if (!db || !user) return null
+    return doc(db, "settings", "village")
+  }, [db, user])
+  const { data: villageSettings } = useDoc(villageSettingsRef)
+
+  const getSavedPhotoUrls = (activity: any, category: 'kegiatan' | 'atk' | 'konsumsi'): string[] => {
+    const raw: string[] =
+      category === 'kegiatan'
+        ? (activity?.cloudinaryUrls?.kegiatan?.length
+            ? activity.cloudinaryUrls.kegiatan
+            : (activity?.imageUrls || []))
+        : (activity?.cloudinaryUrls?.[category] || [])
+    return raw.filter((u) => typeof u === "string" && (u.startsWith("http") || u.startsWith("data:image")))
+  }
+
+  const fetchFilesFromUrls = async (urls: string[]): Promise<File[]> => {
+    const results = await Promise.all(
+      urls.map(async (url, idx) => {
+        try {
+          const res = await fetch(url)
+          if (!res.ok) return null
+          const blob = await res.blob()
+          return new File([blob], `image_${idx}.jpg`, { type: blob.type || "image/jpeg" })
+        } catch {
+          return null
+        }
+      })
+    )
+    return results.filter((f): f is File => f !== null)
+  }
+
+  const blobToBase64 = (blob: Blob): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onloadend = () => resolve((reader.result as string).split(",")[1])
+      reader.onerror = reject
+      reader.readAsDataURL(blob)
+    })
+
+  const handlePrintSavedDok = async (activity: any, category: 'kegiatan' | 'atk' | 'konsumsi') => {
+    const driveKey = category === 'kegiatan' ? 'dokKegiatan' : category === 'atk' ? 'dokAtk' : 'dokKonsumsi'
+    const sectionTitle = category === 'kegiatan' ? 'DOKUMENTASI KEGIATAN' : category === 'atk' ? 'DOKUMENTASI ATK' : 'DOKUMENTASI KONSUMSI'
+    const urls = getSavedPhotoUrls(activity, category)
+
+    if (urls.length === 0) {
+      if (activity?.driveUrls?.[driveKey]) {
+        window.open(activity.driveUrls[driveKey], "_blank", "noopener,noreferrer")
+      } else {
+        toast({ variant: "destructive", title: "Foto Tidak Tersedia", description: "Tidak ada foto tersimpan untuk mencetak ulang PDF." })
+      }
+      return
+    }
+
+    setPrintingCategory(category)
+    try {
+      const files = await fetchFilesFromUrls(urls)
+      if (files.length === 0) {
+        if (activity?.driveUrls?.[driveKey]) {
+          window.open(activity.driveUrls[driveKey], "_blank", "noopener,noreferrer")
+          return
+        }
+        throw new Error("Foto tidak dapat dimuat dari server.")
+      }
+      const pdfBlob = await generateDokumentasiPDF(
+        {
+          title: activity.title || "-",
+          date: activity.date || activity.uploadDate || "",
+          time: activity.time || "",
+          location: activity.location || "-",
+        },
+        sectionTitle,
+        files,
+        villageSettings?.logoBase64
+      )
+      const blobUrl = URL.createObjectURL(pdfBlob)
+      window.open(blobUrl, "_blank")
+    } catch (err: any) {
+      toast({ variant: "destructive", title: "Gagal Cetak PDF", description: err?.message || "Terjadi kesalahan saat membuat PDF." })
+      if (activity?.driveUrls?.[driveKey]) {
+        window.open(activity.driveUrls[driveKey], "_blank", "noopener,noreferrer")
+      }
+    } finally {
+      setPrintingCategory(null)
+    }
+  }
+
+  const handlePrintSavedNotulen = async (activity: any) => {
+    setPrintingCategory('notulen')
+    try {
+      const pdfBlob = await generateNotulenPDF(
+        {
+          title: activity.title || "-",
+          date: activity.date || activity.uploadDate || "",
+          time: activity.time || "",
+          location: activity.location || "-",
+          description: activity.description || "",
+          officialName: activity.officialName || "",
+        },
+        villageSettings?.logoBase64
+      )
+      const blobUrl = URL.createObjectURL(pdfBlob)
+      window.open(blobUrl, "_blank")
+    } catch (err: any) {
+      toast({ variant: "destructive", title: "Gagal Cetak Notulen", description: err?.message || "Terjadi kesalahan saat membuat PDF." })
+      if (activity?.driveUrls?.notulen) {
+        window.open(activity.driveUrls.notulen, "_blank", "noopener,noreferrer")
+      }
+    } finally {
+      setPrintingCategory(null)
+    }
+  }
+
+  const handleRegenerateDrivePdf = async (activity: any) => {
+    if (!activity?.id || !db) return
+    const categories: Array<{ key: 'kegiatan' | 'atk' | 'konsumsi'; driveKey: 'dokKegiatan' | 'dokAtk' | 'dokKonsumsi'; title: string; fileName: string }> = [
+      { key: 'kegiatan', driveKey: 'dokKegiatan', title: 'DOKUMENTASI KEGIATAN', fileName: 'Dokumentasi_Kegiatan.pdf' },
+      { key: 'atk', driveKey: 'dokAtk', title: 'DOKUMENTASI ATK', fileName: 'Dokumentasi_ATK.pdf' },
+      { key: 'konsumsi', driveKey: 'dokKonsumsi', title: 'DOKUMENTASI KONSUMSI', fileName: 'Dokumentasi_Konsumsi.pdf' },
+    ]
+
+    setIsSyncingDrivePdf(true)
+    try {
+      const targetFolderId = activity.driveFolderId || villageSettings?.kegiatanFolderId || GOOGLE_CONFIG.parentFolderId
+      const updatedDriveUrls: Record<string, string> = { ...(activity.driveUrls || {}) }
+      let updatedCount = 0
+
+      // 1. Perbarui Notulen PDF dengan format multi-halaman baru
+      try {
+        const notulenBlob = await generateNotulenPDF(
+          {
+            title: activity.title || "-",
+            date: activity.date || activity.uploadDate || "",
+            time: activity.time || "",
+            location: activity.location || "-",
+            description: activity.description || "",
+            officialName: activity.officialName || "",
+          },
+          villageSettings?.logoBase64
+        )
+        const notulenBase64 = await blobToBase64(notulenBlob)
+        const upNotulen = await callAppsScript({
+          action: 'uploadArchiveFile',
+          folderId: targetFolderId,
+          fileName: `Notulen_${activity.title || 'Kegiatan'}.pdf`,
+          fileData: { type: 'application/pdf', base64: notulenBase64 }
+        })
+        if (upNotulen?.success && upNotulen.fileUrl) {
+          updatedDriveUrls.notulen = upNotulen.fileUrl
+          updatedCount++
+        }
+      } catch (e) {
+        console.warn("Gagal perbarui Notulen PDF ke Drive:", e)
+      }
+
+      // 2. Perbarui Dokumentasi PDF (Kegiatan, ATK, Konsumsi)
+      for (const cat of categories) {
+        const urls = getSavedPhotoUrls(activity, cat.key)
+        if (urls.length === 0) continue
+        const files = await fetchFilesFromUrls(urls)
+        if (files.length === 0) continue
+
+        const pdfBlob = await generateDokumentasiPDF(
+          {
+            title: activity.title || "-",
+            date: activity.date || activity.uploadDate || "",
+            time: activity.time || "",
+            location: activity.location || "-",
+          },
+          cat.title,
+          files,
+          villageSettings?.logoBase64
+        )
+        const base64 = await blobToBase64(pdfBlob)
+        const upRes = await callAppsScript({
+          action: 'uploadArchiveFile',
+          folderId: targetFolderId,
+          fileName: cat.fileName,
+          fileData: { type: 'application/pdf', base64 }
+        })
+        if (upRes?.success && upRes.fileUrl) {
+          updatedDriveUrls[cat.driveKey] = upRes.fileUrl
+          updatedCount++
+        }
+      }
+
+      if (updatedCount > 0) {
+        const docRef = doc(db, "kegiatans", activity.id)
+        updateDocumentNonBlocking(docRef, {
+          driveUrls: updatedDriveUrls,
+          lastUpdate: new Date().toISOString(),
+        })
+        setSelectedActivity((prev: any) => prev ? { ...prev, driveUrls: updatedDriveUrls } : prev)
+        toast({
+          title: "PDF Arsip Diperbarui!",
+          description: `${updatedCount} dokumen PDF berhasil diperbarui dengan format teks 2 baris & disimpan ke Drive.`,
+        })
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Tidak Ada PDF Diperbarui",
+          description: "Pastikan foto dokumentasi tersedia atau periksa koneksi Apps Script Drive.",
+        })
+      }
+    } catch (err: any) {
+      toast({ variant: "destructive", title: "Gagal Perbarui Drive", description: err?.message || "Terjadi kesalahan." })
+    } finally {
+      setIsSyncingDrivePdf(false)
+    }
+  }
 
   // GLOBAL COLLECTION: Use village-wide kegiatan collection
   const kegiatanQuery = useMemoFirebase(() => {
@@ -267,12 +485,19 @@ export default function KegiatanPage() {
                     <Share2 className="h-3 w-3" /> Dokumen Terlampir (Drive)
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {selectedActivity.driveUrls?.notulen && (
-                      <Button variant="outline" className="h-12 rounded-xl justify-between border-primary/20 hover:bg-primary/5" asChild>
-                        <a href={selectedActivity.driveUrls.notulen} target="_blank" rel="noopener noreferrer">
-                          <span className="text-[10px] font-black uppercase flex items-center gap-2"><FileText className="h-4 w-4 text-red-500" /> Notulen PDF</span>
-                          <ExternalLink className="h-3 w-3" />
-                        </a>
+                    {(selectedActivity.driveUrls?.notulen || selectedActivity.description) && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        disabled={printingCategory === 'notulen'}
+                        onClick={() => handlePrintSavedNotulen(selectedActivity)}
+                        className="h-12 rounded-xl justify-between border-primary/20 hover:bg-primary/5"
+                      >
+                        <span className="text-[10px] font-black uppercase flex items-center gap-2">
+                          {printingCategory === 'notulen' ? <Loader2 className="h-4 w-4 animate-spin text-red-500" /> : <FileText className="h-4 w-4 text-red-500" />}
+                          Notulen PDF
+                        </span>
+                        <Printer className="h-3.5 w-3.5 text-red-500" />
                       </Button>
                     )}
                     {selectedActivity.driveUrls?.bast && (
@@ -283,28 +508,49 @@ export default function KegiatanPage() {
                         </a>
                       </Button>
                     )}
-                    {selectedActivity.driveUrls?.dokKegiatan && (
-                      <Button variant="outline" className="h-12 rounded-xl justify-between border-primary/20 hover:bg-primary/5" asChild>
-                        <a href={selectedActivity.driveUrls.dokKegiatan} target="_blank" rel="noopener noreferrer">
-                          <span className="text-[10px] font-black uppercase flex items-center gap-2"><FileText className="h-4 w-4 text-blue-500" /> Dok. Kegiatan</span>
-                          <ExternalLink className="h-3 w-3" />
-                        </a>
+                    {(selectedActivity.driveUrls?.dokKegiatan || getSavedPhotoUrls(selectedActivity, 'kegiatan').length > 0) && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        disabled={printingCategory === 'kegiatan'}
+                        onClick={() => handlePrintSavedDok(selectedActivity, 'kegiatan')}
+                        className="h-12 rounded-xl justify-between border-primary/20 hover:bg-primary/5"
+                      >
+                        <span className="text-[10px] font-black uppercase flex items-center gap-2">
+                          {printingCategory === 'kegiatan' ? <Loader2 className="h-4 w-4 animate-spin text-blue-500" /> : <FileText className="h-4 w-4 text-blue-500" />}
+                          Dok. Kegiatan
+                        </span>
+                        <Printer className="h-3.5 w-3.5 text-blue-500" />
                       </Button>
                     )}
-                    {selectedActivity.driveUrls?.dokAtk && (
-                      <Button variant="outline" className="h-12 rounded-xl justify-between border-primary/20 hover:bg-primary/5" asChild>
-                        <a href={selectedActivity.driveUrls.dokAtk} target="_blank" rel="noopener noreferrer">
-                          <span className="text-[10px] font-black uppercase flex items-center gap-2"><FileText className="h-4 w-4 text-amber-500" /> Dok. ATK</span>
-                          <ExternalLink className="h-3 w-3" />
-                        </a>
+                    {(selectedActivity.driveUrls?.dokAtk || getSavedPhotoUrls(selectedActivity, 'atk').length > 0) && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        disabled={printingCategory === 'atk'}
+                        onClick={() => handlePrintSavedDok(selectedActivity, 'atk')}
+                        className="h-12 rounded-xl justify-between border-primary/20 hover:bg-primary/5"
+                      >
+                        <span className="text-[10px] font-black uppercase flex items-center gap-2">
+                          {printingCategory === 'atk' ? <Loader2 className="h-4 w-4 animate-spin text-amber-500" /> : <FileText className="h-4 w-4 text-amber-500" />}
+                          Dok. ATK
+                        </span>
+                        <Printer className="h-3.5 w-3.5 text-amber-500" />
                       </Button>
                     )}
-                    {selectedActivity.driveUrls?.dokKonsumsi && (
-                      <Button variant="outline" className="h-12 rounded-xl justify-between border-primary/20 hover:bg-primary/5" asChild>
-                        <a href={selectedActivity.driveUrls.dokKonsumsi} target="_blank" rel="noopener noreferrer">
-                          <span className="text-[10px] font-black uppercase flex items-center gap-2"><FileText className="h-4 w-4 text-purple-500" /> Dok. Konsumsi</span>
-                          <ExternalLink className="h-3 w-3" />
-                        </a>
+                    {(selectedActivity.driveUrls?.dokKonsumsi || getSavedPhotoUrls(selectedActivity, 'konsumsi').length > 0) && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        disabled={printingCategory === 'konsumsi'}
+                        onClick={() => handlePrintSavedDok(selectedActivity, 'konsumsi')}
+                        className="h-12 rounded-xl justify-between border-primary/20 hover:bg-primary/5"
+                      >
+                        <span className="text-[10px] font-black uppercase flex items-center gap-2">
+                          {printingCategory === 'konsumsi' ? <Loader2 className="h-4 w-4 animate-spin text-purple-500" /> : <FileText className="h-4 w-4 text-purple-500" />}
+                          Dok. Konsumsi
+                        </span>
+                        <Printer className="h-3.5 w-3.5 text-purple-500" />
                       </Button>
                     )}
                     {selectedActivity.driveUrls?.undangan && (
@@ -317,13 +563,27 @@ export default function KegiatanPage() {
                     )}
                   </div>
 
-                  {selectedActivity.driveFolderId && (
-                    <Button variant="secondary" className="w-full h-12 rounded-xl gap-2 font-black uppercase text-[10px]" asChild>
-                      <a href={`https://drive.google.com/drive/folders/${selectedActivity.driveFolderId}`} target="_blank" rel="noopener noreferrer">
-                        <FolderOpen className="h-4 w-4" /> Buka Folder Kegiatan di Drive
-                      </a>
-                    </Button>
-                  )}
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    {getSavedPhotoUrls(selectedActivity, 'kegiatan').length > 0 && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        disabled={isSyncingDrivePdf}
+                        onClick={() => handleRegenerateDrivePdf(selectedActivity)}
+                        className="flex-1 h-11 rounded-xl gap-2 font-black uppercase text-[10px] border-cyan-600/30 text-cyan-700 hover:bg-cyan-50 dark:text-cyan-300 dark:hover:bg-cyan-950/40"
+                      >
+                        {isSyncingDrivePdf ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+                        {isSyncingDrivePdf ? "Memperbarui PDF Drive..." : "Perbarui PDF di Drive"}
+                      </Button>
+                    )}
+                    {selectedActivity.driveFolderId && (
+                      <Button variant="secondary" className="flex-1 h-11 rounded-xl gap-2 font-black uppercase text-[10px]" asChild>
+                        <a href={`https://drive.google.com/drive/folders/${selectedActivity.driveFolderId}`} target="_blank" rel="noopener noreferrer">
+                          <FolderOpen className="h-4 w-4" /> Buka Folder Drive
+                        </a>
+                      </Button>
+                    )}
+                  </div>
                 </div>
 
                 <div className="pt-4 border-t flex flex-col sm:flex-row gap-3">

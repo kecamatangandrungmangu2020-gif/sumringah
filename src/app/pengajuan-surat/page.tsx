@@ -666,10 +666,10 @@ function PengajuanSuratContent() {
         <div className="max-w-5xl mx-auto space-y-3 relative z-10 text-center">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/10 border border-white/15 text-amber-300 text-xs font-bold tracking-wide">
             <ShieldCheck className="w-4 h-4" />
-            Formulir Resmi Pengajuan Pelayanan Surat Mandiri
+            Formulir Resmi Pengajuan Mandiri
           </div>
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight">
-            Pusat Pelayanan Surat <span className="text-amber-400">Kecamatan Gandrungmangu</span>
+            Pusat Pengajuan Mandiri <span className="text-amber-400">Kecamatan Gandrungmangu</span>
           </h1>
           <p className="text-xs sm:text-sm text-slate-300 max-w-2xl mx-auto leading-relaxed">
             Lengkapi formulir permohonan secara mandiri dari mana saja. Berkas persyaratan Anda akan tersimpan aman di Google Drive untuk diverifikasi oleh petugas pelayanan.
@@ -692,7 +692,7 @@ function PengajuanSuratContent() {
                   }`}
               >
                 <FileText className="w-4 h-4" />
-                <span>Ajukan Surat Baru</span>
+                <span>Ajukan Pelayanan Baru</span>
               </button>
               <button
                 type="button"
@@ -703,7 +703,7 @@ function PengajuanSuratContent() {
                   }`}
               >
                 <Search className="w-4 h-4" />
-                <span>Lacak Status Surat</span>
+                <span>Lacak Status Layanan</span>
               </button>
             </div>
           </div>
@@ -1138,7 +1138,7 @@ function PengajuanSuratContent() {
                 )}
               </div>
             ) : (
-              /* Tab Lacak Status Surat */
+              /* Tab Lacak Status Layanan */
               <div className="space-y-8 max-w-3xl mx-auto py-4">
                 <div className="text-center space-y-2">
                   <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto mb-3">

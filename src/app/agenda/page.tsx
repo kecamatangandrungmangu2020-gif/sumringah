@@ -11,31 +11,38 @@ import { GOOGLE_CONFIG } from "@/lib/google-config"
 export default function AgendaPage() {
   return (
     <div className="flex flex-col gap-6 p-4 md:p-8 max-w-6xl mx-auto">
-      <header className="flex items-center gap-4">
-        <div className="h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center">
-          <Calendar className="h-7 w-7 text-primary" />
+      <header className="flex items-center gap-4 pb-4 border-b border-slate-200/80 dark:border-white/10">
+        <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-[#0E7490] to-[#061E2B] flex items-center justify-center shadow-md">
+          <Calendar className="h-6 w-6 text-cyan-200" />
         </div>
         <div>
-          <h1 className="text-2xl font-black text-primary uppercase tracking-tight">Agenda Kegiatan</h1>
-          <p className="text-xs text-muted-foreground font-bold uppercase">Manajemen Kalender, Disposisi & Input Acara</p>
+          <span className="font-mono text-[9.5px] font-bold uppercase tracking-[0.16em] text-[#0E7490] dark:text-cyan-300">
+            Kecamatan Gandrungmangu • Google Calendar
+          </span>
+          <h1 className="font-hero text-2xl font-extrabold text-[#061E2B] dark:text-white tracking-tight leading-tight">
+            Agenda Kegiatan
+          </h1>
+          <p className="font-hero text-xs text-slate-500 dark:text-slate-400 font-medium">
+            Manajemen Kalender, Disposisi, Notulensi &amp; Input Acara Multi-Hari
+          </p>
         </div>
       </header>
 
       <Tabs defaultValue="rincian" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto sm:h-14 bg-muted/50 p-1.5 rounded-2xl gap-1 sm:gap-0">
-          <TabsTrigger value="rincian" className="gap-2 text-[10px] font-black uppercase rounded-xl h-11 sm:h-full">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto sm:h-13 p-1.5 rounded-2xl gap-1">
+          <TabsTrigger value="rincian" className="gap-2 text-[11px] font-bold uppercase rounded-xl h-10 sm:h-full">
             <Calendar className="h-4 w-4" />
             Rincian
           </TabsTrigger>
-          <TabsTrigger value="disposisi" className="gap-2 text-[10px] font-black uppercase rounded-xl h-11 sm:h-full data-[state=active]:bg-emerald-600 data-[state=active]:text-white">
-            <UserCheck className="h-4 w-4" />
-            Disposisi
-          </TabsTrigger>
-          <TabsTrigger value="input" className="gap-2 text-[10px] font-black uppercase rounded-xl h-11 sm:h-full">
+          <TabsTrigger value="input" className="gap-2 text-[11px] font-bold uppercase rounded-xl h-10 sm:h-full">
             <FilePlus className="h-4 w-4" />
             Input Baru
           </TabsTrigger>
-          <TabsTrigger value="visual" className="gap-2 text-[10px] font-black uppercase rounded-xl h-11 sm:h-full">
+          <TabsTrigger value="disposisi" className="gap-2 text-[11px] font-bold uppercase rounded-xl h-10 sm:h-full">
+            <UserCheck className="h-4 w-4" />
+            Disposisi
+          </TabsTrigger>
+          <TabsTrigger value="visual" className="gap-2 text-[11px] font-bold uppercase rounded-xl h-10 sm:h-full">
             <Globe className="h-4 w-4" />
             Kalender
           </TabsTrigger>
@@ -45,12 +52,12 @@ export default function AgendaPage() {
           <RincianKegiatan />
         </TabsContent>
 
-        <TabsContent value="disposisi" className="mt-6">
-          <DisposisiKegiatan />
-        </TabsContent>
-
         <TabsContent value="input" className="mt-6">
           <InputAgendaForm />
+        </TabsContent>
+
+        <TabsContent value="disposisi" className="mt-6">
+          <DisposisiKegiatan />
         </TabsContent>
 
         <TabsContent value="visual" className="mt-6">

@@ -1,26 +1,23 @@
 'use client';
 
-import { useUser, useFirestore } from "@/firebase"
-import { Button } from "@/components/ui/button"
+import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { motion } from 'framer-motion';
+import { doc, onSnapshot } from 'firebase/firestore';
 import {
-  Home,
   LogIn,
-  Shield,
-  Clock,
   ExternalLink,
   Menu,
   FileText,
   Ticket,
-  Landmark,
+  ArrowUpRight,
+  Building2,
+  ChevronRight,
   Star,
-  Calendar,
-  Layers,
-  MapPin
-} from "lucide-react"
-import Link from "next/link"
-import Image from "next/image"
-import { doc, onSnapshot } from "firebase/firestore"
-import { useEffect, useState } from "react"
+} from 'lucide-react';
+import { useUser, useFirestore } from '@/firebase';
+import { Button } from '@/components/ui/button';
 import {
   Sheet,
   SheetContent,
@@ -28,51 +25,83 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet"
+} from '@/components/ui/sheet';
+import { NightModeSwitch } from '@/components/ui/NightModeSwitch';
+import { KineticScatterTitle, EASE_CINEMATIC } from '@/components/landing/hero-cinematic-parts';
+
+const MASCOT_VIDEO_URL =
+  'https://res.cloudinary.com/zqw5r6ay/video/upload/v1790613043/Mascot_revealing_logo_video_20260928232803.mp4';
 
 export default function AdminLandingPage() {
-  const { user } = useUser()
-  const db = useFirestore()
-  const [mounted, setMounted] = useState(false)
+  const { user } = useUser();
+  const db = useFirestore();
+  const [mounted, setMounted] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [mobileSheetOpen, setMobileSheetOpen] = useState(false);
+  const [currentTime, setCurrentTime] = useState<{ time: string; date: string } | null>(null);
+
   const [configData, setConfigData] = useState<any>(() => {
     if (typeof window !== 'undefined') {
       try {
-        const cached = localStorage.getItem('village_profile_cache')
-        if (cached) return JSON.parse(cached)
-      } catch (e) { }
+        const cached = localStorage.getItem('village_profile_cache');
+        if (cached) return JSON.parse(cached);
+      } catch {
+        // ignore
+      }
     }
-    return null
-  })
+    return null;
+  });
 
   useEffect(() => {
-    setMounted(true)
-    // Tarik data profil Kecamatan publik via API route
+    setMounted(true);
     fetch('/api/village-profile/?t=' + Date.now(), { cache: 'no-store' })
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         if (data && !data.error) {
-          setConfigData((prev: any) => ({ ...prev, ...data }))
+          setConfigData((prev: any) => ({ ...prev, ...data }));
           try {
-            localStorage.setItem('village_profile_cache', JSON.stringify(data))
-          } catch (e) { }
+            localStorage.setItem('village_profile_cache', JSON.stringify(data));
+          } catch {
+            // ignore
+          }
         }
       })
-      .catch(err => console.warn('Could not fetch village profile API:', err))
-  }, [])
+      .catch(() => {});
+  }, []);
 
-  // Jika user sedang login, aktifkan listener onSnapshot Firestore untuk update real-time
   useEffect(() => {
-    if (!db || !user) return
-    const unsub = onSnapshot(doc(db, "settings", "village"), (snap) => {
-      if (snap.exists()) {
-        const d = snap.data()
-        setConfigData((prev: any) => ({ ...prev, ...d }))
-      }
-    })
-    return () => unsub()
-  }, [db, user])
+    const onScroll = () => setIsScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
-  if (!mounted) return null
+  useEffect(() => {
+    const tick = () => {
+      const now = new Date();
+      const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+      setCurrentTime({
+        time: `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`,
+        date: `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`,
+      });
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  useEffect(() => {
+    if (!db || !user) return;
+    const unsub = onSnapshot(doc(db, 'settings', 'village'), (snap) => {
+      if (snap.exists()) {
+        setConfigData((prev: any) => ({ ...prev, ...snap.data() }));
+      }
+    });
+    return () => unsub();
+  }, [db, user]);
+
+  if (!mounted) return null;
 
   const getFormattedHeroImage = (data: any) => {
     const raw = data?.heroPhotoUrl || data?.heroPhotoBase64 || data?.heroImageUrl || data?.heroImageBase64;
@@ -85,7 +114,7 @@ export default function AdminLandingPage() {
 
   const getFormattedLogo = (data: any) => {
     const raw = data?.logoUrl || data?.logoKecamatanUrl || data?.logoBase64;
-    if (!raw || typeof raw !== 'string') return '/img/Logo.png';
+    if (!raw || typeof raw !== 'string') return '';
     if (raw.startsWith('http://') || raw.startsWith('https://') || raw.startsWith('data:') || raw.startsWith('/')) {
       return raw;
     }
@@ -94,392 +123,321 @@ export default function AdminLandingPage() {
 
   const heroImage = getFormattedHeroImage(configData);
   const logoImage = getFormattedLogo(configData);
+  const systemHref = user ? '/dashboard/' : '/login/';
+
+  const navLinks = [
+    { href: '/', label: 'Portal Warga' },
+    { href: '/Antrian/', label: 'Sistem Antrian' },
+    { href: '/kunjungan-tamu/?channel=front_office', label: 'Kunjungan Tamu' },
+    { href: '/agenda/', label: 'Agenda' },
+  ];
+
+  const brandBlock = (
+    <Link
+      href="/"
+      className="flex items-center gap-2 sm:gap-2.5 shrink-0 transition-all hover:opacity-90 active:scale-[0.98]"
+    >
+      {logoImage ? (
+        <div className="relative flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl overflow-hidden p-0.5 shrink-0 bg-white/90 dark:bg-slate-800/80 border border-slate-200/80 dark:border-white/10">
+          <Image src={logoImage} alt="Logo Kecamatan" fill unoptimized className="object-contain p-0.5" />
+        </div>
+      ) : (
+        <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl shrink-0 bg-[#061E2B] text-white dark:bg-[#0E7490]">
+          <Building2 className="h-4 w-4" />
+        </div>
+      )}
+      <div className="flex flex-col text-left">
+        <span className="font-hero font-extrabold tracking-[0.04em] sm:tracking-[0.06em] text-[10.5px] sm:text-[12.5px] uppercase leading-none text-[#061E2B] dark:text-white">
+          PORTAL ADMIN
+        </span>
+        <span className="text-[7px] sm:text-[8.5px] font-hero uppercase tracking-[0.14em] sm:tracking-[0.18em] font-semibold mt-0.5 sm:mt-1 text-[#0E7490] dark:text-cyan-300">
+          KEC. GANDRUNGMANGU • CILACAP
+        </span>
+      </div>
+    </Link>
+  );
+
+  const mobileControls = (
+    <div className="flex items-center gap-1.5 lg:hidden">
+      <NightModeSwitch size="sm" />
+      <Sheet open={mobileSheetOpen} onOpenChange={setMobileSheetOpen}>
+        <SheetTrigger asChild>
+          <button
+            type="button"
+            className="h-8 w-8 flex items-center justify-center rounded-full bg-[#061E2B] hover:bg-[#0E7490] dark:bg-[#0E7490] text-white transition-all cursor-pointer"
+            aria-label="Buka menu portal admin"
+          >
+            <Menu className="h-4 w-4" />
+          </button>
+        </SheetTrigger>
+        <SheetContent
+          side="right"
+          className="w-[310px] max-w-[88vw] border-l border-slate-200/80 dark:border-white/10 bg-white dark:bg-[#070b10] text-[#061E2B] dark:text-slate-100 p-5 shadow-2xl flex flex-col justify-between"
+        >
+          <SheetHeader className="sr-only">
+            <SheetTitle>Menu Portal Admin</SheetTitle>
+            <SheetDescription>Navigasi Portal Admin Kecamatan Gandrungmangu</SheetDescription>
+          </SheetHeader>
+
+          <div className="flex flex-col gap-4">
+            <div className="pb-3.5 border-b border-slate-200/80 dark:border-white/10 pr-8">
+              {brandBlock}
+            </div>
+            <div className="space-y-1.5">
+              {navLinks.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setMobileSheetOpen(false)}
+                  className="px-4 py-2.5 rounded-2xl text-xs font-hero font-bold uppercase tracking-wider flex items-center justify-between neu-btn text-[#061E2B] dark:text-slate-200 hover:text-[#0E7490]"
+                >
+                  <span>{item.label}</span>
+                  <ChevronRight className="h-3.5 w-3.5 opacity-40" />
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          <div className="pt-3.5 border-t border-slate-200/80 dark:border-white/10 flex flex-col gap-2">
+            <Link href={systemHref} onClick={() => setMobileSheetOpen(false)}>
+              <Button className="neu-btn-primary text-white w-full h-11 rounded-2xl font-hero font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 border-0">
+                <LogIn className="h-4 w-4" />
+                <span>Masuk Sistem</span>
+              </Button>
+            </Link>
+          </div>
+        </SheetContent>
+      </Sheet>
+    </div>
+  );
 
   return (
-    <div className="flex min-h-screen flex-col bg-slate-950 text-white font-sans selection:bg-amber-400 selection:text-slate-950">
-      
-      {/* ── 1. HEADER / NAVBAR (SERASI DENGAN LANDING PAGE) ────────────────────── */}
-      <header className="px-4 lg:px-10 h-20 flex items-center justify-between border-b border-white/10 bg-slate-950/75 backdrop-blur-md sticky top-0 z-50 text-white">
-        <Link href="/" className="flex items-center gap-3.5 hover:opacity-90 transition-opacity">
-          <div className="h-11 w-11 rounded-2xl flex items-center justify-center relative shrink-0 shadow-lg shadow-black/40 overflow-hidden bg-black/30 border border-white/15 p-1">
-            <Image
-              src={logoImage}
-              alt="Logo Cilacap"
-              fill
-              className="object-contain p-1"
-              unoptimized
-            />
-          </div>
-          <div className="flex flex-col">
-            <span className="font-heading font-black text-lg sm:text-xl text-white tracking-tight leading-tight">
-              Kecamatan Gandrungmangu
-            </span>
-            <span className="text-[10px] sm:text-xs font-semibold text-amber-300/90 tracking-wider uppercase">
-              Kabupaten Cilacap
-            </span>
-          </div>
-        </Link>
-
-        {/* Desktop Nav */}
-        <div className="hidden md:flex items-center gap-2.5">
-          <Button asChild variant="outline" className="rounded-full font-bold border-amber-400/30 text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 hover:text-amber-200 transition-all">
-            <Link href="/">
-              <FileText className="w-4 h-4 mr-1.5 text-amber-400" />
-              Portal Warga
-            </Link>
-          </Button>
-
-          <Button asChild variant="outline" className="rounded-full font-bold border-sky-400/30 text-sky-300 bg-sky-500/10 hover:bg-sky-500/20 hover:text-sky-200 transition-all">
-            <Link href="/Antrian/">
-              <Ticket className="w-4 h-4 mr-1.5 text-sky-400" />
-              Sistem Antrian
-            </Link>
-          </Button>
-
-          <Button asChild variant="outline" className="rounded-full font-bold border-white/15 text-slate-200 bg-white/5 hover:bg-white/15 hover:text-white transition-all">
-            <Link href="/agenda/">
-              <Calendar className="w-4 h-4 mr-1.5 text-sky-300" />
-              Agenda
-            </Link>
-          </Button>
-
-          <Button asChild variant="default" className="rounded-full font-bold bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 shadow-md shadow-amber-500/20 hover:scale-105 transition-all border border-amber-300/60 ml-1">
-            <Link href={user ? "/dashboard/" : "/login/"}>
-              <LogIn className="w-4 h-4 mr-1.5 text-slate-950" />
-              Masuk Sistem
-            </Link>
-          </Button>
-        </div>
-
-        {/* Mobile Nav (Hamburger) */}
-        <div className="md:hidden">
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="rounded-xl hover:bg-white/10 text-white">
-                <Menu className="h-6 w-6 text-white" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-[300px] border-l border-white/10 rounded-l-[2rem] shadow-2xl bg-slate-950 text-white">
-              <SheetHeader className="text-left pb-6 border-b border-white/10">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="h-9 w-9 bg-primary/20 border border-primary/40 rounded-xl flex items-center justify-center p-1.5 relative shrink-0">
-                    <Image src={logoImage} alt="Logo" fill className="object-contain p-1" unoptimized />
-                  </div>
-                  <SheetTitle className="text-white font-black uppercase tracking-tight text-base">Menu Portal</SheetTitle>
-                </div>
-                <SheetDescription className="text-[10px] font-bold uppercase tracking-widest text-amber-300">Pemerintah Kecamatan Gandrungmangu</SheetDescription>
-              </SheetHeader>
-
-              <div className="py-6 space-y-3">
-                <Button asChild variant="ghost" className="w-full h-14 justify-start gap-4 rounded-2xl text-sm font-black uppercase tracking-tight bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 transition-all">
-                  <Link href="/">
-                    <div className="h-10 w-10 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center shrink-0 shadow-md shadow-amber-500/20">
-                      <FileText className="h-5 w-5" />
-                    </div>
-                    Portal Warga
-                  </Link>
-                </Button>
-
-                <Button asChild variant="ghost" className="w-full h-14 justify-start gap-4 rounded-2xl text-sm font-black uppercase tracking-tight bg-sky-500/10 text-sky-300 hover:bg-sky-500/20 transition-all">
-                  <Link href="/Antrian/">
-                    <div className="h-10 w-10 rounded-xl bg-sky-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-sky-500/20">
-                      <Ticket className="h-5 w-5" />
-                    </div>
-                    Sistem Antrian
-                  </Link>
-                </Button>
-
-                <Button asChild variant="ghost" className="w-full h-14 justify-start gap-4 rounded-2xl text-sm font-black uppercase tracking-tight bg-white/5 text-white hover:bg-white/10 transition-all">
-                  <Link href="/agenda/">
-                    <div className="h-10 w-10 rounded-xl bg-white/10 flex items-center justify-center shrink-0 text-sky-300">
-                      <Calendar className="h-5 w-5" />
-                    </div>
-                    Agenda Kegiatan
-                  </Link>
-                </Button>
-
-                <Button asChild variant="ghost" className="w-full h-14 justify-start gap-4 rounded-2xl text-sm font-black uppercase tracking-tight bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 hover:from-amber-300 hover:to-amber-400 transition-all shadow-lg">
-                  <Link href={user ? "/dashboard/" : "/login/"}>
-                    <div className="h-10 w-10 rounded-xl bg-slate-950/20 flex items-center justify-center shrink-0 text-slate-950">
-                      <LogIn className="h-5 w-5" />
-                    </div>
-                    Masuk Sistem
-                  </Link>
-                </Button>
+    <div className="relative flex min-h-screen flex-col bg-white dark:bg-[#070b10] text-slate-900 dark:text-slate-100 overflow-x-clip transition-colors duration-300">
+      {/* ── 1. HEADER: ARCHITECTURAL DUAL-WING (TOP) & FLOATING CAPSULE (SCROLLED) ── */}
+      {!isScrolled ? (
+        <header className="fixed top-0 left-0 z-50 w-full pointer-events-none transition-all duration-300">
+          <div className="w-full h-[8px] sm:h-[12px] lg:h-[14px] bg-white dark:bg-[#070b10] pointer-events-auto" />
+          <div className="relative flex items-start justify-between w-full -mt-[8px] sm:-mt-[12px] lg:-mt-[14px]">
+            {/* Left Wing */}
+            <div className="relative flex items-start shrink-0 pointer-events-auto">
+              <div className="h-[54px] sm:h-[64px] lg:h-[68px] pl-3.5 sm:pl-6 lg:pl-8 pr-2.5 sm:pr-5 bg-white dark:bg-[#070b10] flex items-center">
+                {brandBlock}
               </div>
-
-              <div className="absolute bottom-8 left-6 right-6 border-t border-white/10 pt-4">
-                <div className="flex flex-col gap-1">
-                  <p className="text-[10px] text-amber-300/80 font-bold uppercase tracking-widest">Kecamatan Gandrungmangu</p>
-                  <p className="text-[9px] text-slate-400 font-medium">Kabupaten Cilacap, Jawa Tengah</p>
-                </div>
-              </div>
-            </SheetContent>
-          </Sheet>
-        </div>
-      </header>
-
-      {/* ── 2. HERO SECTION IDENTIK LANDING PAGE ────────────────────────────────── */}
-      <main className="flex-1">
-        <section className="relative w-full min-h-[calc(100vh-5rem)] flex items-center justify-center overflow-hidden py-16 md:py-24">
-          {/* Background Video Mascot Revealing Logo */}
-          <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-            <video
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="w-full h-full object-cover object-center brightness-90"
-              poster={heroImage}
-            >
-              <source
-                src="https://res.cloudinary.com/zqw5r6ay/video/upload/v1790613043/Mascot_revealing_logo_video_20260928232803.mp4"
-                type="video/mp4"
-              />
-              {heroImage && (
-                <Image
-                  src={heroImage}
-                  alt="Foto Utama Kecamatan Gandrungmangu"
-                  fill
-                  priority
-                  className="object-cover object-center brightness-95 scale-100"
-                  unoptimized
-                />
-              )}
-            </video>
-            <div className="absolute inset-0 bg-gradient-to-b from-black/65 via-slate-950/50 to-slate-950/90" />
-            <div className="absolute inset-0 bg-radial from-transparent via-slate-950/20 to-black/60" />
-          </div>
-
-          <div className="container relative z-10 mx-auto px-4 text-center my-auto flex flex-col items-center">
-            
-            {/* Badge Pemerintah Kecamatan */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/70 backdrop-blur-md border border-amber-400/30 text-amber-300 text-[11px] sm:text-xs font-bold tracking-[0.25em] uppercase mb-3 sm:mb-4 shadow-lg animate-in fade-in slide-in-from-bottom-3 duration-700">
-              <Landmark className="w-3.5 h-3.5 text-amber-400" />
-              <span>Pemerintah Kecamatan</span>
+              <svg
+                viewBox="0 0 46 68"
+                fill="none"
+                aria-hidden="true"
+                className="h-[54px] sm:h-[64px] lg:h-[68px] w-[26px] sm:w-[40px] lg:w-[46px] shrink-0 -ml-[1px] text-white dark:text-[#070b10]"
+              >
+                <path d="M0 0H46V12C26 12 24 68 0 68V0Z" fill="currentColor" />
+              </svg>
+              <svg
+                viewBox="0 0 22 22"
+                fill="none"
+                aria-hidden="true"
+                className="absolute left-2 sm:left-3 lg:left-3.5 top-[54px] sm:top-[64px] lg:top-[68px] h-[18px] w-[18px] sm:h-[22px] sm:w-[22px] text-white dark:text-[#070b10] pointer-events-none"
+              >
+                <path d="M0 0H22C9.85 0 0 9.85 0 22V0Z" fill="currentColor" />
+              </svg>
             </div>
 
-            {/* Judul Besar 2 Baris: Dashboard Admin */}
-            <h1 className="select-none mb-3 sm:mb-4 flex flex-col items-center justify-center leading-[1.05] sm:leading-[1.08] animate-in fade-in slide-in-from-bottom-5 duration-700">
-              <span className="font-heading font-black text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-[80px] text-white tracking-tight drop-shadow-[0_4px_20px_rgba(0,0,0,0.9)]">
-                Dashboard
-              </span>
-
-              <span className="relative inline-flex flex-col items-center mt-1 sm:mt-2">
-                <span className="relative inline-flex items-center justify-center">
-                  <span className="font-editorial italic font-extrabold text-4xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-[94px] text-transparent bg-clip-text bg-gradient-to-r from-amber-100 via-amber-300 to-yellow-400 tracking-tight drop-shadow-[0_4px_24px_rgba(245,158,11,0.5)]">
-                    Admin
-                  </span>
-                </span>
-
-                {/* Lengkungan Garis Senyuman (Smile Arc) Presisi */}
-                <span className="w-44 sm:w-64 md:w-80 lg:w-96 h-4 sm:h-6 relative -mt-0.5 sm:-mt-1 flex items-center justify-center pointer-events-none">
-                  <svg
-                    viewBox="0 0 320 38"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="w-full h-full overflow-visible"
+            {/* Center Nav */}
+            <nav className="hidden lg:flex flex-1 items-center justify-center h-[68px] pt-2.5 px-4 pointer-events-auto">
+              <div className="flex items-center gap-5 xl:gap-7">
+                {navLinks.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="font-hero text-[13px] font-medium text-white/90 hover:text-white transition-all py-1 drop-shadow-[0_2px_8px_rgba(3,20,30,0.65)] whitespace-nowrap"
                   >
-                    <defs>
-                      <linearGradient id="smileGradientAdmin" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" stopColor="#F59E0B" stopOpacity="0.75" />
-                        <stop offset="25%" stopColor="#FDE047" />
-                        <stop offset="50%" stopColor="#FFFFFF" />
-                        <stop offset="75%" stopColor="#FDE047" />
-                        <stop offset="100%" stopColor="#F59E0B" stopOpacity="0.75" />
-                      </linearGradient>
-                    </defs>
-                    <path
-                      d="M 12 10 Q 160 38 308 10"
-                      stroke="url(#smileGradientAdmin)"
-                      strokeWidth="4.5"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                </span>
-              </span>
-            </h1>
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+            </nav>
 
-            {/* Slogan SEMRINGAH Badge */}
-            <div className="mb-4 animate-in fade-in slide-in-from-bottom-6 duration-700">
-              <span
-                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full font-bold shadow-md"
-                style={{
-                  background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
-                  color: '#0f172a',
-                  fontSize: '0.825rem',
-                  letterSpacing: '0.3px',
-                  border: '1px solid #fef08a'
-                }}
+            {/* Right Wing */}
+            <div className="relative flex items-start shrink-0 pointer-events-auto">
+              <svg
+                viewBox="0 0 46 68"
+                fill="none"
+                aria-hidden="true"
+                className="h-[54px] sm:h-[64px] lg:h-[68px] w-[26px] sm:w-[40px] lg:w-[46px] shrink-0 -mr-[1px] text-white dark:text-[#070b10]"
               >
-                <Star className="w-3.5 h-3.5 fill-current text-slate-900" />
-                "SEMAngat memberIkan pelayanan NGgawe bungAH"
-              </span>
-            </div>
-
-            {/* Subtitle Deskripsi */}
-            <p className="text-sm sm:text-base md:text-lg text-slate-200/90 max-w-2xl mx-auto leading-relaxed font-normal mb-8 drop-shadow-sm animate-in fade-in slide-in-from-bottom-7 duration-700">
-              {configData?.subheadline || "Platform terintegrasi pengelolaan administrasi pemerintahan, pelayanan warga Kecamatan, dan dokumentasi kegiatan."}
-            </p>
-
-            {/* 3 Tombol Aksi Utama */}
-            <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-4 md:gap-5 max-w-4xl mx-auto w-full animate-in fade-in slide-in-from-bottom-9 duration-1000">
-              {/* Tombol 1: Masuk Sistem */}
-              <Link
-                href={user ? "/dashboard/" : "/login/"}
-                className="w-full sm:w-auto min-w-[200px] md:min-w-[220px] h-16 md:h-18 px-7 md:px-9 rounded-2xl bg-white hover:bg-slate-50 active:bg-slate-100 text-blue-700 hover:text-blue-800 font-black text-base md:text-lg tracking-wide uppercase shadow-xl shadow-black/25 hover:shadow-2xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-3 border border-white"
+                <path d="M46 0H0V12C20 12 22 68 46 68V0Z" fill="currentColor" />
+              </svg>
+              <div className="h-[54px] sm:h-[64px] lg:h-[68px] pl-1.5 sm:pl-3.5 pr-3.5 sm:pr-6 lg:pr-8 bg-white dark:bg-[#070b10] flex items-center gap-2">
+                <div className="hidden lg:flex items-center gap-2">
+                  <NightModeSwitch size="sm" />
+                  <Link
+                    href={systemHref}
+                    className="ml-1 inline-flex items-center gap-1.5 h-9 xl:h-10 px-4 xl:px-5 rounded-full bg-[#061E2B] hover:bg-[#0E7490] dark:bg-[#0E7490] dark:hover:bg-cyan-400 text-white dark:hover:text-[#061E2B] font-hero font-semibold text-xs tracking-[0.02em] shadow-sm transition-all whitespace-nowrap"
+                  >
+                    <LogIn className="h-3.5 w-3.5" />
+                    <span>Masuk Sistem</span>
+                  </Link>
+                </div>
+                {mobileControls}
+              </div>
+              <svg
+                viewBox="0 0 22 22"
+                fill="none"
+                aria-hidden="true"
+                className="absolute right-2 sm:right-3 lg:right-3.5 top-[54px] sm:top-[64px] lg:top-[68px] h-[18px] w-[18px] sm:h-[22px] sm:w-[22px] text-white dark:text-[#070b10] pointer-events-none"
               >
-                <LogIn className="h-5 w-5 md:h-6 md:w-6 text-blue-700 shrink-0" />
-                <span>MASUK SISTEM</span>
-              </Link>
-
-              {/* Tombol 2: Antrian */}
-              <Link
-                href="/Antrian/"
-                className="w-full sm:w-auto min-w-[200px] md:min-w-[220px] h-16 md:h-18 px-7 md:px-9 rounded-2xl bg-gradient-to-r from-sky-600 via-sky-500 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white font-black text-base md:text-lg tracking-wide uppercase shadow-xl shadow-sky-950/40 hover:shadow-2xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-3 border border-sky-300/40"
-              >
-                <Ticket className="h-5 w-5 md:h-6 md:w-6 text-sky-100 shrink-0" />
-                <span>ANTRIAN</span>
-              </Link>
-
-              {/* Tombol 3: Portal Warga */}
-              <Link
-                href="/"
-                className="w-full sm:w-auto min-w-[200px] md:min-w-[220px] h-16 md:h-18 px-7 md:px-9 rounded-2xl bg-slate-900/60 hover:bg-slate-900/80 backdrop-blur-md border border-white/20 hover:border-amber-400/40 text-white font-bold text-base md:text-lg tracking-normal shadow-xl shadow-slate-950/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-3"
-              >
-                <FileText className="h-5 w-5 md:h-6 md:w-6 text-amber-400 shrink-0" />
-                <span>Portal Warga</span>
-              </Link>
+                <path d="M22 0H0C12.15 0 22 9.85 22 22V0Z" fill="currentColor" />
+              </svg>
             </div>
           </div>
-        </section>
+        </header>
+      ) : (
+        <header className="fixed top-0 left-0 z-50 w-full py-2 sm:py-3 px-2.5 sm:px-5 lg:px-8 transition-all duration-300 pointer-events-none">
+          <div className="mx-auto flex items-center justify-between h-14 sm:h-[62px] max-w-7xl px-3 sm:px-5 rounded-full bg-white/95 dark:bg-[#070b10]/95 backdrop-blur-2xl border border-slate-200/80 dark:border-white/10 shadow-[0_12px_36px_rgba(15,23,42,0.08)] pointer-events-auto">
+            {brandBlock}
+            <nav className="hidden lg:flex items-center gap-1.5">
+              {navLinks.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="font-hero text-[12.5px] font-medium text-slate-700 dark:text-slate-300 hover:text-[#0E7490] dark:hover:text-cyan-300 hover:bg-[#EBF5F8] dark:hover:bg-white/5 px-3 py-1.5 rounded-full transition-all whitespace-nowrap"
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+            <div className="hidden lg:flex items-center gap-2">
+              <NightModeSwitch size="sm" />
+              <Link
+                href={systemHref}
+                className="inline-flex items-center gap-1.5 h-9 px-4 rounded-full bg-[#061E2B] hover:bg-[#0E7490] dark:bg-[#0E7490] text-white font-hero font-semibold text-xs transition-all whitespace-nowrap"
+              >
+                <LogIn className="h-3.5 w-3.5" />
+                <span>Masuk Sistem</span>
+              </Link>
+            </div>
+            {mobileControls}
+          </div>
+        </header>
+      )}
 
-        {/* ── 3. FITUR & SISTEM TERPADU KECAMATAN ─────────────────────────────────── */}
-        <section id="features" className="py-24 bg-slate-950/95 relative z-10 border-t border-white/10">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-16 space-y-3">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-500/10 border border-amber-400/30 text-amber-400 text-xs font-bold uppercase tracking-widest">
-                <span>DIGITALISASI KECAMATAN</span>
-              </div>
-              <h2 className="text-3xl md:text-4xl font-black uppercase tracking-tight text-white">
-                Sistem & Pelayanan Terpadu
-              </h2>
-              <div className="h-1.5 w-24 bg-gradient-to-r from-blue-500 via-amber-400 to-yellow-400 mx-auto rounded-full" />
+      {/* ── 2. FRAMED CINEMATIC HERO SECTION (SERASI LANDING PAGE) ──────────────── */}
+      <main className="relative z-10 space-y-1 sm:space-y-2">
+        <section className="relative min-h-[100svh] lg:h-[100dvh] lg:max-h-[1080px] lg:min-h-[600px] w-full bg-white dark:bg-[#070b10] p-2 sm:p-3 lg:p-3.5">
+          <div className="relative h-full min-h-[calc(100svh-16px)] sm:min-h-[calc(100svh-24px)] lg:min-h-0 w-full rounded-[20px] sm:rounded-[26px] lg:rounded-[28px] overflow-hidden bg-[#072636] text-white flex flex-col justify-between select-none shadow-[0_12px_40px_rgba(7,22,30,0.12)]">
+            {/* Video / Image Backdrop */}
+            <div className="absolute inset-0 z-0 overflow-hidden">
+              <video
+                autoPlay
+                loop
+                muted
+                playsInline
+                poster={heroImage}
+                className="w-full h-full object-cover object-center brightness-[0.8] contrast-[1.06]"
+              >
+                <source src={MASCOT_VIDEO_URL} type="video/mp4" />
+              </video>
+              <div className="absolute inset-0 bg-gradient-to-br from-[#08384a]/80 via-[#146a80]/60 to-[#062230]/88 pointer-events-none" />
+              <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-[#041620]/80 to-transparent pointer-events-none" />
+              <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[#041620]/80 to-transparent pointer-events-none" />
             </div>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-              {[
-                {
-                  title: "Database Terpadu",
-                  icon: Shield,
-                  desc: "Satu database untuk seluruh data administrasi Kecamatan, tersimpan aman dan terintegrasi real-time cloud.",
-                  color: "text-sky-400",
-                  bg: "bg-sky-500/10 border-sky-500/20"
-                },
-                {
-                  title: "Laporan Kegiatan",
-                  icon: ExternalLink,
-                  desc: "Digitalisasi setiap agenda, kegiatan dinas, dan pembangunan wilayah Kecamatan secara transparan.",
-                  color: "text-amber-400",
-                  bg: "bg-amber-500/10 border-amber-500/20"
-                },
-                {
-                  title: "Pelayanan Mandiri",
-                  icon: FileText,
-                  desc: "Layanan permohonan surat online cepat, tertib administrasi, dan mudah diakses oleh warga masyarakat.",
-                  color: "text-emerald-400",
-                  bg: "bg-emerald-500/10 border-emerald-500/20"
-                },
-                {
-                  title: "Sistem Antrian Loket",
-                  icon: Ticket,
-                  desc: "Kiosk tiket fisik, layar display TV ruang tunggu, dan konsol loket pelayanan terpadu real-time.",
-                  color: "text-blue-400",
-                  bg: "bg-blue-500/10 border-blue-500/20"
-                }
-              ].map((f, i) => (
-                <div key={i} className="p-8 rounded-3xl border border-white/10 bg-slate-900/60 backdrop-blur-md shadow-lg shadow-black/20 hover:border-amber-400/40 hover:-translate-y-1.5 transition-all duration-300 group relative overflow-hidden">
-                  <div className={`h-14 w-14 rounded-2xl ${f.bg} ${f.color} border shadow-sm flex items-center justify-center mb-6 group-hover:scale-110 transition-all duration-300`}>
-                    <f.icon className="h-7 w-7" />
-                  </div>
-                  <h3 className="text-xl font-bold text-white mb-3">{f.title}</h3>
-                  <p className="text-slate-300/80 leading-relaxed text-sm">{f.desc}</p>
+            {/* Spacer Header */}
+            <div className="h-14 sm:h-[68px] lg:h-[72px] shrink-0 pointer-events-none" />
+
+            {/* Konten Hero Tengah */}
+            <div className="relative z-20 flex-1 flex items-center justify-center px-4 sm:px-8 py-4">
+              <div className="mx-auto max-w-4xl flex flex-col items-center text-center">
+                <motion.div
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.45, ease: EASE_CINEMATIC }}
+                  className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-[#061E2B]/75 backdrop-blur-md border border-cyan-300/35 mb-3 sm:mb-4 shadow-md"
+                >
+                  <span className="h-2 w-2 rounded-full bg-[#f4c430] shadow-[0_0_8px_#f4c430]" />
+                  <span className="font-mono text-[9.5px] sm:text-[10.5px] font-semibold uppercase tracking-[0.22em] text-cyan-50">
+                    Portal Manajemen Pemerintah Kecamatan
+                  </span>
+                </motion.div>
+
+                <KineticScatterTitle
+                  text="Dashboard Admin"
+                  slideKey="admin-hero"
+                  align="center"
+                  size="center"
+                />
+
+                <div className="mt-3 sm:mt-4 flex items-center justify-center gap-2.5 sm:gap-3.5">
+                  <span className="hidden sm:block w-8 sm:w-12 h-[1.5px] bg-cyan-300/75" />
+                  <p className="font-hero text-[11px] sm:text-[13px] font-bold uppercase tracking-[0.2em] text-cyan-200">
+                    Gandrungmangu Semringah • Kabupaten Cilacap
+                  </p>
+                  <span className="hidden sm:block w-8 sm:w-12 h-[1.5px] bg-cyan-300/75" />
                 </div>
-              ))}
+
+                <p className="mt-2.5 font-hero text-xs sm:text-sm font-medium text-white/90 leading-relaxed max-w-2xl">
+                  {configData?.subheadline ||
+                    'Platform terintegrasi pengelolaan administrasi pemerintahan, sistem antrian loket, kunjungan tamu front office, dan dokumentasi kegiatan Kecamatan.'}
+                </p>
+
+                {/* 3 Tombol Aksi Utama (Selaras Pill Style Landing Page) */}
+                <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+                  <Link
+                    href={systemHref}
+                    className="group inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#0E7490] hover:bg-white text-white hover:text-[#061E2B] border border-cyan-300/40 font-hero font-bold text-xs uppercase tracking-[0.15em] shadow-[0_12px_30px_rgba(14,116,144,0.45)] transition-all duration-300 active:scale-95"
+                  >
+                    <LogIn className="h-4 w-4" />
+                    <span>Masuk Sistem</span>
+                    <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  </Link>
+
+                  <Link
+                    href="/Antrian/"
+                    className="group inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#f4c430] hover:bg-white text-[#061E2B] font-hero font-bold text-xs uppercase tracking-[0.15em] shadow-lg transition-all duration-300 active:scale-95"
+                  >
+                    <Ticket className="h-4 w-4" />
+                    <span>Sistem Antrian</span>
+                  </Link>
+
+                  <Link
+                    href="/"
+                    className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-[#061E2B]/70 hover:bg-[#0E7490] text-white border border-white/25 backdrop-blur-md font-hero font-bold text-xs uppercase tracking-[0.14em] transition-all duration-300"
+                  >
+                    <FileText className="h-4 w-4 text-cyan-300" />
+                    <span>Portal Warga</span>
+                  </Link>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom HUD Bar */}
+            <div className="relative z-30 w-full pb-4 px-4 sm:px-8 lg:px-12 flex items-center justify-between gap-3">
+              <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-2xl bg-[#061E2B]/80 backdrop-blur-md border border-cyan-300/25 min-w-[146px]">
+                <div className="flex flex-col items-start leading-none">
+                  <div className="flex items-center gap-1.5 font-mono text-xs font-bold text-white tracking-widest">
+                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-300 animate-pulse" />
+                    <span className="tabular-nums">{currentTime ? currentTime.time : '00:00:00'}</span>
+                    <span className="text-[9px] text-cyan-300 font-semibold">WIB</span>
+                  </div>
+                  <span className="text-[8.5px] font-mono uppercase tracking-[0.12em] text-cyan-100/75 mt-0.5">
+                    {currentTime ? currentTime.date : 'ADMIN • GANDRUNGMANGU'}
+                  </span>
+                </div>
+              </div>
+
+              <a
+                href="https://sisukma.cilacapkab.go.id/Home/pelayanan/4012001"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#061E2B]/75 hover:bg-[#f4c430] text-cyan-100 hover:text-[#061E2B] border border-cyan-300/25 font-hero text-[11px] font-bold transition-all"
+              >
+                <Star className="h-3.5 w-3.5 text-[#f4c430] fill-current" />
+                <span>SiSukma Cilacap</span>
+                <ExternalLink className="h-3 w-3 opacity-75" />
+              </a>
             </div>
           </div>
         </section>
       </main>
-
-      {/* ── 4. FOOTER IDENTIK LANDING PAGE ─────────────────────────────────────── */}
-      <footer className="bg-slate-950 text-slate-400 py-16 border-t border-slate-900">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-12 mb-12">
-            <div className="col-span-2 space-y-6">
-              <div className="flex items-center gap-3.5">
-                <div className="h-10 w-10 rounded-xl bg-slate-900 border border-white/10 flex items-center justify-center overflow-hidden relative shrink-0 p-1">
-                  <Image src={logoImage} alt="Logo" fill className="object-contain p-1" unoptimized />
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-lg font-black tracking-tight text-white leading-tight">Kecamatan Gandrungmangu</span>
-                  <span className="text-xs font-semibold text-amber-400 tracking-wider uppercase">Kabupaten Cilacap</span>
-                </div>
-              </div>
-              <p className="max-w-md leading-relaxed text-sm text-slate-300">
-                Pemerintah Kecamatan Gandrungmangu berkomitmen untuk terus berinovasi dalam memberikan pelayanan prima melalui digitalisasi terpadu dan transparan.
-              </p>
-              <div className="pt-2">
-                <a
-                  href="https://sisukma.cilacapkab.go.id/Home/pelayanan/4012001"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/15 border border-amber-400/40 text-amber-300 text-xs font-bold hover:bg-amber-500/25 transition-all shadow-sm"
-                >
-                  <Star className="w-4 h-4 fill-current text-amber-400" />
-                  Bantu Nilai Kami di Sisukma Cilacap
-                </a>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <h4 className="text-amber-400 font-bold text-sm uppercase tracking-widest">Akses Menu</h4>
-              <ul className="space-y-3 text-sm">
-                <li><Link href="/" className="text-amber-300 font-semibold hover:text-white transition-colors">Portal Warga</Link></li>
-                <li><Link href="/Antrian/" className="hover:text-amber-300 transition-colors">Sistem Antrian Terpadu</Link></li>
-                <li><Link href="/agenda/" className="hover:text-amber-300 transition-colors">Agenda Kegiatan Wilayah</Link></li>
-                <li><Link href={user ? "/dashboard/" : "/login/"} className="hover:text-amber-300 transition-colors">Masuk Sistem Manajemen</Link></li>
-              </ul>
-            </div>
-
-            <div className="space-y-4">
-              <h4 className="text-amber-400 font-bold text-sm uppercase tracking-widest">Website & Layanan</h4>
-              <ul className="space-y-3 text-sm">
-                <li>
-                  <a href="https://gandrungmangu.cilacapkab.go.id/" target="_blank" rel="noreferrer" className="hover:text-amber-300 transition-colors inline-flex items-center gap-1.5">
-                    Website Resmi Kecamatan <ExternalLink className="w-3.5 h-3.5 opacity-70" />
-                  </a>
-                </li>
-                <li>
-                  <a href="https://cilacapkab.go.id/" target="_blank" rel="noreferrer" className="hover:text-amber-300 transition-colors inline-flex items-center gap-1.5">
-                    Portal Kabupaten Cilacap <ExternalLink className="w-3.5 h-3.5 opacity-70" />
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="pt-8 border-t border-slate-900 flex flex-col md:flex-row justify-between items-center gap-6 text-xs text-slate-500 font-medium">
-            <p className="uppercase tracking-wider">
-              &copy; {new Date().getFullYear()} Pemerintah Kecamatan Gandrungmangu. Seluruh Hak Cipta Dilindungi.
-            </p>
-            <div className="flex gap-6 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-              <span>Gandrungmangu Semringah</span>
-              <span>&bull;</span>
-              <span>Cilacap Bercahaya</span>
-            </div>
-          </div>
-        </div>
-      </footer>
     </div>
-  )
+  );
 }

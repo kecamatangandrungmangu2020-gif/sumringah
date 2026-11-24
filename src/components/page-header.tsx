@@ -8,19 +8,24 @@ interface PageHeaderProps {
 
 export function PageHeader({ title, description, children }: PageHeaderProps) {
   return (
-    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 mb-6">
+    <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 mb-6 border-b border-slate-200/80 dark:border-white/10">
       <div className="space-y-1">
-        <h1 className="text-xl md:text-2xl font-black uppercase tracking-tight text-slate-900 italic font-serif">
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#EBF5F8] dark:bg-cyan-950/60 border border-[#0E7490]/20">
+          <span className="h-1.5 w-1.5 rounded-full bg-[#0E7490] dark:bg-cyan-400" />
+          <span className="font-mono text-[9.5px] font-bold uppercase tracking-[0.15em] text-[#0E7490] dark:text-cyan-300">
+            Sistem Terpadu Kecamatan
+          </span>
+        </div>
+        <h1 className="font-hero text-xl md:text-2xl font-extrabold tracking-tight text-[#061E2B] dark:text-white">
           {title}
         </h1>
         {description && (
-          <p className="text-xs text-slate-500 font-medium max-w-3xl">
+          <p className="font-hero text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium max-w-3xl">
             {description}
           </p>
         )}
       </div>
-      {children && <div className="flex items-center gap-3 shrink-0">{children}</div>}
+      {children && <div className="flex flex-wrap items-center gap-2.5 shrink-0">{children}</div>}
     </div>
   );
 }
-

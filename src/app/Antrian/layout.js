@@ -15,7 +15,7 @@ export const metadata = {
 
 export default function AntrianLayout({ children }) {
   return (
-    <div className={`antrian-system min-h-screen ${outfit.variable} ${outfit.className}`}>
+    <div className={`antrian-system min-h-screen ${outfit.variable}`}>
       {/* Bootstrap 5 & Bootstrap Icons specifically for Antrian portal pages */}
       <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"

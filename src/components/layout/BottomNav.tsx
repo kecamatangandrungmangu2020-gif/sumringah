@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, FileUp, Map, User } from "lucide-react"
+import { LayoutDashboard, Calendar, FileUp, Map, User } from "lucide-react"
 import { cn } from "@/lib/utils"
 import * as React from "react"
 
@@ -16,34 +16,39 @@ export function BottomNav() {
 
   const navItems = [
     { label: "Beranda", icon: LayoutDashboard, href: "/dashboard/" },
-    { label: "Dokumentasi", icon: FileUp, href: "/kegiatan/" },
+    { label: "Agenda", icon: Calendar, href: "/agenda/" },
+    { label: "Kegiatan", icon: FileUp, href: "/kegiatan/" },
     { label: "SPPD", icon: Map, href: "/sppd/" },
-    { label: "Data Kecamatan", icon: User, href: "/profile/" },
+    { label: "Profil", icon: User, href: "/profile/" },
   ]
 
-  if (!mounted) return null;
+  if (!mounted) return null
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-card px-4 pb-safe-area-inset-bottom md:hidden shadow-[0_-8px_30px_rgba(0,0,0,0.08)]">
-      <div className="flex justify-around py-3">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-slate-200/80 dark:border-white/10 bg-white/95 dark:bg-[#0c1622]/95 backdrop-blur-xl px-2 pb-safe-area-inset-bottom md:hidden shadow-[0_-8px_30px_rgba(6,30,43,0.08)]">
+      <div className="flex justify-around py-2.5">
         {navItems.map((item) => {
-          const isActive = pathname === item.href || (item.href !== "/dashboard/" && pathname.startsWith(item.href))
+          const isActive =
+            pathname === item.href ||
+            (item.href !== "/dashboard/" && pathname.startsWith(item.href.replace(/\/$/, "")))
 
           return (
             <Link
               key={item.href}
               href={item.href}
               className={cn(
-                "flex flex-col items-center gap-1.5 px-4 py-1 transition-all active:scale-90 relative",
-                isActive ? "text-primary" : "text-muted-foreground"
+                "flex flex-col items-center gap-1 px-3 py-1 rounded-2xl transition-all active:scale-95 relative",
+                isActive
+                  ? "text-[#0E7490] dark:text-cyan-300"
+                  : "text-slate-500 dark:text-slate-400"
               )}
             >
-              <item.icon className={cn("h-6 w-6 transition-transform", isActive && "stroke-[2.5px] scale-110")} />
-              <span className={cn("text-[9px] uppercase tracking-wider font-black", isActive ? "opacity-100" : "opacity-60")}>
+              <item.icon className={cn("h-5 w-5 transition-transform", isActive && "stroke-[2.5px] scale-110")} />
+              <span className={cn("font-hero text-[9px] uppercase tracking-wider font-bold", isActive ? "opacity-100" : "opacity-75")}>
                 {item.label}
               </span>
               {isActive && (
-                <div className="absolute -top-1 w-1 h-1 rounded-full bg-primary animate-pulse" />
+                <div className="absolute -top-0.5 w-1.5 h-1.5 rounded-full bg-[#f4c430] shadow-[0_0_6px_#f4c430]" />
               )}
             </Link>
           )

@@ -122,6 +122,7 @@ export function KegiatanUpload({ onSuccess, initialData }: { onSuccess?: () => v
   const [selectedUndangan, setSelectedUndangan] = useState<File | null>(null)
   const [isAnalyzingAcuan, setIsAnalyzingAcuan] = useState(false)
   const [uploadedAcuanName, setUploadedAcuanName] = useState<string | null>(null)
+  const [uploadedAcuanFile, setUploadedAcuanFile] = useState<File | null>(null)
 
   const undanganInputRef = useRef<HTMLInputElement>(null)
   const materiInputRef = useRef<HTMLInputElement>(null)
@@ -347,14 +348,59 @@ export function KegiatanUpload({ onSuccess, initialData }: { onSuccess?: () => v
       return;
     }
 
+    const manualNotes = (values.aiPromptNotes || "").trim();
     setIsGeneratingAI(true);
     try {
+      // Mode Gabungan (Berkas + Catatan Manual) jika ada berkas acuan aktif
+      if (uploadedAcuanFile) {
+        const formData = new FormData();
+        formData.append("file", uploadedAcuanFile);
+        formData.append("title", values.title || "");
+        formData.append("location", values.location || "Balai Kecamatan Gandrungmangu");
+        formData.append("date", values.date || format(new Date(), "yyyy-MM-dd"));
+        formData.append("time", values.time || "");
+        formData.append("activityType", values.activityType || "Eksternal");
+        formData.append("manualNotes", manualNotes);
+
+        const res = await fetch("/api/analyze-acuan", {
+          method: "POST",
+          body: formData,
+        });
+        const data = await res.json();
+        if (!data.success) {
+          throw new Error(data.error || "Gagal memproses gabungan berkas & catatan.");
+        }
+
+        if (data.notulen) {
+          form.setValue("description", data.notulen, { shouldDirty: true, shouldValidate: true });
+        }
+        const finalWa = data.notulenWa || convertNotulenToWa({
+          notulen: data.notulen || "",
+          title: values.title,
+          location: values.location || "Balai Kecamatan Gandrungmangu",
+          date: values.date || format(new Date(), "yyyy-MM-dd"),
+          time: values.time || "",
+          notes: manualNotes || data.aiPromptNotes || "",
+          officialName: values.officialName,
+          activityType: values.activityType || "Internal",
+        });
+        form.setValue("notulenWa", finalWa, { shouldDirty: true, shouldValidate: true });
+        toast({
+          title: manualNotes ? "Notulen Gabungan Berhasil!" : "Notulen dari Berkas Berhasil!",
+          description: manualNotes
+            ? "AI menyusun Isi Notulen & Draf WA (II. Hadir, III. Hasil Rapat, IV. Diskusi) dari gabungan berkas + catatan manual."
+            : "AI menyusun Isi Notulen & Draf WA berdasarkan berkas acuan.",
+        });
+        return;
+      }
+
+      // Mode Catatan Manual saja (atau tanpa catatan)
       const response = await generateNotulen({
         title: values.title,
         location: values.location || "Balai Kecamatan Gandrungmangu",
         date: values.date || format(new Date(), "yyyy-MM-dd"),
         time: values.time || "",
-        notes: values.aiPromptNotes || "",
+        notes: manualNotes,
         activityType: values.activityType || "Internal",
       });
 
@@ -368,13 +414,18 @@ export function KegiatanUpload({ onSuccess, initialData }: { onSuccess?: () => v
           location: values.location || "Balai Kecamatan Gandrungmangu",
           date: values.date || format(new Date(), "yyyy-MM-dd"),
           time: values.time || "",
-          notes: values.aiPromptNotes || "",
+          notes: manualNotes,
           officialName: values.officialName,
           activityType: values.activityType || "Internal",
         });
 
         form.setValue("notulenWa", finalWa, { shouldDirty: true, shouldValidate: true });
-        toast({ title: "AI Berhasil", description: "Draf notulen & format WA telah diselaraskan." });
+        toast({
+          title: "AI Berhasil Menyusun Notulen!",
+          description: manualNotes
+            ? "Draf Notulen & WA (II. Hadir, III. Hasil Rapat, IV. Diskusi) telah disesuaikan dengan catatan manual Anda."
+            : "Draf notulen & format WA telah diselaraskan.",
+        });
       }
     } catch (e: any) {
       console.error("Gagal AI Notulen:", e);
@@ -386,22 +437,6 @@ export function KegiatanUpload({ onSuccess, initialData }: { onSuccess?: () => v
     } finally {
       setIsGeneratingAI(false);
     }
-  }
-
-  const handleGenerateWaTemplate = () => {
-    const values = form.getValues();
-    const template = convertNotulenToWa({
-      notulen: values.description,
-      title: values.title,
-      location: values.location,
-      date: values.date,
-      time: values.time,
-      notes: values.aiPromptNotes,
-      officialName: values.officialName,
-      activityType: values.activityType,
-    });
-    form.setValue("notulenWa", template, { shouldDirty: true, shouldValidate: true });
-    toast({ title: "Format WA Diselaraskan", description: "Format laporan WhatsApp telah disesuaikan dengan isi notulen kegiatan." });
   }
 
   const handleCopyWa = () => {
@@ -438,7 +473,10 @@ export function KegiatanUpload({ onSuccess, initialData }: { onSuccess?: () => v
     });
 
     setUploadedAcuanName(file.name);
+    setUploadedAcuanFile(file);
     setIsAnalyzingAcuan(true);
+
+    const existingManualNotes = (form.getValues("aiPromptNotes") || "").trim();
 
     try {
       // Mengirim via FormData streaming agar browser tidak mengonversi ke base64 string di memori (bebas call stack overflow)
@@ -449,6 +487,9 @@ export function KegiatanUpload({ onSuccess, initialData }: { onSuccess?: () => v
       formData.append("date", form.getValues("date") || "");
       formData.append("time", form.getValues("time") || "");
       formData.append("activityType", form.getValues("activityType") || "Eksternal");
+      if (existingManualNotes) {
+        formData.append("manualNotes", existingManualNotes);
+      }
 
       const res = await fetch("/api/analyze-acuan", {
         method: "POST",
@@ -460,7 +501,8 @@ export function KegiatanUpload({ onSuccess, initialData }: { onSuccess?: () => v
         throw new Error(data.error || "Gagal memproses berkas acuan.");
       }
 
-      if (data.aiPromptNotes) {
+      // Jangan timpa catatan manual user; jika sebelumnya kosong baru isi dari rangkuman berkas
+      if (data.aiPromptNotes && !existingManualNotes) {
         form.setValue("aiPromptNotes", data.aiPromptNotes, { shouldDirty: true, shouldValidate: true });
       }
       if (data.notulen) {
@@ -471,8 +513,10 @@ export function KegiatanUpload({ onSuccess, initialData }: { onSuccess?: () => v
       }
 
       toast({
-        title: "Berkas Berhasil Dibaca AI!",
-        description: `Berkas "${file.name}" berhasil dibaca. Catatan acuan, Isi Notulen, dan Notulen WA telah otomatis terisi, serta berkas dilampirkan ke Upload Materi.`,
+        title: existingManualNotes ? "Gabungan Berkas + Catatan Diproses AI!" : "Berkas Berhasil Dibaca AI!",
+        description: existingManualNotes
+          ? `Berkas "${file.name}" digabungkan dengan catatan manual Anda. Notulen & Draf WA telah disusun otomatis.`
+          : `Berkas "${file.name}" berhasil dibaca. Catatan acuan, Isi Notulen, dan Notulen WA telah otomatis terisi, serta berkas dilampirkan ke Upload Materi.`,
       });
     } catch (err: any) {
       console.error("Error analyze acuan:", err);
@@ -637,6 +681,7 @@ export function KegiatanUpload({ onSuccess, initialData }: { onSuccess?: () => v
       setCloudinaryUrls({ kegiatan: [], atk: [], konsumsi: [] });
       setSelectedMaterials([]); setSelectedUndangan(null);
       setUploadedAcuanName(null);
+      setUploadedAcuanFile(null);
       onSuccess?.();
     } catch (err: any) {
       toast({ variant: "destructive", title: "Gagal Mengirim", description: err.message });
@@ -887,7 +932,7 @@ export function KegiatanUpload({ onSuccess, initialData }: { onSuccess?: () => v
                     </div>
 
                     <p className="text-[11px] text-amber-800/80 leading-relaxed">
-                      Tulis catatan rapat atau unggah berkas acuan (foto tulis tangan, PDF, materi PPT) untuk dibaca AI secara otomatis menjadi Notulen & Draf WA.
+                      Tulis catatan rapat manual (Hadir, Hasil Rapat, Diskusi/Tanya Jawab), unggah berkas acuan (Foto/PDF/PPT), atau <strong>gabungan keduanya</strong> untuk disusun AI secara otomatis menjadi Notulen &amp; Draf WA.
                     </p>
 
                     {/* Badge Berkas Aktif */}
@@ -899,19 +944,63 @@ export function KegiatanUpload({ onSuccess, initialData }: { onSuccess?: () => v
                             Acuan Aktif: <strong className="font-bold text-emerald-950">{uploadedAcuanName}</strong>
                           </span>
                         </div>
-                        <span className="text-[9px] font-extrabold uppercase bg-emerald-100/90 text-emerald-800 px-2.5 py-0.5 rounded-md border border-emerald-300/80 shrink-0">
-                          Tersimpan di Upload Materi
-                        </span>
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <span className="text-[9px] font-extrabold uppercase bg-emerald-100/90 text-emerald-800 px-2 py-0.5 rounded-md border border-emerald-300/80">
+                            Tersimpan di Upload Materi
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => { setUploadedAcuanName(null); setUploadedAcuanFile(null); }}
+                            className="text-[10px] font-bold text-rose-600 hover:text-rose-700 px-1.5 py-0.5 rounded hover:bg-rose-50"
+                            title="Lepas berkas dari acuan AI"
+                          >
+                            Lepas
+                          </button>
+                        </div>
                       </div>
                     )}
 
                     <FormControl>
                       <Textarea
-                        placeholder="Contoh: Hadir Danramil 10 Gdm, Polsek/yg mewakili, Sekcam, Kades, Pengurus Karang Taruna. Rapat bahas persiapan Pordes Sepak Bola & Voli tgl 13-27 Sept di Desa Cinangsi..."
-                        className="min-h-[90px] text-xs leading-relaxed bg-white border-amber-200 focus-visible:ring-amber-400 placeholder:text-muted-foreground/60 rounded-xl"
+                        placeholder={`Contoh catatan manual (bebas atau berpoin):\nHadir: Sekcam, Danramil 10 Gdm, Kades se-Kec. Gandrungmangu.\nHasil Rapat: Pembahasan persiapan Pordes Sepak Bola & Voli tgl 13-27 Sept di Desa Cinangsi, anggaran swadaya desa.\nDiskusi/Tanya Jawab: Kades Cinangsi mengusulkan jadwal technical meeting H-3; disepakati panitia kecamatan koordinasi dengan Polsek.`}
+                        className="min-h-[110px] text-xs leading-relaxed bg-white border-amber-200 focus-visible:ring-amber-400 placeholder:text-muted-foreground/60 rounded-xl"
                         {...field}
                       />
                     </FormControl>
+
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1">
+                      <span className="text-[10px] font-semibold text-amber-900/80">
+                        Mode AI:{" "}
+                        <strong>
+                          {uploadedAcuanFile && (field.value || "").trim()
+                            ? "Gabungan Berkas + Catatan Manual"
+                            : uploadedAcuanFile
+                            ? "Berkas Acuan Saja"
+                            : (field.value || "").trim()
+                            ? "Catatan Manual Saja"
+                            : "Otomatis dari Judul Kegiatan"}
+                        </strong>
+                      </span>
+                      <Button
+                        type="button"
+                        size="sm"
+                        disabled={isGeneratingAI || isAnalyzingAcuan}
+                        onClick={handleAskAI}
+                        className="h-9 px-4 text-[11px] font-extrabold uppercase rounded-xl bg-amber-600 hover:bg-amber-700 text-white shadow-sm gap-1.5"
+                      >
+                        {isGeneratingAI ? (
+                          <>
+                            <Loader2 className="h-3.5 w-3.5 animate-spin shrink-0" />
+                            <span>Menyusun Notulen AI...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles className="h-3.5 w-3.5 shrink-0" />
+                            <span>Generate Notulen &amp; WA dari AI</span>
+                          </>
+                        )}
+                      </Button>
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -964,23 +1053,12 @@ export function KegiatanUpload({ onSuccess, initialData }: { onSuccess?: () => v
                             Notulen Kirim WA
                           </CardTitle>
                           <p className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider">
-                            Format Laporan WhatsApp Resmi Siap Kirim
+                            Otomatis Dibuat AI Bersamaan dengan Isi Notulen
                           </p>
                         </div>
                       </div>
 
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={handleGenerateWaTemplate}
-                          title="Sinkronkan format WA dari isi notulen saat ini"
-                          className="h-8 px-2.5 text-[10px] font-bold uppercase rounded-xl border-emerald-300 text-emerald-800 hover:bg-emerald-100/60 gap-1.5"
-                        >
-                          <RefreshCw className="h-3 w-3 text-emerald-600" />
-                          Sinkronkan dari Notulen
-                        </Button>
                         <Button
                           type="button"
                           variant="outline"
@@ -1170,6 +1248,7 @@ export function KegiatanUpload({ onSuccess, initialData }: { onSuccess?: () => v
                               setSelectedMaterials(prev => prev.filter((_, i) => i !== idx));
                               if (uploadedAcuanName === file.name) {
                                 setUploadedAcuanName(null);
+      setUploadedAcuanFile(null);
                               }
                             }}
                             className="text-muted-foreground hover:text-destructive p-1 rounded transition-colors"

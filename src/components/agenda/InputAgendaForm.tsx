@@ -10,26 +10,51 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { FileUp, Loader2, Save, KeyRound, CheckCircle2, AlertCircle, X, Sparkles, Wand2 } from "lucide-react"
+import { FileUp, Loader2, Save, KeyRound, CheckCircle2, AlertCircle, X, Sparkles, Wand2, CalendarDays } from "lucide-react"
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"
 import { useToast } from "@/hooks/use-toast"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { GOOGLE_CONFIG } from "@/lib/google-config"
 import { callAppsScript } from "@/app/agenda/actions"
-import { format } from "date-fns"
+import { format, addDays, parseISO, differenceInCalendarDays, isValid } from "date-fns"
+import { id as localeID } from "date-fns/locale"
 import { useUser, useDoc, useFirestore, useMemoFirebase } from "@/firebase"
 import { doc, collection } from "firebase/firestore"
 import { addDocumentNonBlocking } from "@/firebase/non-blocking-updates"
 import { cn } from "@/lib/utils"
 
-const formSchema = z.object({
-  eventType: z.enum(["Internal", "Eksternal"]).default("Internal"),
-  eventDate: z.string().min(1, "Tanggal harus diisi."),
-  eventTime: z.string().min(1, "Waktu harus diisi."),
-  eventLocation: z.string().min(3, "Tempat minimal 3 karakter."),
-  eventTitle: z.string().min(5, "Acara minimal 5 karakter."),
-  eventNotes: z.string().optional(),
-})
+const formSchema = z
+  .object({
+    eventType: z.enum(["Internal", "Eksternal"]).default("Internal"),
+    eventDate: z.string().min(1, "Tanggal mulai harus diisi."),
+    eventEndDate: z.string().min(1, "Tanggal selesai harus diisi."),
+    eventTime: z.string().min(1, "Waktu harus diisi."),
+    eventLocation: z.string().min(3, "Tempat minimal 3 karakter."),
+    eventTitle: z.string().min(5, "Acara minimal 5 karakter."),
+    eventNotes: z.string().optional(),
+  })
+  .refine(
+    (data) => {
+      const start = parseISO(data.eventDate);
+      const end = parseISO(data.eventEndDate);
+      return isValid(start) && isValid(end) && end >= start;
+    },
+    {
+      message: "Tanggal selesai tidak boleh lebih awal dari tanggal mulai.",
+      path: ["eventEndDate"],
+    }
+  )
+  .refine(
+    (data) => {
+      const start = parseISO(data.eventDate);
+      const end = parseISO(data.eventEndDate);
+      return isValid(start) && isValid(end) && differenceInCalendarDays(end, start) <= 13;
+    },
+    {
+      message: "Maksimal rentang kegiatan adalah 14 hari berturut-turut.",
+      path: ["eventEndDate"],
+    }
+  )
 
 const fileToBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -61,12 +86,39 @@ export function InputAgendaForm() {
     defaultValues: {
       eventType: "Internal",
       eventDate: format(new Date(), "yyyy-MM-dd"),
+      eventEndDate: format(new Date(), "yyyy-MM-dd"),
       eventTime: "",
       eventLocation: "Balai Kecamatan Gandrungmangu",
       eventTitle: "",
       eventNotes: "",
     },
   })
+
+  const watchedStartDate = form.watch("eventDate");
+  const watchedEndDate = form.watch("eventEndDate");
+
+  const selectedDatesList = (() => {
+    try {
+      const s = parseISO(watchedStartDate);
+      const e = parseISO(watchedEndDate || watchedStartDate);
+      if (!isValid(s) || !isValid(e) || e < s) return [];
+      const diff = Math.min(differenceInCalendarDays(e, s), 13);
+      return Array.from({ length: diff + 1 }, (_, i) => addDays(s, i));
+    } catch {
+      return [];
+    }
+  })();
+
+  const applyDurationDays = (days: number) => {
+    try {
+      const s = parseISO(form.getValues("eventDate"));
+      if (isValid(s)) {
+        form.setValue("eventEndDate", format(addDays(s, days - 1), "yyyy-MM-dd"), {
+          shouldValidate: true,
+        });
+      }
+    } catch {}
+  };
 
   const [mounted, setMounted] = useState(false)
   useEffect(() => {
@@ -127,6 +179,7 @@ export function InputAgendaForm() {
       }
       if (scanned.eventDate) {
         form.setValue("eventDate", scanned.eventDate, { shouldValidate: true });
+        form.setValue("eventEndDate", scanned.eventEndDate || scanned.eventDate, { shouldValidate: true });
       }
       if (scanned.eventTime) {
         form.setValue("eventTime", scanned.eventTime, { shouldValidate: true });
@@ -173,37 +226,64 @@ export function InputAgendaForm() {
         };
       }
 
-      const startDateTime = new Date(`${values.eventDate}T${values.eventTime.split(' ')[0] || '00:00'}`);
-      // Simpan jenis dan penanda disposisi awal
-      const description = `JENIS: ${values.eventType}\nDISPOSISI: Belum Didisposisi\n\nCATATAN: ${values.eventNotes || '-'}`.trim();
+      const startObj = parseISO(values.eventDate);
+      const endObj = parseISO(values.eventEndDate || values.eventDate);
+      const totalDays = Math.max(1, differenceInCalendarDays(endObj, startObj) + 1);
+      const timePart = values.eventTime.split(' ')[0] || '08:00';
 
-      const result = await callAppsScript({
-        action: "createEventAndUpload",
-        eventData: {
-          calendarId: calendarId,
-          title: values.eventTitle,
-          start: startDateTime.toISOString(),
-          end: new Date(startDateTime.getTime() + 60 * 60 * 1000).toISOString(),
-          description: description,
-          location: values.eventLocation,
-        },
-        fileData: fileData,
-        folderId: folderId
-      });
+      let uploadedFileUrl = "";
+      let lastWarning: string | null = null;
 
-      if (!result || !result.success) {
-        throw new Error(result?.error || "Gagal menyimpan ke Google.");
+      for (let dayIdx = 0; dayIdx < totalDays; dayIdx++) {
+        const currentDateStr = format(addDays(startObj, dayIdx), "yyyy-MM-dd");
+        const startDateTime = new Date(`${currentDateStr}T${timePart}`);
+        const dayInfoNote = totalDays > 1 ? ` (Hari ke-${dayIdx + 1} dari ${totalDays} Hari)` : "";
+        let description = `JENIS: ${values.eventType}\nDISPOSISI: Belum Didisposisi\n\nCATATAN: ${values.eventNotes || '-'}${dayInfoNote}`.trim();
+
+        // Pada hari ke-2 dst., tautkan file undangan yang sudah diunggah di hari ke-1 agar tidak duplikat di Google Drive
+        if (dayIdx > 0 && uploadedFileUrl) {
+          description += `\n\n📄 Undangan / Lampiran: ${uploadedFileUrl}`;
+        }
+
+        const result = await callAppsScript({
+          action: "createEventAndUpload",
+          eventData: {
+            calendarId: calendarId,
+            title: values.eventTitle,
+            start: startDateTime.toISOString(),
+            end: new Date(startDateTime.getTime() + 60 * 60 * 1000).toISOString(),
+            description: description,
+            location: values.eventLocation,
+          },
+          fileData: dayIdx === 0 ? fileData : null,
+          folderId: folderId
+        });
+
+        if (!result || !result.success) {
+          throw new Error(result?.error || `Gagal menyimpan agenda hari ke-${dayIdx + 1} ke Google.`);
+        }
+
+        if (dayIdx === 0 && result.fileUrl) {
+          uploadedFileUrl = result.fileUrl;
+        }
+        if (result.warning) {
+          lastWarning = result.warning;
+        }
       }
 
       // Otomatis masukkan ke arsip dokumen "Dok Surat Masuk" di Firestore
       if (db) {
         try {
+          const tanggalLabel =
+            totalDays > 1
+              ? `${values.eventDate} s.d. ${values.eventEndDate} (${totalDays} Hari)`
+              : values.eventDate;
           const docSuratMasuk = {
             acara: values.eventTitle,
             lokasi: values.eventLocation || "Balai Kecamatan Gandrungmangu",
-            tanggal: values.eventDate,
+            tanggal: tanggalLabel,
             waktu: values.eventTime || "",
-            fileUrl: result.fileUrl || "",
+            fileUrl: uploadedFileUrl,
             fileName: invitationFile ? invitationFile.name : "",
             keterangan: values.eventNotes || "",
             sumber: "Agenda Undangan",
@@ -216,18 +296,26 @@ export function InputAgendaForm() {
         }
       }
 
-      if (result.warning) {
+      if (lastWarning) {
         toast({
-          title: "Agenda Tersimpan!",
-          description: result.warning,
+          title: `Agenda ${totalDays > 1 ? `${totalDays} Hari ` : ""}Tersimpan!`,
+          description: lastWarning,
         });
       } else {
-        toast({ title: "Sukses!", description: "Agenda telah ditambahkan ke kalender dan otomatis diarsipkan ke Dok Surat Masuk." });
+        toast({
+          title: "Sukses!",
+          description:
+            totalDays > 1
+              ? `Berhasil membuat ${totalDays} agenda kegiatan (${values.eventDate} s.d. ${values.eventEndDate}) di Google Calendar dan arsip Dok Surat Masuk.`
+              : "Agenda telah ditambahkan ke kalender dan otomatis diarsipkan ke Dok Surat Masuk.",
+        });
       }
 
+      const todayNow = format(new Date(), "yyyy-MM-dd");
       form.reset({
         eventType: "Internal",
-        eventDate: format(new Date(), "yyyy-MM-dd"),
+        eventDate: todayNow,
+        eventEndDate: todayNow,
         eventTime: "",
         eventLocation: "Balai Kecamatan Gandrungmangu",
         eventTitle: "",
@@ -404,21 +492,98 @@ export function InputAgendaForm() {
               </FormItem>
             )} />
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <FormField control={form.control} name="eventDate" render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-xs font-bold uppercase text-muted-foreground">Hari / Tanggal</FormLabel>
-                  <FormControl><Input type="date" {...field} className="h-12 rounded-xl" /></FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
-              <FormField control={form.control} name="eventTime" render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-xs font-bold uppercase text-muted-foreground">Waktu</FormLabel>
-                  <FormControl><Input type="time" {...field} className="h-12 rounded-xl" /></FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
+            <div className="space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <FormLabel className="text-xs font-bold uppercase text-muted-foreground flex items-center gap-1.5">
+                  <CalendarDays className="h-3.5 w-3.5 text-primary" />
+                  <span>Hari &amp; Tanggal Kegiatan (Bisa Lebih Dari 1 Hari)</span>
+                </FormLabel>
+                <div className="flex items-center gap-1.5">
+                  {[1, 2, 3].map((d) => (
+                    <button
+                      key={d}
+                      type="button"
+                      onClick={() => applyDurationDays(d)}
+                      className={cn(
+                        "px-2.5 py-1 rounded-full text-[10px] font-bold border transition-all cursor-pointer",
+                        selectedDatesList.length === d
+                          ? "bg-[#0E7490] text-white border-[#0E7490]"
+                          : "bg-slate-50 text-slate-600 border-slate-200 hover:border-[#0E7490]/50"
+                      )}
+                    >
+                      {d} Hari
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <FormField control={form.control} name="eventDate" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-[11px] font-bold uppercase text-muted-foreground">Tanggal Mulai</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="date"
+                        {...field}
+                        onChange={(e) => {
+                          const newStart = e.target.value;
+                          field.onChange(newStart);
+                          const currEnd = form.getValues("eventEndDate");
+                          if (!currEnd || currEnd < newStart) {
+                            form.setValue("eventEndDate", newStart, { shouldValidate: true });
+                          }
+                        }}
+                        className="h-12 rounded-xl"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+
+                <FormField control={form.control} name="eventEndDate" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-[11px] font-bold uppercase text-muted-foreground">Tanggal Selesai</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="date"
+                        min={watchedStartDate}
+                        {...field}
+                        className="h-12 rounded-xl"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+
+                <FormField control={form.control} name="eventTime" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-[11px] font-bold uppercase text-muted-foreground">Waktu Mulai</FormLabel>
+                    <FormControl><Input type="time" {...field} className="h-12 rounded-xl" /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+              </div>
+
+              {selectedDatesList.length > 1 && (
+                <div className="p-3.5 rounded-2xl bg-cyan-50/80 border border-cyan-200 text-xs space-y-1.5">
+                  <div className="font-bold text-[#0E7490] flex items-center gap-1.5">
+                    <CalendarDays className="h-4 w-4 shrink-0" />
+                    <span>
+                      Kegiatan Multi-Hari ({selectedDatesList.length} Hari) — Otomatis dibuat {selectedDatesList.length} agenda di Google Calendar:
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5 pt-0.5">
+                    {selectedDatesList.map((dt, idx) => (
+                      <span
+                        key={idx}
+                        className="px-2.5 py-0.5 rounded-full bg-white border border-cyan-200 text-[11px] font-semibold text-[#061E2B]"
+                      >
+                        Hari {idx + 1}: {format(dt, "EEE, dd MMM yyyy", { locale: localeID })}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             <FormField control={form.control} name="eventLocation" render={({ field }) => (

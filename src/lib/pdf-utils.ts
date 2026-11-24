@@ -185,27 +185,155 @@ export const generateNotulenPDF = async (values: any, logoBase64?: string | null
   doc.setLineWidth(0.1);
   doc.line(margin, currentY, pageWidth - margin, currentY);
   currentY += 8;
-  doc.setFontSize(11);
-  doc.setFont("helvetica", "normal");
-  const descriptionText = values.description || "(Belum ada isi ringkasan)";
-  const paragraphs = descriptionText.split('\n').filter((p: string) => p.trim() !== '');
-  const lineHeightFactor = 1.15;
-  paragraphs.forEach((para: string) => {
-    const lines = doc.splitTextToSize(para, contentWidth);
-    const textBlockHeight = doc.getTextDimensions(lines, { maxWidth: contentWidth }).h * lineHeightFactor;
-    if (currentY + textBlockHeight > pageHeight - 50) {
-      doc.addPage();
-      addKopSuratSync(doc, logoImg, margin, pageWidth);
-      currentY = 40;
-    }
-    doc.text(lines, margin, currentY, { align: "justify", maxWidth: contentWidth, lineHeightFactor: lineHeightFactor });
-    currentY += textBlockHeight + 4;
-  });
-  const signatureBlockHeight = 40;
-  if (currentY + signatureBlockHeight > pageHeight - margin) {
+
+  const bodyFontSize = 11;
+  const lineHeight = 5.5;
+  const paragraphGap = 3.5;
+  const firstLineIndent = 12; // Alinea paragraf 1,2 cm standar tata naskah dinas
+  const bottomMargin = 22;
+  const continuationTopY = 50;
+
+  const resetBodyFont = (style: "normal" | "bold" = "normal") => {
+    doc.setFont("helvetica", style);
+    doc.setFontSize(bodyFontSize);
+  };
+
+  const addNewPage = (style: "normal" | "bold" = "normal") => {
     doc.addPage();
     addKopSuratSync(doc, logoImg, margin, pageWidth);
-    currentY = 40;
+    resetBodyFont(style);
+    currentY = continuationTopY;
+  };
+
+  // Helper render satu baris rata kanan-kiri (justify) presisi
+  const drawJustifiedLine = (text: string, x: number, y: number, targetWidth: number) => {
+    const words = text.trim().split(/\s+/).filter(Boolean);
+    if (words.length <= 1) {
+      doc.text(text.trim(), x, y);
+      return;
+    }
+    const wordsWidth = words.reduce((sum, w) => sum + doc.getTextWidth(w), 0);
+    const extraSpace = targetWidth - wordsWidth;
+    const spaceWidth = extraSpace / (words.length - 1);
+    // Hindari peregangan berlebihan jika baris terlalu pendek
+    if (spaceWidth > 5.5 || spaceWidth < 0) {
+      doc.text(text.trim(), x, y);
+      return;
+    }
+    let cursorX = x;
+    words.forEach((word, idx) => {
+      doc.text(word, cursorX, y);
+      cursorX += doc.getTextWidth(word) + (idx < words.length - 1 ? spaceWidth : 0);
+    });
+  };
+
+  // Helper wrap teks dengan dukungan lebar baris pertama berbeda (untuk alinea/indent)
+  const wrapWordsWithIndent = (text: string, firstMaxW: number, restMaxW: number): string[] => {
+    const words = text.trim().split(/\s+/).filter(Boolean);
+    if (words.length === 0) return [];
+    const result: string[] = [];
+    let currentLine = "";
+    let isFirst = true;
+
+    for (const word of words) {
+      const maxW = isFirst ? firstMaxW : restMaxW;
+      const candidate = currentLine ? `${currentLine} ${word}` : word;
+      if (doc.getTextWidth(candidate) <= maxW || !currentLine) {
+        currentLine = candidate;
+      } else {
+        result.push(currentLine);
+        currentLine = word;
+        isFirst = false;
+      }
+    }
+    if (currentLine) result.push(currentLine);
+    return result;
+  };
+
+  resetBodyFont("normal");
+  const descriptionText = (values.description || "(Belum ada isi ringkasan)").replace(/\r\n/g, "\n");
+  const rawParagraphs = descriptionText.split("\n").filter((p: string) => p.trim() !== "");
+
+  rawParagraphs.forEach((rawPara: string) => {
+    const cleanPara = rawPara.replace(/\t/g, "    ").replace(/^\*+|\*+$/g, "").trim();
+    if (!cleanPara) return;
+
+    // 1. Cek apakah baris adalah sub-judul bagian (misal "I. Pendahuluan", "A. Arahan Pimpinan:")
+    const isHeading =
+      /^(?:(?:I|II|III|IV|V|VI|[A-Z])\.\s+[^.]{2,60}|[A-Za-z\s\/&]{3,45}:)$/.test(cleanPara) &&
+      cleanPara.length <= 70;
+
+    if (isHeading) {
+      resetBodyFont("bold");
+      const hLines: string[] = doc.splitTextToSize(cleanPara, contentWidth);
+      hLines.forEach((line: string) => {
+        if (currentY + lineHeight > pageHeight - bottomMargin) {
+          addNewPage("bold");
+        }
+        doc.text(line, margin, currentY);
+        currentY += lineHeight;
+      });
+      currentY += 1.5;
+      resetBodyFont("normal");
+      return;
+    }
+
+    // 2. Cek apakah baris adalah daftar bernomor / bullet (hanging indent + rata kanan-kiri)
+    const listMatch = cleanPara.match(/^(\d+[\.\)]|[a-zA-Z][\.\)]|[-•])\s+(.+)$/);
+    if (listMatch) {
+      resetBodyFont("normal");
+      const marker = listMatch[1] === "•" ? "-" : listMatch[1];
+      const itemText = listMatch[2].trim();
+      const markerX = margin + 4;
+      const textX = margin + 12;
+      const itemWidth = contentWidth - 12;
+      const wrappedLines = wrapWordsWithIndent(itemText, itemWidth, itemWidth);
+
+      wrappedLines.forEach((line: string, idx: number) => {
+        if (currentY + lineHeight > pageHeight - bottomMargin) {
+          addNewPage("normal");
+        }
+        if (idx === 0) {
+          doc.text(marker, markerX, currentY);
+        }
+        const isLastLine = idx === wrappedLines.length - 1;
+        if (!isLastLine) {
+          drawJustifiedLine(line, textX, currentY, itemWidth);
+        } else {
+          doc.text(line, textX, currentY);
+        }
+        currentY += lineHeight;
+      });
+      currentY += 1.5;
+      return;
+    }
+
+    // 3. Paragraf narasi normal: alinea menjorok (firstLineIndent = 12mm) + rata kanan-kiri (justify)
+    resetBodyFont("normal");
+    const wrappedLines = wrapWordsWithIndent(cleanPara, contentWidth - firstLineIndent, contentWidth);
+
+    wrappedLines.forEach((line: string, idx: number) => {
+      if (currentY + lineHeight > pageHeight - bottomMargin) {
+        addNewPage("normal");
+      }
+      const lineX = idx === 0 ? margin + firstLineIndent : margin;
+      const targetW = idx === 0 ? contentWidth - firstLineIndent : contentWidth;
+      const isLastLine = idx === wrappedLines.length - 1;
+
+      if (!isLastLine) {
+        drawJustifiedLine(line, lineX, currentY, targetW);
+      } else {
+        doc.text(line, lineX, currentY);
+      }
+      currentY += lineHeight;
+    });
+
+    currentY += paragraphGap;
+  });
+
+  const signatureBlockHeight = 40;
+  if (currentY + signatureBlockHeight > pageHeight - bottomMargin) {
+    addNewPage();
   }
   const signatureName = values.officialName?.split(" - ")[0]?.toUpperCase() || "PELAKSANA KEGIATAN";
   const signatureX = pageWidth - margin - 50;
@@ -354,42 +482,84 @@ export const generateDokumentasiPDF = async (values: any, sectionTitle: string, 
     doc.setFont("helvetica", "bold");
     doc.text("RINCIAN KEGIATAN", margin, 68);
     doc.setFont("helvetica", "normal");
-    doc.text("Kegiatan", margin, 74);
-    doc.text(":", margin + 25, 74);
-    doc.text(values.title || "-", margin + 28, 74);
-    doc.text("Tanggal", margin, 80);
-    doc.text(":", margin + 25, 80);
-    doc.text(formatDateIndo(values.date), margin + 28, 80);
-    doc.text("Waktu", margin, 86);
-    doc.text(":", margin + 25, 86);
-    doc.text(formatWaktuSurat(values.time), margin + 28, 86);
-    doc.text("Tempat", margin, 92);
-    doc.text(":", margin + 25, 92);
-    doc.text(values.location || "-", margin + 28, 92);
+
+    const valueX = margin + 28;
+    const maxValueWidth = pageWidth - margin - valueX;
+    const lineHeight = 5;
+    let y = 74;
+
+    const drawMetaRow = (label: string, value: string) => {
+      doc.text(label, margin, y);
+      doc.text(":", margin + 25, y);
+      const wrappedLines: string[] = doc.splitTextToSize(value || "-", maxValueWidth);
+      wrappedLines.forEach((line, idx) => {
+        doc.text(line, valueX, y + idx * lineHeight);
+      });
+      y += Math.max(1, wrappedLines.length) * lineHeight + 1;
+    };
+
+    drawMetaRow("Kegiatan", values.title || "-");
+    drawMetaRow("Tanggal", formatDateIndo(values.date));
+    drawMetaRow("Waktu", formatWaktuSurat(values.time));
+    drawMetaRow("Tempat", values.location || "-");
+
+    const dividerY = y - 2;
     doc.setLineWidth(0.1);
-    doc.line(margin, 96, pageWidth - margin, 96);
-    return 104;
+    doc.line(margin, dividerY, pageWidth - margin, dividerY);
+    return dividerY + 8;
   };
-  const fileToBase64 = (file: File): Promise<string> => {
+  const fileToJpegDataUrl = (file: File): Promise<{ dataUrl: string; width: number; height: number }> => {
     return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = reject;
+      const objectUrl = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        try {
+          const width = img.naturalWidth || img.width || 1200;
+          const height = img.naturalHeight || img.height || 800;
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          if (!ctx) {
+            URL.revokeObjectURL(objectUrl);
+            reject(new Error("Canvas tidak tersedia di browser."));
+            return;
+          }
+          ctx.fillStyle = "#ffffff";
+          ctx.fillRect(0, 0, width, height);
+          ctx.drawImage(img, 0, 0, width, height);
+          const dataUrl = canvas.toDataURL("image/jpeg", 0.92);
+          URL.revokeObjectURL(objectUrl);
+          resolve({ dataUrl, width, height });
+        } catch (err) {
+          URL.revokeObjectURL(objectUrl);
+          reject(err);
+        }
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        reject(new Error(`Gagal memproses gambar ${file.name}`));
+      };
+      img.src = objectUrl;
     });
   };
   let currentY = addPageHeader();
   for (let f = 0; f < files.length; f++) {
     const file = files[f];
-    const base64 = await fileToBase64(file);
-    const imgProps = doc.getImageProperties(base64);
-    const imgWidth = contentWidth;
-    const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
+    const { dataUrl, width, height } = await fileToJpegDataUrl(file);
+    let imgWidth = contentWidth;
+    let imgHeight = (height * imgWidth) / width;
     if (currentY + imgHeight > pageHeight - 20) {
       doc.addPage();
       currentY = addPageHeader();
     }
-    doc.addImage(base64, 'JPEG', margin, currentY, imgWidth, imgHeight);
+    const maxAvailHeight = pageHeight - currentY - 20;
+    if (imgHeight > maxAvailHeight && maxAvailHeight > 20) {
+      imgHeight = maxAvailHeight;
+      imgWidth = (width * imgHeight) / height;
+    }
+    const xPos = margin + (contentWidth - imgWidth) / 2;
+    doc.addImage(dataUrl, 'JPEG', xPos, currentY, imgWidth, imgHeight);
     currentY += imgHeight + 10;
   }
   return doc.output("blob");

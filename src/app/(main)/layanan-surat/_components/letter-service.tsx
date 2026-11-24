@@ -96,7 +96,7 @@ export function LetterService({ isAdmin = false }: LetterServiceProps) {
         <div className="space-y-6">
           <div className="text-center space-y-1.5 my-4">
             <h2 className="text-xl md:text-2xl font-black text-slate-900 uppercase tracking-tight italic font-serif">
-              Pilih <span className="text-primary not-italic">Layanan Surat</span>
+              Pilih <span className="text-primary not-italic">Layanan Mandiri</span>
             </h2>
             <p className="text-xs text-slate-500 font-medium max-w-md mx-auto">
               Silakan pilih salah satu kartu di bawah ini untuk mulai pengisian formulir pengajuan surat resmi Anda.

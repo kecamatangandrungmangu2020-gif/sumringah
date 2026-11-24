@@ -1,115 +1,105 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600;1,700;1,800;1,900&family=Outfit:wght@500;600;700;800;900&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-.font-editorial {
-  font-family: 'Playfair Display', Georgia, Cambria, serif;
-}
-
-.font-heading {
-  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-}
-
-.font-display {
-  font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
-}
-
 @layer base {
   :root {
+    /* Font CSS Variables (Corporate Presentation Deck) */
+    --font-sans: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+    --font-hero: 'Montserrat', 'Plus Jakarta Sans', sans-serif;
+    --font-display: 'Fraunces', Georgia, serif;
+    --font-condensed: 'Oswald', sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+
     /* =========================================================
-       TEMA KEKecamatanN NUSANTARA: BIRU SAMUDERA PAMONG PRAJA & EMAS PADI
-       Palet: Biru Samudera Pamong Praja (Royal Maritime Navy), 
-       Emas Bulir Padi Siap Panen (Harvest Amber/Gold), 
-       dan Putih Pualam Sejuk (Pure Porcelain White)
+       CORPORATE PRESENTATION DECK DESIGN SYSTEM (Ocean Teal & Marine Navy)
+       Canvas: #FFFFFF (Light) / #070b10 (Dark)
+       Primary Accent: #0E7490 (Ocean Teal)
+       Contrast Dark: #061E2B (Deep Marine Navy)
+       Soft Tinted Surface: #F3F7F9 & #EBF5F8 (Ice-Cyan)
        ========================================================= */
+    --background: 0 0% 100%;
+    --foreground: 201 76% 10%;
 
-    /* Latar Belakang Hangat, Bersih, Bersahaja */
-    --background: 210 20% 98%;          /* #F8FAFC - Putih pualam kebiruan sejuk & bersih */
-    --foreground: 215 35% 14%;          /* #162438 - Slate pekat sangat kontras & ramah dibaca */
-
-    /* Kartu & Elemen Kontainer */
-    --card: 0 0% 100%;                 /* Putih bersih dengan bayangan lembut */
-    --card-foreground: 215 35% 14%;
+    --card: 0 0% 100%;
+    --card-foreground: 201 76% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 215 35% 14%;
+    --popover-foreground: 201 76% 10%;
 
-    /* Warna Utama: Biru Samudera Pamong Praja (Royal Navy Pamong Praja) */
-    --primary: 215 75% 30%;             /* #13447C - Biru resmi pemerintahan Kecamatan & kementerian */
+    --primary: 193 82% 31%;
     --primary-foreground: 0 0% 100%;
 
-    /* Warna Sekunder: Slate Navy (Maritime Slate) */
-    --secondary: 215 25% 24%;           /* #2E3E52 - Slate navy tenang & berwibawa */
+    --secondary: 201 76% 10%;
     --secondary-foreground: 0 0% 100%;
 
-    /* Warna Lembut: Biru Awan Halus (Soft Sky Gray) */
-    --muted: 210 25% 95%;               /* #EEF2F6 - Abu kebiruan sejuk */
-    --muted-foreground: 215 20% 45%;    /* #5C6E84 - Teks sekunder presisi */
+    --muted: 197 37% 96%;
+    --muted-foreground: 215 19% 42%;
 
-    /* Warna Aksen: Emas Bulir Padi / Hasil Panen Kecamatan (Golden Paddy / Harvest Amber) */
-    --accent: 38 92% 50%;              /* #F59E0B - Kuning emas lumbung pangan Kecamatan */
-    --accent-foreground: 0 0% 100%;
+    --accent: 194 46% 95%;
+    --accent-foreground: 193 82% 28%;
 
-    /* Status & Batas */
-    --destructive: 0 78% 54%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 215 18% 88%;              /* Garis tepi sejuk halus */
-    --input: 215 18% 90%;
-    --ring: 215 75% 35%;
-    --radius: 1.25rem;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    /* Sidebar Sistem Kecamatan */
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 215 30% 22%;
-    --sidebar-primary: 215 75% 30%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 210 30% 95%;
-    --sidebar-accent-foreground: 215 75% 25%;
-    --sidebar-border: 215 18% 90%;
-    --sidebar-ring: 215 75% 30%;
+    --border: 210 29% 89%;
+    --input: 210 29% 89%;
+    --ring: 193 82% 31%;
+    --radius: 1.4rem;
 
-    /* Palet Grafik Bernuansa Samudera & Padi Nusantara */
-    --chart-1: 215 75% 35%;             /* Biru Pamong Praja */
-    --chart-2: 38 92% 50%;              /* Emas Bulir Padi */
-    --chart-3: 198 80% 40%;             /* Biru Toska Samudera */
-    --chart-4: 28 65% 42%;              /* Sawo Matang */
-    --chart-5: 210 50% 60%;             /* Sky Blue Cerah */
+    --sidebar-background: 201 76% 10%;
+    --sidebar-foreground: 210 20% 98%;
+    --sidebar-primary: 192 91% 56%;
+    --sidebar-primary-foreground: 201 76% 10%;
+    --sidebar-accent: 200 65% 15%;
+    --sidebar-accent-foreground: 210 20% 98%;
+    --sidebar-border: 200 50% 18%;
+    --sidebar-ring: 192 91% 56%;
+
+    --chart-1: 193 82% 31%;
+    --chart-2: 43 90% 57%;
+    --chart-3: 198 80% 40%;
+    --chart-4: 201 76% 18%;
+    --chart-5: 192 91% 56%;
   }
 
   .dark {
-    /* Mode Malam: Nuansa Samudera Malam & Safir Obsidian (Deep Maritime Obsidian) */
-    --background: 218 35% 8%;           /* #0D1522 - Biru malam samudera pekat */
-    --foreground: 210 25% 92%;
-    --card: 218 30% 12%;                /* #141E2F - Kartu malam navy obsidian */
-    --card-foreground: 210 25% 94%;
-    --popover: 218 35% 8%;
-    --popover-foreground: 210 25% 92%;
+    --background: 213 39% 5%;
+    --foreground: 210 20% 98%;
 
-    --primary: 212 90% 55%;             /* Biru safir cerah untuk kontras tinggi malam hari */
-    --primary-foreground: 218 45% 6%;
-    --secondary: 215 25% 35%;
+    --card: 208 42% 8%;
+    --card-foreground: 210 20% 98%;
+
+    --popover: 208 42% 8%;
+    --popover-foreground: 210 20% 98%;
+
+    --primary: 192 91% 56%;
+    --primary-foreground: 201 76% 10%;
+
+    --secondary: 193 82% 31%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 218 25% 16%;
-    --muted-foreground: 210 20% 70%;
-    --accent: 38 92% 52%;              /* Padi emas malam hari */
-    --accent-foreground: 218 45% 6%;
-    --destructive: 0 65% 52%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 218 25% 18%;
-    --input: 218 25% 18%;
-    --ring: 212 90% 55%;
+    --muted: 206 38% 13%;
+    --muted-foreground: 215 20% 65%;
 
-    --sidebar-background: 218 30% 10%;
-    --sidebar-foreground: 210 25% 88%;
-    --sidebar-primary: 212 90% 55%;
-    --sidebar-primary-foreground: 218 45% 6%;
-    --sidebar-accent: 218 25% 16%;
-    --sidebar-accent-foreground: 212 90% 60%;
-    --sidebar-border: 218 25% 18%;
-    --sidebar-ring: 212 90% 55%;
+    --accent: 192 91% 56%;
+    --accent-foreground: 201 76% 10%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 208 32% 16%;
+    --input: 208 32% 16%;
+    --ring: 192 91% 56%;
+
+    --sidebar-background: 201 76% 8%;
+    --sidebar-foreground: 210 20% 98%;
+    --sidebar-primary: 192 91% 56%;
+    --sidebar-primary-foreground: 201 76% 10%;
+    --sidebar-accent: 201 55% 13%;
+    --sidebar-accent-foreground: 210 20% 98%;
+    --sidebar-border: 201 45% 15%;
+    --sidebar-ring: 192 91% 56%;
   }
 }
 
@@ -119,113 +109,159 @@
     -webkit-tap-highlight-color: transparent;
   }
   body {
-    @apply bg-background text-foreground font-body overflow-x-hidden;
+    @apply bg-background text-foreground antialiased font-sans overflow-x-hidden;
     overscroll-behavior-y: none;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply tracking-tight;
   }
 }
 
-/* Custom Scrollbar for better UI on mobile */
+html {
+  scroll-behavior: smooth;
+}
+
+.snap-section {
+  scroll-margin-top: 5rem;
+}
+
+::selection {
+  background: #0E7490;
+  color: #ffffff;
+}
+
+/* Font utility aliases (compatibility + new system) */
+.font-editorial {
+  font-family: var(--font-display), Georgia, serif;
+}
+.font-heading {
+  font-family: var(--font-hero), var(--font-sans), sans-serif;
+}
+
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
   @apply bg-transparent;
 }
 ::-webkit-scrollbar-thumb {
-  @apply bg-muted-foreground/20 rounded-full;
+  @apply bg-slate-400/30 dark:bg-slate-600/40 rounded-full;
+}
+
+/* ========================================================
+   CORPORATE PRESENTATION DECK SURFACE UTILITIES
+   ======================================================== */
+.teal-gradient {
+  background: linear-gradient(135deg, #0E7490 0%, #0284c7 100%);
+}
+
+.navy-gradient {
+  background: linear-gradient(180deg, #061E2B 0%, #082738 50%, #04151F 100%);
+}
+
+.glass-card {
+  @apply rounded-2xl border border-slate-200/85 bg-white/95 backdrop-blur-xl shadow-sm;
+}
+
+.glass-card-dark {
+  @apply rounded-2xl border border-cyan-300/15 bg-[#061E2B]/90 backdrop-blur-xl text-white shadow-sm;
+}
+
+.neu-inset {
+  background: #EBF5F8;
+  box-shadow:
+    inset 0 2px 5px rgba(6, 30, 43, 0.045),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(186, 230, 253, 0.72);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.neu-btn {
+  background: #FFFFFF;
+  box-shadow:
+    0 4px 14px rgba(6, 30, 43, 0.05),
+    0 1px 2px rgba(6, 30, 43, 0.03);
+  border: 1px solid rgba(203, 213, 225, 0.9);
+  color: #061E2B;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.neu-btn:hover {
+  transform: translateY(-1.5px);
+  background: #EBF5F8;
+  border-color: rgba(14, 116, 144, 0.38);
+  color: #0E7490;
+  box-shadow:
+    0 8px 20px rgba(14, 116, 144, 0.12),
+    0 2px 6px rgba(6, 30, 43, 0.04);
+}
+
+.neu-btn-primary {
+  background: linear-gradient(135deg, #0E7490 0%, #095C73 100%);
+  box-shadow:
+    0 10px 24px -4px rgba(14, 116, 144, 0.35),
+    0 2px 6px rgba(6, 30, 43, 0.08);
+  border: 1px solid rgba(103, 232, 249, 0.28);
+  color: #ffffff;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.neu-btn-primary:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #0884A6 0%, #061E2B 100%);
+}
+
+.neu-btn-dark {
+  background: linear-gradient(135deg, #061E2B 0%, #0A384D 100%);
+  box-shadow:
+    0 10px 24px -4px rgba(6, 30, 43, 0.28),
+    0 2px 6px rgba(6, 30, 43, 0.08);
+  border: 1px solid rgba(103, 232, 249, 0.2);
+  color: #ffffff;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dark .neu-inset {
+  background: #070b10 !important;
+  box-shadow:
+    inset 4px 4px 10px rgba(0, 0, 0, 0.8),
+    inset -3px -3px 8px rgba(255, 255, 255, 0.03) !important;
+  border-color: rgba(255, 255, 255, 0.06) !important;
+  color: #f1f5f9 !important;
+}
+
+.dark .neu-btn {
+  background: linear-gradient(145deg, #1e2633, #111722) !important;
+  box-shadow:
+    5px 5px 12px rgba(0, 0, 0, 0.6),
+    -3px -3px 8px rgba(255, 255, 255, 0.04) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #f1f5f9 !important;
 }
 
 @layer components {
-  /* Utilitas Tipografi Gradien Modern */
   .text-gradient-Kecamatan {
-    @apply bg-gradient-to-r from-blue-950 via-blue-800 to-indigo-900 dark:from-sky-200 dark:via-blue-300 dark:to-amber-200 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-[#061E2B] via-[#0E7490] to-cyan-700 dark:from-cyan-200 dark:via-sky-300 dark:to-amber-200 bg-clip-text text-transparent;
   }
   .text-gradient-amber {
     @apply bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-600 dark:from-amber-400 dark:to-yellow-300 bg-clip-text text-transparent;
   }
-
-  /* Utilitas Kartu Nuansa PeKecamatanan Modern (Glassmorphism) */
   .card-Kecamatan {
-    @apply rounded-2xl md:rounded-3xl border border-blue-950/10 dark:border-blue-500/20 bg-white/85 dark:bg-card/90 backdrop-blur-md text-card-foreground shadow-sm shadow-blue-950/5 transition-all duration-300 hover:shadow-xl hover:shadow-blue-950/10 hover:border-blue-600/30 hover:-translate-y-1;
+    @apply rounded-2xl md:rounded-3xl border border-slate-200/80 dark:border-white/10 bg-white/90 dark:bg-[#0c1622]/90 backdrop-blur-md text-card-foreground shadow-sm transition-all duration-300 hover:shadow-xl hover:border-[#0E7490]/35 hover:-translate-y-1;
   }
   .card-Kecamatan-header {
-    @apply p-5 md:p-6 bg-gradient-to-r from-blue-50/70 via-blue-50/30 to-transparent dark:from-blue-950/40 dark:via-blue-950/10 dark:to-transparent border-b border-blue-950/10 dark:border-blue-500/20;
+    @apply p-5 md:p-6 bg-gradient-to-r from-[#EBF5F8]/80 via-[#F3F7F9]/50 to-transparent dark:from-cyan-950/40 dark:via-cyan-950/10 dark:to-transparent border-b border-slate-200/80 dark:border-white/10;
   }
   .badge-padi {
     @apply inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-black uppercase bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/25 shadow-sm;
   }
   .badge-Kecamatan {
-    @apply inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-black uppercase bg-blue-800/15 text-blue-900 dark:text-sky-300 border border-blue-800/25 shadow-sm;
+    @apply inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-black uppercase bg-[#EBF5F8] text-[#0E7490] dark:bg-cyan-950/60 dark:text-cyan-300 border border-[#0E7490]/20 shadow-sm;
   }
-
-  /* Animasi Elegan Masuk Konten */
   .animate-fade-in-up {
     animation: fadeInUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  }
-  .animate-float-subtle {
-    animation: floatSubtle 4s ease-in-out infinite;
-  }
-  .animate-pulse-glow {
-    animation: pulseGlow 3s ease-in-out infinite;
-  }
-  /* Animasi Kilau Teks Hero Modern: Biru Samudera & Emas Padi */
-  .text-shimmer-hero {
-    background: linear-gradient(
-      100deg,
-      #ffffff 0%,
-      #ffffff 30%,
-      #7dd3fc 45%,
-      #fde047 55%,
-      #93c5fd 65%,
-      #ffffff 80%,
-      #ffffff 100%
-    );
-    background-size: 200% 100%;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: beamSweep 4s ease-in-out infinite;
-  }
-
-  .hero-title-white {
-    background: linear-gradient(
-      100deg,
-      #ffffff 0%,
-      #ffffff 35%,
-      #93c5fd 50%,
-      #ffffff 65%,
-      #ffffff 100%
-    );
-    background-size: 200% 100%;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: beamSweep 4.5s ease-in-out infinite;
-    display: inline-block;
-  }
-
-  .hero-title-accent {
-    background: linear-gradient(
-      100deg,
-      #38bdf8 0%,
-      #60a5fa 25%,
-      #fde047 50%,
-      #38bdf8 75%,
-      #60a5fa 100%
-    );
-    background-size: 200% 100%;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: beamSweep 3.5s ease-in-out infinite;
-    display: inline-block;
-  }
-
-  .hero-title-aura {
-    animation: heroTitleFloat 5s ease-in-out infinite;
-    filter: drop-shadow(0 0 32px rgba(59, 130, 246, 0.45)) drop-shadow(0 4px 18px rgba(0, 0, 0, 0.85));
-  }
-
-  .text-glow-hero {
-    filter: drop-shadow(0 0 28px rgba(59, 130, 246, 0.4)) drop-shadow(0 4px 16px rgba(0, 0, 0, 0.5));
   }
 }
 
@@ -240,100 +276,64 @@
   }
 }
 
-@keyframes floatSubtle {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-4px);
-  }
+/* ========================================================
+   SYSTEM-WIDE CORPORATE PRESENTATION DECK OVERRIDES
+   Menyelaraskan seluruh menu & sub-menu internal dengan tema Landing Page
+   (Ocean Teal #0E7490, Deep Marine Navy #061E2B, Ice-Cyan #F3F7F9, Dark #0c1622)
+   ======================================================== */
+.system-shell input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+.system-shell textarea,
+.system-shell select {
+  border-color: rgba(203, 213, 225, 0.85);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-@keyframes pulseGlow {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.85;
-    transform: scale(1.02);
-  }
+.system-shell input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):focus,
+.system-shell textarea:focus,
+.system-shell select:focus {
+  border-color: #0E7490 !important;
+  box-shadow: 0 0 0 3px rgba(14, 116, 144, 0.14) !important;
 }
 
-@keyframes heroTitleFloat {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-3px);
-  }
+/* Dark mode harmony for all inner menu & submenu pages that use utility bg-white/text-slate-* */
+.dark .system-shell .bg-white,
+.dark .system-shell .bg-white\/80,
+.dark .system-shell .bg-white\/90 {
+  background-color: #0c1622 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
 }
 
-@keyframes beamSweep {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
-  }
+.dark .system-shell .bg-slate-50,
+.dark .system-shell .bg-slate-50\/50,
+.dark .system-shell .bg-slate-100 {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+  border-color: rgba(255, 255, 255, 0.09) !important;
 }
 
-@keyframes textShimmerSweep {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
-  }
+.dark .system-shell .text-slate-900,
+.dark .system-shell .text-slate-800 {
+  color: #f1f5f9 !important;
 }
 
-/* ── Animasi Khas Semringah (Senyuman Bahagia & Berseri-seri) ────────────── */
-@keyframes smileBloom {
-  0%, 100% {
-    transform: scaleY(1) translateY(0);
-    filter: drop-shadow(0 2px 8px rgba(245, 158, 11, 0.6));
-  }
-  50% {
-    transform: scaleY(1.22) translateY(2px);
-    filter: drop-shadow(0 4px 18px rgba(253, 224, 71, 0.95));
-  }
+.dark .system-shell .text-slate-700,
+.dark .system-shell .text-slate-600 {
+  color: #cbd5e1 !important;
 }
 
-@keyframes sparkleTwinkle {
-  0%, 100% {
-    transform: scale(0.8) rotate(0deg);
-    opacity: 0.6;
-  }
-  50% {
-    transform: scale(1.25) rotate(20deg);
-    opacity: 1;
-    filter: drop-shadow(0 0 12px rgba(253, 224, 71, 0.95));
-  }
+.dark .system-shell .text-slate-500 {
+  color: #94a3b8 !important;
 }
 
-@keyframes semringahRadiance {
-  0%, 100% {
-    filter: drop-shadow(0 0 16px rgba(245, 158, 11, 0.45)) drop-shadow(0 4px 14px rgba(0, 0, 0, 0.75));
-    transform: translateY(0px);
-  }
-  50% {
-    filter: drop-shadow(0 0 32px rgba(253, 224, 71, 0.85)) drop-shadow(0 4px 18px rgba(0, 0, 0, 0.85));
-    transform: translateY(-2px);
-  }
+.dark .system-shell .border-slate-100,
+.dark .system-shell .border-slate-200 {
+  border-color: rgba(255, 255, 255, 0.1) !important;
 }
 
-.animate-smile-bloom {
-  transform-origin: center top;
-  animation: smileBloom 3.5s ease-in-out infinite;
+.dark .system-shell input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+.dark .system-shell textarea,
+.dark .system-shell select {
+  background-color: #070f18 !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+  color: #f8fafc !important;
 }
 
-.animate-sparkle-twinkle {
-  animation: sparkleTwinkle 2.5s ease-in-out infinite;
-}
-
-.animate-sparkle-twinkle-delay {
-  animation: sparkleTwinkle 2.5s ease-in-out infinite 1.25s;
-}
-
-.animate-semringah-radiance {
-  animation: semringahRadiance 4s ease-in-out infinite;
-}

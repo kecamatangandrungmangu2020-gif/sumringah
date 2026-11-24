@@ -24,7 +24,8 @@ import {
   Globe,
   Sparkles,
   ArrowLeft,
-  Plus
+  Plus,
+  Printer
 } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
@@ -35,17 +36,25 @@ import { useFirestore } from "@/firebase"
 import { collection, onSnapshot, query, orderBy } from "firebase/firestore"
 import { useToast } from "@/hooks/use-toast"
 import { Badge } from "@/components/ui/badge"
+import { generateDokumentasiPDF, generateNotulenPDF } from "@/lib/pdf-utils"
 
 interface KegiatanItem {
   id: string
   title?: string
   description?: string
   date?: string
+  time?: string
+  officialName?: string
   uploadDate?: string
   location?: string
   category?: string
   activityType?: string
   imageUrls?: string[]
+  cloudinaryUrls?: {
+    kegiatan?: string[]
+    atk?: string[]
+    konsumsi?: string[]
+  }
   notulenWa?: string
   driveUrls?: {
     notulen?: string
@@ -63,6 +72,96 @@ export default function PublicKegiatanPage() {
   const [filterType, setFilterType] = useState<"Semua" | "Internal" | "Eksternal">("Semua")
   const [isUploadOpen, setIsUploadOpen] = useState(false)
   const [selectedActivity, setSelectedActivity] = useState<KegiatanItem | null>(null)
+  const [printingCategory, setPrintingCategory] = useState<'notulen' | 'kegiatan' | 'atk' | 'konsumsi' | null>(null)
+
+  const handlePrintSavedNotulen = async (activity: KegiatanItem) => {
+    setPrintingCategory('notulen')
+    try {
+      const pdfBlob = await generateNotulenPDF({
+        title: activity.title || "-",
+        date: activity.date || activity.uploadDate || "",
+        time: activity.time || "",
+        location: activity.location || "-",
+        description: activity.description || "",
+        officialName: activity.officialName || "",
+      })
+      const blobUrl = URL.createObjectURL(pdfBlob)
+      window.open(blobUrl, "_blank")
+    } catch {
+      if (activity?.driveUrls?.notulen) {
+        window.open(activity.driveUrls.notulen, "_blank", "noopener,noreferrer")
+      }
+    } finally {
+      setPrintingCategory(null)
+    }
+  }
+
+  const getSavedPhotoUrls = (activity: KegiatanItem | null, category: 'kegiatan' | 'atk' | 'konsumsi'): string[] => {
+    const raw: string[] =
+      category === 'kegiatan'
+        ? (activity?.cloudinaryUrls?.kegiatan?.length
+            ? activity.cloudinaryUrls.kegiatan
+            : (activity?.imageUrls || []))
+        : (activity?.cloudinaryUrls?.[category] || [])
+    return raw.filter((u) => typeof u === "string" && (u.startsWith("http") || u.startsWith("data:image")))
+  }
+
+  const handlePrintSavedDok = async (activity: KegiatanItem, category: 'kegiatan' | 'atk' | 'konsumsi') => {
+    const driveKey = category === 'kegiatan' ? 'dokKegiatan' : category === 'atk' ? 'dokAtk' : 'dokKonsumsi'
+    const sectionTitle = category === 'kegiatan' ? 'DOKUMENTASI KEGIATAN' : category === 'atk' ? 'DOKUMENTASI ATK' : 'DOKUMENTASI KONSUMSI'
+    const urls = getSavedPhotoUrls(activity, category)
+
+    if (urls.length === 0) {
+      if (activity?.driveUrls?.[driveKey]) {
+        window.open(activity.driveUrls[driveKey], "_blank", "noopener,noreferrer")
+      }
+      return
+    }
+
+    setPrintingCategory(category)
+    try {
+      const files = (
+        await Promise.all(
+          urls.map(async (url, idx) => {
+            try {
+              const res = await fetch(url)
+              if (!res.ok) return null
+              const blob = await res.blob()
+              return new File([blob], `image_${idx}.jpg`, { type: blob.type || "image/jpeg" })
+            } catch {
+              return null
+            }
+          })
+        )
+      ).filter((f): f is File => f !== null)
+
+      if (files.length === 0) {
+        if (activity?.driveUrls?.[driveKey]) {
+          window.open(activity.driveUrls[driveKey], "_blank", "noopener,noreferrer")
+        }
+        return
+      }
+
+      const pdfBlob = await generateDokumentasiPDF(
+        {
+          title: activity.title || "-",
+          date: activity.date || activity.uploadDate || "",
+          time: activity.time || "",
+          location: activity.location || "-",
+        },
+        sectionTitle,
+        files
+      )
+      const blobUrl = URL.createObjectURL(pdfBlob)
+      window.open(blobUrl, "_blank")
+    } catch {
+      if (activity?.driveUrls?.[driveKey]) {
+        window.open(activity.driveUrls[driveKey], "_blank", "noopener,noreferrer")
+      }
+    } finally {
+      setPrintingCategory(null)
+    }
+  }
   const [kegiatans, setKegiatans] = useState<KegiatanItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [copiedWA, setCopiedWA] = useState(false)
@@ -439,18 +538,19 @@ export default function PublicKegiatanPage() {
                     <Share2 className="h-3 w-3" /> Dokumen Terlampir (Drive)
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {selectedActivity.driveUrls?.notulen && (
+                    {(selectedActivity.driveUrls?.notulen || selectedActivity.description) && (
                       <Button
+                        type="button"
                         variant="outline"
+                        disabled={printingCategory === 'notulen'}
+                        onClick={() => handlePrintSavedNotulen(selectedActivity)}
                         className="h-12 rounded-xl justify-between border-primary/20 hover:bg-primary/5"
-                        asChild
                       >
-                        <a href={selectedActivity.driveUrls.notulen} target="_blank" rel="noopener noreferrer">
-                          <span className="text-[10px] font-black uppercase flex items-center gap-2">
-                            <FileText className="h-4 w-4 text-red-500" /> Notulen PDF
-                          </span>
-                          <ExternalLink className="h-3 w-3" />
-                        </a>
+                        <span className="text-[10px] font-black uppercase flex items-center gap-2">
+                          {printingCategory === 'notulen' ? <Loader2 className="h-4 w-4 animate-spin text-red-500" /> : <FileText className="h-4 w-4 text-red-500" />}
+                          Notulen PDF
+                        </span>
+                        <Printer className="h-3.5 w-3.5 text-red-500" />
                       </Button>
                     )}
                     {selectedActivity.driveUrls?.bast && (
@@ -467,46 +567,49 @@ export default function PublicKegiatanPage() {
                         </a>
                       </Button>
                     )}
-                    {selectedActivity.driveUrls?.dokKegiatan && (
+                    {(selectedActivity.driveUrls?.dokKegiatan || getSavedPhotoUrls(selectedActivity, 'kegiatan').length > 0) && (
                       <Button
+                        type="button"
                         variant="outline"
+                        disabled={printingCategory === 'kegiatan'}
+                        onClick={() => handlePrintSavedDok(selectedActivity, 'kegiatan')}
                         className="h-12 rounded-xl justify-between border-primary/20 hover:bg-primary/5"
-                        asChild
                       >
-                        <a href={selectedActivity.driveUrls.dokKegiatan} target="_blank" rel="noopener noreferrer">
-                          <span className="text-[10px] font-black uppercase flex items-center gap-2">
-                            <FileText className="h-4 w-4 text-blue-500" /> Dok. Kegiatan
-                          </span>
-                          <ExternalLink className="h-3 w-3" />
-                        </a>
+                        <span className="text-[10px] font-black uppercase flex items-center gap-2">
+                          {printingCategory === 'kegiatan' ? <Loader2 className="h-4 w-4 animate-spin text-blue-500" /> : <FileText className="h-4 w-4 text-blue-500" />}
+                          Dok. Kegiatan
+                        </span>
+                        <Printer className="h-3.5 w-3.5 text-blue-500" />
                       </Button>
                     )}
-                    {selectedActivity.driveUrls?.dokAtk && (
+                    {(selectedActivity.driveUrls?.dokAtk || getSavedPhotoUrls(selectedActivity, 'atk').length > 0) && (
                       <Button
+                        type="button"
                         variant="outline"
+                        disabled={printingCategory === 'atk'}
+                        onClick={() => handlePrintSavedDok(selectedActivity, 'atk')}
                         className="h-12 rounded-xl justify-between border-primary/20 hover:bg-primary/5"
-                        asChild
                       >
-                        <a href={selectedActivity.driveUrls.dokAtk} target="_blank" rel="noopener noreferrer">
-                          <span className="text-[10px] font-black uppercase flex items-center gap-2">
-                            <FileText className="h-4 w-4 text-amber-500" /> Dok. ATK
-                          </span>
-                          <ExternalLink className="h-3 w-3" />
-                        </a>
+                        <span className="text-[10px] font-black uppercase flex items-center gap-2">
+                          {printingCategory === 'atk' ? <Loader2 className="h-4 w-4 animate-spin text-amber-500" /> : <FileText className="h-4 w-4 text-amber-500" />}
+                          Dok. ATK
+                        </span>
+                        <Printer className="h-3.5 w-3.5 text-amber-500" />
                       </Button>
                     )}
-                    {selectedActivity.driveUrls?.dokKonsumsi && (
+                    {(selectedActivity.driveUrls?.dokKonsumsi || getSavedPhotoUrls(selectedActivity, 'konsumsi').length > 0) && (
                       <Button
+                        type="button"
                         variant="outline"
+                        disabled={printingCategory === 'konsumsi'}
+                        onClick={() => handlePrintSavedDok(selectedActivity, 'konsumsi')}
                         className="h-12 rounded-xl justify-between border-primary/20 hover:bg-primary/5"
-                        asChild
                       >
-                        <a href={selectedActivity.driveUrls.dokKonsumsi} target="_blank" rel="noopener noreferrer">
-                          <span className="text-[10px] font-black uppercase flex items-center gap-2">
-                            <FileText className="h-4 w-4 text-purple-500" /> Dok. Konsumsi
-                          </span>
-                          <ExternalLink className="h-3 w-3" />
-                        </a>
+                        <span className="text-[10px] font-black uppercase flex items-center gap-2">
+                          {printingCategory === 'konsumsi' ? <Loader2 className="h-4 w-4 animate-spin text-purple-500" /> : <FileText className="h-4 w-4 text-purple-500" />}
+                          Dok. Konsumsi
+                        </span>
+                        <Printer className="h-3.5 w-3.5 text-purple-500" />
                       </Button>
                     )}
                     {selectedActivity.driveUrls?.undangan && (

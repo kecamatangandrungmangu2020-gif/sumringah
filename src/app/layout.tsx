@@ -7,12 +7,35 @@ import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/s
 import { AppSidebar } from '@/components/layout/AppSidebar';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
 import { Button } from '@/components/ui/button';
-import { Settings, Loader2 } from 'lucide-react';
+import { Settings, Loader2, Globe, Users, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { VectorBackground } from '@/components/layout/VectorBackground';
+import { BackgroundPattern } from '@/components/landing/BackgroundPattern';
+import { NightModeSwitch } from '@/components/ui/NightModeSwitch';
+import { ThemeProvider } from '@/components/theme/ThemeProvider';
 import { useUser } from '@/firebase';
+
+function getSystemPageTitle(pathname: string | null): string {
+  const p = (pathname || '').replace(/\/$/, '').toLowerCase();
+  if (p.startsWith('/dashboard')) return 'Dashboard Kecamatan';
+  if (p.startsWith('/agenda')) return 'Agenda Kegiatan';
+  if (p.startsWith('/pelayanan/informasi')) return 'Informasi Terkini';
+  if (p.startsWith('/pelayanan/desa')) return 'Profil & Layanan Desa';
+  if (p.startsWith('/pelayanan/wilayah')) return 'Data Wilayah';
+  if (p.startsWith('/pelayanan/pengaduan')) return 'Pengaduan & Informasi';
+  if (p.startsWith('/pelayanan')) return 'Kelola Pengajuan';
+  if (p.startsWith('/penduduk')) return 'Data Penduduk';
+  if (p.startsWith('/arsip-dokumen')) return 'Arsip Digital';
+  if (p.startsWith('/arsip-nomor-surat')) return 'Register Surat';
+  if (p.startsWith('/sppd')) return 'Manajemen SPPD';
+  if (p.startsWith('/kegiatan')) return 'Laporan Kegiatan';
+  if (p.startsWith('/dokumen-penunjang')) return 'Cetak Dokumen';
+  if (p.startsWith('/profile')) return 'Data Karyawan Kecamatan';
+  if (p.startsWith('/data-kesehatan')) return 'Data Kesehatan';
+  if (p.startsWith('/settings')) return 'Pengaturan Sistem';
+  return 'Sistem Terpadu';
+}
 
 /**
  * Guard Komponen untuk memastikan hanya admin gandrungmangu@gmail.id 
@@ -90,6 +113,11 @@ export default function RootLayout({
     cleanPath === 'desa';
 
   const isInputPage = pathname === '/input' || pathname === '/input/' || pathname?.startsWith('/input/');
+  const isInformasiPage = pathname === '/informasi' || pathname === '/informasi/' || pathname?.startsWith('/informasi');
+  const isKunjunganTamu =
+    pathname === '/kunjungan-tamu' ||
+    pathname === '/kunjungan-tamu/' ||
+    pathname?.startsWith('/kunjungan-tamu/');
 
   const isPublicPage =
     pathname === '/' ||
@@ -102,18 +130,20 @@ export default function RootLayout({
     isPengajuanSurat ||
     isAntrian ||
     isInputPage ||
-    isDesaPage;
+    isDesaPage ||
+    isInformasiPage ||
+    isKunjunganTamu;
 
   return (
-    <html lang="id">
+    <html lang="id" suppressHydrationWarning>
       <head>
-        <title>Manajemen Kecamatan Gandrungmangu</title>
-        <meta name="description" content="Sistem Manajemen & Pelayanan Kecamatan Gandrungmangu, Kec. Gandrungmangu, Kab. Cilacap" />
+        <title>Kecamatan Gandrungmangu — Pelayanan Digital Semringah</title>
+        <meta name="description" content="Portal Resmi Sistem Manajemen & Pelayanan Digital Kecamatan Gandrungmangu, Kabupaten Cilacap" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0, viewport-fit=cover" />
 
         {/* ── PWA / Android APK ────────────────────────────────── */}
         <link rel="manifest" href="/site.webmanifest" />
-        <meta name="theme-color" content="#13447c" />
+        <meta name="theme-color" content="#0E7490" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="application-name" content="Gandrungmangu" />
 
@@ -128,10 +158,30 @@ export default function RootLayout({
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
         <link rel="shortcut icon" href="/favicon.ico" />
 
-        {/* ── Fonts ────────────────────────────────────────────── */}
+        {/* ── Fonts (Plus Jakarta Sans, Montserrat, Fraunces, Oswald, JetBrains Mono) ── */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+        <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,800&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700;800;900&family=Oswald:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet"
+        />
+
+        {/* ── Theme Pre-hydration Script ───────────────────────── */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                var savedTheme = localStorage.getItem('gandrungmangu_theme');
+                if (savedTheme === 'dark') {
+                  document.documentElement.classList.add('dark');
+                } else {
+                  document.documentElement.classList.remove('dark');
+                }
+              } catch (e) {}
+            `,
+          }}
+        />
 
         {/* ── Service Worker Registration ───────────────────────── */}
         <script dangerouslySetInnerHTML={{
@@ -151,48 +201,88 @@ export default function RootLayout({
           }
         `}} />
       </head>
-      <body className="font-body antialiased bg-background overflow-x-hidden selection:bg-primary selection:text-primary-foreground">
-        {!mounted ? (
-          <div className="flex h-screen w-full items-center justify-center bg-background">
-            <Loader2 className="h-10 w-10 animate-spin text-primary/20" />
-          </div>
-        ) : (
-          <FirebaseClientProvider>
-            {!isAntrian && <VectorBackground />}
-            {isPublicPage ? (
-              <main className="w-full min-h-screen relative z-10">
-                {children}
-                <Toaster />
-              </main>
-            ) : (
-              <ManagementGuard>
-                <SidebarProvider>
-                  <div className="flex min-h-screen w-full overflow-hidden relative z-10">
-                    <AppSidebar />
-                    <SidebarInset className="flex-1 flex flex-col min-w-0 bg-transparent">
-                      <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-2 border-b border-border/60 bg-background/80 backdrop-blur-md px-4 md:hidden">
-                        <SidebarTrigger className="h-10 w-10" />
-                        <div className="flex-1 text-center font-black text-primary uppercase tracking-tighter">Gandrungmangu</div>
-                        <Button variant="ghost" size="icon" asChild className="rounded-full h-10 w-10">
-                          <Link href="/settings/">
-                            <Settings className="h-5 w-5 text-muted-foreground" />
-                          </Link>
-                        </Button>
-                      </header>
-                      <main className="flex-1 w-full max-w-screen-2xl mx-auto p-0 overflow-y-auto">
-                        <div className="pb-24 md:pb-8">
-                          {children}
-                        </div>
-                      </main>
-                    </SidebarInset>
-                  </div>
-                  <BottomNav />
+      <body className="font-sans antialiased bg-background text-foreground overflow-x-hidden selection:bg-[#0E7490] selection:text-white" suppressHydrationWarning>
+        <ThemeProvider>
+          {!mounted ? (
+            <div className="flex h-screen w-full items-center justify-center bg-background">
+              <Loader2 className="h-10 w-10 animate-spin text-primary/30" />
+            </div>
+          ) : (
+            <FirebaseClientProvider>
+              {!isAntrian && !isPublicPage && <BackgroundPattern />}
+              {isPublicPage ? (
+                <main className="w-full min-h-screen relative z-10">
+                  {children}
                   <Toaster />
-                </SidebarProvider>
-              </ManagementGuard>
-            )}
-          </FirebaseClientProvider>
-        )}
+                </main>
+              ) : (
+                <ManagementGuard>
+                  <SidebarProvider>
+                    <div className="system-shell flex min-h-screen w-full overflow-hidden relative z-10">
+                      <AppSidebar />
+                      <SidebarInset className="flex-1 flex flex-col min-w-0 bg-transparent">
+                        <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center justify-between gap-3 border-b border-slate-200/80 dark:border-white/10 bg-white/90 dark:bg-[#0c1622]/90 backdrop-blur-xl px-4 md:px-6 shadow-[0_4px_20px_rgba(6,30,43,0.04)]">
+                          <div className="flex items-center gap-3 min-w-0">
+                            <SidebarTrigger className="h-9 w-9 rounded-full bg-[#EBF5F8] hover:bg-[#0E7490] text-[#0E7490] hover:text-white dark:bg-white/10 dark:text-cyan-300 transition-colors" />
+                            <div className="flex flex-col min-w-0">
+                              <div className="flex items-center gap-1.5">
+                                <span className="h-2 w-2 rounded-full bg-[#0E7490] dark:bg-cyan-400 shrink-0" />
+                                <span className="font-mono text-[9.5px] font-bold uppercase tracking-[0.16em] text-[#0E7490] dark:text-cyan-300 truncate">
+                                  Kecamatan Gandrungmangu
+                                </span>
+                              </div>
+                              <span className="font-hero font-extrabold text-sm sm:text-base text-[#061E2B] dark:text-white truncate leading-tight">
+                                {getSystemPageTitle(pathname)}
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2 shrink-0">
+                            <Link
+                              href="/kunjungan-tamu/?channel=front_office"
+                              className="hidden lg:inline-flex items-center gap-1.5 h-8 px-3.5 rounded-full bg-[#EBF5F8] hover:bg-[#0E7490] text-[#0E7490] hover:text-white dark:bg-white/10 dark:text-cyan-300 font-hero text-[11px] font-bold transition-all"
+                            >
+                              <Users className="h-3.5 w-3.5" />
+                              <span>Kunjungan Tamu</span>
+                            </Link>
+                            <Link
+                              href="/"
+                              className="hidden sm:inline-flex items-center gap-1.5 h-8 px-3.5 rounded-full bg-[#061E2B] hover:bg-[#0E7490] text-white font-hero text-[11px] font-bold transition-all"
+                            >
+                              <Globe className="h-3.5 w-3.5 text-cyan-300" />
+                              <span>Portal Warga</span>
+                            </Link>
+                            <Link
+                              href="/admin/"
+                              className="inline-flex items-center gap-1.5 h-8 px-3 sm:px-3.5 rounded-full bg-[#0E7490] hover:bg-[#0884A6] text-white dark:bg-cyan-500/20 dark:text-cyan-200 dark:border dark:border-cyan-400/30 dark:hover:bg-cyan-500/30 font-hero text-[11px] font-bold shadow-sm transition-all"
+                              title="Kembali ke Portal Admin"
+                            >
+                              <ArrowLeft className="h-3.5 w-3.5" />
+                              <span className="hidden xs:inline sm:inline">Kembali ke Admin</span>
+                            </Link>
+                            <NightModeSwitch size="sm" />
+                            <Button variant="ghost" size="icon" asChild className="rounded-full h-9 w-9 bg-[#F3F7F9] hover:bg-[#EBF5F8] dark:bg-white/10 text-[#061E2B] dark:text-slate-200">
+                              <Link href="/settings/" title="Pengaturan">
+                                <Settings className="h-4 w-4" />
+                              </Link>
+                            </Button>
+                          </div>
+                        </header>
+                        <main className="flex-1 w-full max-w-screen-2xl mx-auto p-0 overflow-y-auto">
+                          <div className="pb-24 md:pb-8">
+                            {children}
+                          </div>
+                        </main>
+                      </SidebarInset>
+                    </div>
+                    <BottomNav />
+                    <Toaster />
+                  </SidebarProvider>
+                </ManagementGuard>
+              )}
+            </FirebaseClientProvider>
+          )}
+        </ThemeProvider>
       </body>
     </html>
   );

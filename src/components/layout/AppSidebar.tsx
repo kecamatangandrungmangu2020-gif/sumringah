@@ -70,6 +70,7 @@ const menuGroups: MenuGroupType[] = [
   {
     label: "PELAYANAN",
     items: [
+      { label: "Kunjungan Tamu FO", icon: User, href: "/kunjungan-tamu/?channel=front_office" },
       { label: "Kelola Pengajuan", icon: FileCheck, href: "/pelayanan" },
       { label: "Data Penduduk", icon: Users, href: "/penduduk" },
       { label: "Informasi Terkini", icon: Newspaper, href: "/pelayanan/informasi" },
@@ -145,10 +146,10 @@ export function AppSidebar() {
   }
 
   return (
-    <Sidebar className="border-r bg-card shadow-none" collapsible="icon">
-      <SidebarHeader className="p-6">
+    <Sidebar className="border-r border-white/10 bg-[#061E2B] text-white shadow-none" collapsible="icon">
+      <SidebarHeader className="p-6 border-b border-white/10">
         <div className="flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-background shadow-lg shadow-primary/10 border border-border overflow-hidden shrink-0">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/95 shadow-lg shadow-black/25 border border-white/20 overflow-hidden shrink-0">
             {configData?.logoUrl || configData?.logoKecamatanUrl || configData?.logoBase64 ? (
               <Image
                 src={configData.logoUrl || configData.logoKecamatanUrl || configData.logoBase64}
@@ -159,14 +160,14 @@ export function AppSidebar() {
                 unoptimized
               />
             ) : (
-              <div className="flex h-full w-full items-center justify-center bg-primary text-primary-foreground">
+              <div className="flex h-full w-full items-center justify-center bg-[#0E7490] text-white">
                 <Home className="h-7 w-7" />
               </div>
             )}
           </div>
           <div className="flex flex-col overflow-hidden">
-            <span className="font-black text-xl leading-tight tracking-tighter text-foreground">Gandrungmangu</span>
-            <span className="text-[10px] text-muted-foreground uppercase tracking-[0.1em] font-bold">DATABASE TERPADU</span>
+            <span className="font-hero font-extrabold text-lg leading-tight tracking-tight text-white">Gandrungmangu</span>
+            <span className="text-[10px] font-mono text-cyan-300/85 uppercase tracking-[0.14em] font-bold mt-0.5">DATABASE TERPADU</span>
           </div>
         </div>
       </SidebarHeader>
@@ -174,7 +175,7 @@ export function AppSidebar() {
       <SidebarContent className="px-4">
         {menuGroups.map((group) => (
           <SidebarGroup key={group.label} className="mt-2">
-            <SidebarGroupLabel className="px-2 py-4 text-[10px] uppercase tracking-widest font-black text-muted-foreground">
+            <SidebarGroupLabel className="px-2 py-3 text-[10px] font-mono uppercase tracking-[0.16em] font-bold text-cyan-200/60">
               {group.label}
             </SidebarGroupLabel>
             <SidebarMenu className="gap-1.5">
@@ -200,34 +201,34 @@ export function AppSidebar() {
                         tooltip={item.label}
                         onClick={() => toggleSubMenu(item.label)}
                         className={cn(
-                          "h-12 px-4 rounded-xl transition-all duration-300 group justify-between",
+                          "h-11 px-4 rounded-xl transition-all duration-200 group justify-between",
                           isSubActive
-                            ? "bg-primary/10 text-primary font-bold hover:bg-primary/15"
-                            : "hover:bg-muted text-muted-foreground"
+                            ? "bg-[#0E7490] text-white font-bold hover:bg-[#0E7490]/90"
+                            : "text-slate-200 hover:bg-white/10 hover:text-white"
                         )}
                       >
                         <div className="flex items-center gap-3">
                           <div className={cn(
                             "shrink-0 transition-colors",
-                            isSubActive ? "text-primary" : "text-muted-foreground group-hover:text-primary"
+                            isSubActive ? "text-white" : "text-cyan-300/80 group-hover:text-cyan-200"
                           )}>
                             <item.icon className={cn("h-5 w-5", isSubActive && "stroke-[2.5px]")} />
                           </div>
                           <span className={cn(
-                            "font-bold text-[13px] whitespace-nowrap",
-                            isSubActive ? "text-primary" : "text-foreground"
+                            "font-hero font-semibold text-[13px] whitespace-nowrap",
+                            isSubActive ? "text-white font-bold" : "text-slate-100 group-hover:text-white"
                           )}>
                             {item.label}
                           </span>
                         </div>
                         <ChevronDown className={cn(
-                          "h-4 w-4 shrink-0 transition-transform duration-200 text-muted-foreground",
-                          isOpen && "rotate-180 text-primary"
+                          "h-4 w-4 shrink-0 transition-transform duration-200 text-cyan-200/70",
+                          isOpen && "rotate-180 text-[#f4c430]"
                         )} />
                       </SidebarMenuButton>
 
                       {isOpen && (
-                        <div className="flex flex-col gap-1 pl-4 mt-1 border-l-2 border-primary/20 ml-4 py-1">
+                        <div className="flex flex-col gap-1 pl-4 mt-1 border-l-2 border-cyan-400/30 ml-4 py-1">
                           {item.subItems.map((sub) => {
                             const subPath = sub.href.replace(/\/$/, "")
                             const isSubItemActive = mounted && (
@@ -244,12 +245,12 @@ export function AppSidebar() {
                                 className={cn(
                                   "h-10 px-3 rounded-lg transition-all text-xs font-bold",
                                   isSubItemActive
-                                    ? "bg-primary text-primary-foreground shadow-sm shadow-primary/20 hover:bg-primary/90 hover:text-white"
-                                    : "hover:bg-muted text-muted-foreground hover:text-foreground"
+                                    ? "bg-[#0E7490] text-white shadow-sm hover:bg-[#0E7490]/90"
+                                    : "text-slate-200 hover:bg-white/10 hover:text-white"
                                 )}
                               >
                                 <Link href={sub.href} className="flex items-center gap-2.5 w-full">
-                                  <sub.icon className={cn("h-4 w-4 shrink-0", isSubItemActive ? "text-white" : "text-primary")} />
+                                  <sub.icon className={cn("h-4 w-4 shrink-0", isSubItemActive ? "text-[#f4c430]" : "text-cyan-300/80")} />
                                   <span>{sub.label}</span>
                                 </Link>
                               </SidebarMenuButton>
@@ -269,26 +270,26 @@ export function AppSidebar() {
                       tooltip={item.label}
                       onClick={handleLinkClick}
                       className={cn(
-                        "h-12 px-4 rounded-xl transition-all duration-300 group",
+                        "h-11 px-4 rounded-xl transition-all duration-200 group",
                         isActive
-                          ? "bg-primary/10 text-primary border-none hover:bg-primary/10"
-                          : "hover:bg-muted text-muted-foreground"
+                          ? "bg-[#0E7490] text-white border-none hover:bg-[#0E7490]/90 shadow-md shadow-black/20"
+                          : "text-slate-200 hover:bg-white/10 hover:text-white"
                       )}
                     >
                       <Link href={item.href} className="flex items-center gap-3 w-full">
                         <div className={cn(
                           "shrink-0 transition-colors",
-                          isActive ? "text-primary" : "text-muted-foreground group-hover:text-primary"
+                          isActive ? "text-white" : "text-cyan-300/80 group-hover:text-cyan-200"
                         )}>
                           <item.icon className={cn("h-5 w-5", isActive && "stroke-[2.5px]")} />
                         </div>
                         <span className={cn(
-                          "font-bold text-[13px] whitespace-nowrap",
-                          isActive ? "text-primary" : "text-foreground"
+                          "font-hero text-[13px] whitespace-nowrap",
+                          isActive ? "text-white font-bold" : "text-slate-100 font-semibold group-hover:text-white"
                         )}>
                           {item.label}
                         </span>
-                        {isActive && <div className="ml-auto h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />}
+                        {isActive && <div className="ml-auto h-2 w-2 rounded-full bg-[#f4c430] shadow-[0_0_8px_#f4c430]" />}
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -299,15 +300,20 @@ export function AppSidebar() {
         ))}
 
         <SidebarGroup className="mt-4">
-          <SidebarGroupLabel className="px-2 py-4 text-[10px] uppercase tracking-widest font-black text-muted-foreground">
-            SISTEM & LAYANAN
+          <SidebarGroupLabel className="px-2 py-3 text-[10px] font-mono uppercase tracking-[0.16em] font-bold text-cyan-200/60">
+            SISTEM &amp; LAYANAN
           </SidebarGroupLabel>
           <SidebarMenu className="gap-1.5">
             <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Pengaturan" onClick={handleLinkClick} className="h-11 px-4 rounded-xl hover:bg-muted text-muted-foreground">
+              <SidebarMenuButton
+                asChild
+                tooltip="Pengaturan"
+                onClick={handleLinkClick}
+                className="h-11 px-4 rounded-xl text-slate-200 hover:bg-white/10 hover:text-white transition-all"
+              >
                 <Link href="/settings/" className="flex items-center gap-3">
-                  <Settings className="h-5 w-5 shrink-0" />
-                  <span className="font-semibold text-[13px]">Pengaturan</span>
+                  <Settings className="h-5 w-5 shrink-0 text-cyan-300/80" />
+                  <span className="font-hero font-semibold text-[13px] text-slate-100">Pengaturan</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -315,21 +321,22 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="p-4 bg-muted mt-auto border-t">
+      <SidebarFooter className="p-4 bg-[#04151F]/90 mt-auto border-t border-white/10">
         <SidebarMenu>
           <SidebarMenuItem>
-            <div className="flex items-center gap-3 w-full px-2 py-3 overflow-hidden">
-              <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0 border border-primary/20">
-                <span className="text-xs font-black text-primary uppercase">{user?.email?.substring(0, 2).toUpperCase() || 'AD'}</span>
+            <div className="flex items-center gap-3 w-full px-2 py-2.5 overflow-hidden">
+              <div className="h-10 w-10 rounded-full bg-[#0E7490]/30 flex items-center justify-center shrink-0 border border-cyan-300/30">
+                <span className="text-xs font-mono font-bold text-cyan-200 uppercase">{user?.email?.substring(0, 2).toUpperCase() || 'AD'}</span>
               </div>
               <div className="flex flex-col text-left overflow-hidden flex-1">
-                <span className="text-sm font-black text-foreground truncate">{user?.email?.split('@')[0].toUpperCase() || 'Pengguna'}</span>
-                <span className="text-[10px] text-muted-foreground font-bold uppercase truncate">Karyawan Kecamatan</span>
+                <span className="text-sm font-hero font-bold text-white truncate">{user?.email?.split('@')[0].toUpperCase() || 'Pengguna'}</span>
+                <span className="text-[10px] font-mono text-cyan-300/80 font-semibold uppercase truncate">Karyawan Kecamatan</span>
               </div>
               <button
                 onClick={handleLogout}
                 disabled={isLoggingOut}
-                className="h-8 w-8 flex items-center justify-center rounded-lg hover:bg-muted hover:shadow-sm text-muted-foreground hover:text-destructive transition-all shrink-0"
+                title="Keluar"
+                className="h-8 w-8 flex items-center justify-center rounded-lg hover:bg-rose-500/20 text-slate-300 hover:text-rose-300 transition-all shrink-0 cursor-pointer"
               >
                 {isLoggingOut ? <Loader2 className="h-4 w-4 animate-spin" /> : <LogOut className="h-4 w-4" />}
               </button>

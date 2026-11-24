@@ -1,13 +1,16 @@
 /* Unified Modern Design System for /Antrian/ */
 
 .antrian-system {
-  font-family: var(--font-outfit), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-  color: #ffffff;
+  font-family: var(--font-sans), 'Plus Jakarta Sans', var(--font-outfit), system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
-.antrian-system * {
-  font-family: inherit;
+.antrian-system .font-hero {
+  font-family: var(--font-hero), 'Montserrat', sans-serif !important;
+}
+
+.antrian-system .font-mono {
+  font-family: var(--font-mono), 'JetBrains Mono', ui-monospace, monospace !important;
 }
 
 /* Glassmorphism Cards */

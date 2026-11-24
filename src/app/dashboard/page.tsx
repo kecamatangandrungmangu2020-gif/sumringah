@@ -114,20 +114,20 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-6 p-4 md:p-8 pb-24 md:pb-8 animate-fade-in-up">
-      <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-200/80 dark:border-white/10">
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 md:h-12 md:w-12 rounded-2xl bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900 flex items-center justify-center shadow-lg shadow-blue-950/15">
-              <LayoutDashboard className="h-5 w-5 md:h-6 md:w-6 text-white" />
+            <div className="h-11 w-11 md:h-12 md:w-12 rounded-2xl bg-gradient-to-br from-[#0E7490] to-[#061E2B] flex items-center justify-center shadow-lg shadow-cyan-950/20">
+              <LayoutDashboard className="h-5 w-5 md:h-6 md:w-6 text-cyan-200" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-2xl md:text-3xl font-black tracking-tight text-gradient-Kecamatan">
-                  Dashboard Kecamatan
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="font-hero text-2xl md:text-3xl font-extrabold tracking-tight text-[#061E2B] dark:text-white">
+                  Dashboard <span className="text-[#0E7490] dark:text-cyan-400">Kecamatan</span>
                 </h1>
-                <Badge className="badge-Kecamatan text-[9px] py-0.5 px-2">TERPADU 2026</Badge>
+                <Badge className="bg-[#061E2B] text-[#f4c430] dark:bg-[#0E7490] dark:text-white font-mono text-[9.5px] py-0.5 px-2.5 rounded-full">TERPADU 2026</Badge>
               </div>
-              <p className="text-muted-foreground text-xs md:text-sm font-medium">Pusat database dan layanan terpadu Kecamatan Gandrungmangu.</p>
+              <p className="font-hero text-slate-500 dark:text-slate-400 text-xs md:text-sm font-medium">Pusat database dan layanan terpadu Kecamatan Gandrungmangu.</p>
             </div>
           </div>
         </div>
@@ -135,61 +135,61 @@ export default function DashboardPage() {
 
       <section className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         <Card className="card-Kecamatan overflow-hidden relative group">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-600 to-sky-500 opacity-80 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#0E7490] to-cyan-400 opacity-90" />
           <CardHeader className="p-4 md:p-5 pb-0 flex flex-row items-center justify-between space-y-0">
-            <p className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground">Laporan</p>
-            <div className="h-8 w-8 rounded-xl bg-blue-500/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
-              <FileText className="h-4 w-4 md:h-4.5 md:w-4.5" />
+            <p className="font-mono text-[9px] md:text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Laporan</p>
+            <div className="h-8 w-8 rounded-xl bg-[#EBF5F8] dark:bg-cyan-950/60 flex items-center justify-center text-[#0E7490] dark:text-cyan-300 group-hover:scale-110 transition-transform">
+              <FileText className="h-4 w-4" />
             </div>
           </CardHeader>
           <CardContent className="p-4 md:p-5 pt-1 md:pt-2">
-            <div className="text-2xl md:text-3xl font-black text-gradient-Kecamatan">{kegiatans?.length || 0}</div>
+            <div className="font-hero text-2xl md:text-3xl font-extrabold text-[#061E2B] dark:text-white">{kegiatans?.length || 0}</div>
             <p className="text-[9px] md:text-[10px] text-muted-foreground mt-1 md:mt-2 font-semibold flex items-center gap-1">
-              <span className="h-1.5 w-1.5 rounded-full bg-blue-600 animate-pulse" />
+              <span className="h-1.5 w-1.5 rounded-full bg-[#0E7490] dark:bg-cyan-400 animate-pulse" />
               Database Kecamatan
             </p>
           </CardContent>
         </Card>
 
         <Card className="card-Kecamatan overflow-hidden relative group">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 to-yellow-400 opacity-80 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#f4c430] to-amber-500 opacity-90" />
           <CardHeader className="p-4 md:p-5 pb-0 flex flex-row items-center justify-between space-y-0">
-            <p className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground">SPPD</p>
-            <div className="h-8 w-8 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-600 dark:text-amber-400 group-hover:scale-110 transition-transform">
-              <Map className="h-4 w-4 md:h-4.5 md:w-4.5" />
+            <p className="font-mono text-[9px] md:text-[10px] font-bold uppercase tracking-widest text-muted-foreground">SPPD</p>
+            <div className="h-8 w-8 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-600 dark:text-[#f4c430] group-hover:scale-110 transition-transform">
+              <Map className="h-4 w-4" />
             </div>
           </CardHeader>
           <CardContent className="p-4 md:p-5 pt-1 md:pt-2">
-            <div className="text-2xl md:text-3xl font-black text-amber-600 dark:text-amber-400">{sppds?.length || 0}</div>
+            <div className="font-hero text-2xl md:text-3xl font-extrabold text-amber-600 dark:text-[#f4c430]">{sppds?.length || 0}</div>
             <p className="text-[9px] md:text-[10px] text-muted-foreground mt-1 md:mt-2 font-semibold">Histori Dinas</p>
           </CardContent>
         </Card>
 
         <Card className="card-Kecamatan overflow-hidden relative group">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-sky-600 to-blue-500 opacity-80 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#061E2B] to-[#0E7490] opacity-90" />
           <CardHeader className="p-4 md:p-5 pb-0 flex flex-row items-center justify-between space-y-0">
-            <p className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground">Anggaran</p>
-            <div className="h-8 w-8 rounded-xl bg-sky-500/10 flex items-center justify-center text-sky-700 dark:text-sky-300 group-hover:scale-110 transition-transform">
-              <TrendingUp className="h-4 w-4 md:h-4.5 md:w-4.5" />
+            <p className="font-mono text-[9px] md:text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Anggaran</p>
+            <div className="h-8 w-8 rounded-xl bg-[#EBF5F8] dark:bg-cyan-950/60 flex items-center justify-center text-[#0E7490] dark:text-cyan-300 group-hover:scale-110 transition-transform">
+              <TrendingUp className="h-4 w-4" />
             </div>
           </CardHeader>
           <CardContent className="p-4 md:p-5 pt-1 md:pt-2">
-            <div className="text-2xl md:text-3xl font-black text-primary">85%</div>
-            <p className="text-[9px] md:text-[10px] text-primary/80 font-black mt-1 md:mt-2 uppercase tracking-tight">Realisasi 2026</p>
+            <div className="font-hero text-2xl md:text-3xl font-extrabold text-[#0E7490] dark:text-cyan-300">85%</div>
+            <p className="text-[9px] md:text-[10px] text-[#0E7490] dark:text-cyan-400 font-bold mt-1 md:mt-2 uppercase tracking-tight">Realisasi 2026</p>
           </CardContent>
         </Card>
 
         <Card className="card-Kecamatan overflow-hidden relative group">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-600 to-indigo-500 opacity-80 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-500 to-[#0E7490] opacity-90" />
           <CardHeader className="p-4 md:p-5 pb-0 flex flex-row items-center justify-between space-y-0">
-            <p className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground">Hadir</p>
-            <div className="h-8 w-8 rounded-xl bg-blue-500/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
-              <Users className="h-4 w-4 md:h-4.5 md:w-4.5" />
+            <p className="font-mono text-[9px] md:text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Hadir</p>
+            <div className="h-8 w-8 rounded-xl bg-[#EBF5F8] dark:bg-cyan-950/60 flex items-center justify-center text-[#0E7490] dark:text-cyan-300 group-hover:scale-110 transition-transform">
+              <Users className="h-4 w-4" />
             </div>
           </CardHeader>
           <CardContent className="p-4 md:p-5 pt-1 md:pt-2">
-            <div className="text-2xl md:text-3xl font-black text-blue-600 dark:text-sky-400">100%</div>
-            <p className="text-[9px] md:text-[10px] text-blue-700/90 dark:text-sky-300 font-black mt-1 md:mt-2 uppercase tracking-tight">Staff Aktif</p>
+            <div className="font-hero text-2xl md:text-3xl font-extrabold text-[#061E2B] dark:text-cyan-300">100%</div>
+            <p className="text-[9px] md:text-[10px] text-[#0E7490] dark:text-cyan-400 font-bold mt-1 md:mt-2 uppercase tracking-tight">Staff Aktif</p>
           </CardContent>
         </Card>
       </section>
@@ -288,7 +288,7 @@ export default function DashboardPage() {
             <CardContent className="p-5 md:p-6 space-y-3">
               <Dialog open={isKegiatanOpen} onOpenChange={setIsKegiatanOpen}>
                 <DialogTrigger asChild>
-                  <Button className="w-full h-14 justify-start gap-4 text-sm md:text-base font-bold shadow-lg shadow-blue-950/15 rounded-2xl bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 transition-all active:scale-[0.98]">
+                  <Button className="w-full h-14 justify-start gap-4 text-sm md:text-base font-bold shadow-lg shadow-cyan-950/20 rounded-2xl bg-gradient-to-r from-[#0E7490] to-[#061E2B] hover:from-[#0884A6] hover:to-[#061E2B] text-white transition-all active:scale-[0.98]">
                     <div className="h-9 w-9 rounded-xl bg-white/20 flex items-center justify-center shadow-sm">
                       <Plus className="h-5 w-5 text-white" />
                     </div>
@@ -329,7 +329,7 @@ export default function DashboardPage() {
             <div className="space-y-3">
               {sppds && sppds.length > 0 ? (
                 sppds.map((sppd, i) => (
-                  <div key={i} className="flex items-center gap-4 p-4 rounded-2xl border border-blue-950/10 dark:border-blue-500/20 bg-white/80 dark:bg-card/85 backdrop-blur-md hover:border-primary/30 hover:shadow-md transition-all">
+                  <div key={i} className="flex items-center gap-4 p-4 rounded-2xl border border-slate-200/80 dark:border-white/10 bg-white/90 dark:bg-[#0c1622]/90 backdrop-blur-md hover:border-[#0E7490]/40 hover:shadow-md transition-all">
                     <div className={`h-11 w-11 rounded-2xl flex items-center justify-center shrink-0 border ${sppd.approvalStatus === 'approved'
                       ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/25'
                       : 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/25'

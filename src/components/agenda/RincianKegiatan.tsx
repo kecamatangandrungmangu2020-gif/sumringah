@@ -19,7 +19,10 @@ import {
   Share2,
   Sparkles,
   Tag,
-  Trash2
+  Trash2,
+  Pencil,
+  Save,
+  X
 } from "lucide-react"
 import { format, parseISO, addDays, isValid } from "date-fns"
 import { id as localeID } from "date-fns/locale"
@@ -63,6 +66,17 @@ export function RincianKegiatan() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [isEditingEvent, setIsEditingEvent] = useState(false)
+  const [isSavingEdit, setIsSavingEdit] = useState(false)
+  const [editForm, setEditForm] = useState({
+    title: "",
+    date: "",
+    startTime: "08:00",
+    endTime: "09:00",
+    location: "",
+    eventType: "Internal" as "Internal" | "Eksternal",
+    notes: "",
+  })
   const { toast } = useToast()
 
   // Modal WhatsApp Rengiat
@@ -134,13 +148,173 @@ export function RincianKegiatan() {
     }
   }, [fetchAgendaData, userData, user, searchDate])
 
+  const extractCleanNotes = (desc: string) => {
+    const beforeNotulen = (desc || "").split("--- NOTULENSI ---")[0] || "";
+    const catatanMatch = beforeNotulen.match(/CATATAN:\s*([\s\S]*?)(?:\n\n📄|\n\n⚠️|$)/i);
+    if (catatanMatch && catatanMatch[1]) {
+      const val = catatanMatch[1].trim();
+      return val === "-" ? "" : val;
+    }
+    return beforeNotulen
+      .replace(/^JENIS:.*$/gim, "")
+      .replace(/^DISPOSISI:.*$/gim, "")
+      .replace(/📄 Undangan \/ Lampiran:.*$/gim, "")
+      .replace(/⚠️ Lampiran:.*$/gim, "")
+      .trim();
+  };
+
   const handleSelectEvent = (event: CalendarEvent) => {
     setSelectedEvent(event)
+    setIsEditingEvent(false)
     const description = event.description || "";
     const separator = "--- NOTULENSI ---";
     const parts = description.split(separator);
     setNotulensi(parts.length > 1 ? parts[1].trim() : "");
+
+    let dateVal = searchDate;
+    let startVal = "08:00";
+    let endVal = "09:00";
+    if (event.start?.dateTime) {
+      try {
+        const s = parseISO(event.start.dateTime);
+        if (isValid(s)) {
+          dateVal = format(s, "yyyy-MM-dd");
+          startVal = format(s, "HH:mm");
+        }
+      } catch {}
+    }
+    if (event.end?.dateTime) {
+      try {
+        const e = parseISO(event.end.dateTime);
+        if (isValid(e)) {
+          endVal = format(e, "HH:mm");
+        }
+      } catch {}
+    }
+
+    setEditForm({
+      title: event.summary || "",
+      date: dateVal,
+      startTime: startVal,
+      endTime: endVal,
+      location: event.location || "",
+      eventType: getEventType(event.id, description),
+      notes: extractCleanNotes(description),
+    });
   }
+
+  const handleSaveEditEvent = async () => {
+    if (!selectedEvent) return;
+    if (!editForm.title.trim() || !editForm.date || !editForm.startTime) {
+      toast({
+        variant: "destructive",
+        title: "Data Belum Lengkap",
+        description: "Judul kegiatan, tanggal, dan jam mulai wajib diisi.",
+      });
+      return;
+    }
+
+    setIsSavingEdit(true);
+    try {
+      const calendarId = userData?.googleCalendarId || GOOGLE_CONFIG.calendarId;
+      const startDateTime = new Date(`${editForm.date}T${editForm.startTime}:00`);
+      let endDateTime = editForm.endTime
+        ? new Date(`${editForm.date}T${editForm.endTime}:00`)
+        : new Date(startDateTime.getTime() + 60 * 60 * 1000);
+      if (endDateTime <= startDateTime) {
+        endDateTime = new Date(startDateTime.getTime() + 60 * 60 * 1000);
+      }
+
+      // Pertahankan Disposisi, Lampiran, dan Notulensi yang sudah ada
+      const origDesc = selectedEvent.description || "";
+      const existingDispMatch = origDesc.match(/^DISPOSISI:\s*(.+)$/im);
+      const dispLine = existingDispMatch ? existingDispMatch[0].trim() : "DISPOSISI: Belum Didisposisi";
+      const lampiranMatch = origDesc.match(/📄 Undangan \/ Lampiran:\s*(.+)$/im);
+      const existingNotulenParts = origDesc.split("--- NOTULENSI ---");
+      const existingNotulen = existingNotulenParts.length > 1 ? existingNotulenParts[1].trim() : "";
+
+      let rebuiltDesc = `JENIS: ${editForm.eventType}\n${dispLine}\n\nCATATAN: ${editForm.notes.trim() || "-"}`;
+      if (lampiranMatch) {
+        rebuiltDesc += `\n\n${lampiranMatch[0].trim()}`;
+      }
+      if (existingNotulen) {
+        rebuiltDesc += `\n\n--- NOTULENSI ---\n${existingNotulen}`;
+      }
+
+      // 1. Coba native updateEvent (patch langsung di Google Calendar)
+      let res = await callAppsScript({
+        action: "updateEvent",
+        calendarId,
+        eventId: selectedEvent.id,
+        title: editForm.title.trim(),
+        location: editForm.location.trim(),
+        start: startDateTime.toISOString(),
+        end: endDateTime.toISOString(),
+        description: rebuiltDesc,
+      });
+
+      // 2. Graceful fallback jika Web App Apps Script belum di-redeploy versi terbaru
+      if (!res?.success && String(res?.error || "").includes("Aksi tidak dikenal")) {
+        const created = await callAppsScript({
+          action: "createEventAndUpload",
+          eventData: {
+            calendarId,
+            title: editForm.title.trim(),
+            start: startDateTime.toISOString(),
+            end: endDateTime.toISOString(),
+            description: rebuiltDesc,
+            location: editForm.location.trim(),
+          },
+          fileData: null,
+        });
+        if (!created?.success) {
+          throw new Error(created?.error || "Gagal membuat pembaruan agenda di Google Calendar.");
+        }
+        await callAppsScript({
+          action: "deleteEvent",
+          calendarId,
+          eventId: selectedEvent.id,
+        });
+        res = { success: true };
+      }
+
+      if (!res?.success) {
+        throw new Error(res?.error || "Gagal memperbarui agenda di Google Calendar.");
+      }
+
+      if (db && user) {
+        await setDoc(
+          doc(db, "agenda_types", selectedEvent.id),
+          {
+            eventId: selectedEvent.id,
+            eventType: editForm.eventType,
+            updatedAt: new Date().toISOString(),
+            updatedBy: user.uid,
+          },
+          { merge: true }
+        );
+      }
+
+      toast({
+        title: "Agenda Diperbarui!",
+        description: `"${editForm.title.trim()}" otomatis diperbarui di Google Calendar.`,
+      });
+      setIsEditingEvent(false);
+      if (editForm.date !== searchDate) {
+        setSearchDate(editForm.date);
+      } else {
+        fetchAgendaData(searchDate);
+      }
+    } catch (e: any) {
+      toast({
+        variant: "destructive",
+        title: "Gagal Memperbarui Agenda",
+        description: e.message || "Terjadi kesalahan saat menyimpan perubahan.",
+      });
+    } finally {
+      setIsSavingEdit(false);
+    }
+  };
 
   const getEventType = (eventId: string, desc: string): "Internal" | "Eksternal" => {
     if (agendaTypesMap.has(eventId)) {
@@ -535,20 +709,139 @@ export function RincianKegiatan() {
         <CardContent className="p-6 space-y-4">
           {selectedEvent ? (
             <div className="space-y-4 animate-in fade-in">
-              <div className="flex items-center justify-between">
+              <div className="flex items-start justify-between gap-2">
                 <div>
                     <Label className="text-xs text-muted-foreground">Judul Kegiatan</Label>
                     <p className="font-bold text-primary">{selectedEvent.summary}</p>
                 </div>
-                <span className={cn(
-                    "text-[8px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg border",
-                    getEventType(selectedEvent.id, selectedEvent.description) === "Internal" 
-                      ? "bg-blue-50 border-blue-200 text-blue-800" 
-                      : "bg-amber-50 border-amber-300 text-amber-900 font-black"
-                )}>
-                    Agenda {getEventType(selectedEvent.id, selectedEvent.description)}
-                </span>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant={isEditingEvent ? "secondary" : "outline"}
+                    onClick={() => setIsEditingEvent((prev) => !prev)}
+                    className="h-8 px-3 rounded-xl text-xs font-bold gap-1.5"
+                  >
+                    {isEditingEvent ? <X className="h-3.5 w-3.5" /> : <Pencil className="h-3.5 w-3.5" />}
+                    <span>{isEditingEvent ? "Batal" : "Edit Agenda"}</span>
+                  </Button>
+                  <span className={cn(
+                      "text-[8px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg border",
+                      getEventType(selectedEvent.id, selectedEvent.description) === "Internal" 
+                        ? "bg-blue-50 border-blue-200 text-blue-800" 
+                        : "bg-amber-50 border-amber-300 text-amber-900 font-black"
+                  )}>
+                      Agenda {getEventType(selectedEvent.id, selectedEvent.description)}
+                  </span>
+                </div>
               </div>
+
+              {/* FORM EDIT AGENDA LENGKAP (SINKRON OTOMATIS GOOGLE CALENDAR) */}
+              {isEditingEvent && (
+                <div className="p-4 rounded-2xl bg-cyan-50/70 border border-cyan-200 space-y-3 animate-in fade-in slide-in-from-top-2">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-[11px] font-black uppercase text-[#0E7490] flex items-center gap-1.5">
+                      <Pencil className="h-3.5 w-3.5" />
+                      Edit Detail Agenda (Sinkron Google Calendar)
+                    </Label>
+                  </div>
+
+                  <div className="space-y-2.5">
+                    <div>
+                      <Label className="text-[10px] font-bold uppercase text-slate-600">Nama / Judul Kegiatan</Label>
+                      <Input
+                        value={editForm.title}
+                        onChange={(e) => setEditForm((p) => ({ ...p, title: e.target.value }))}
+                        className="h-10 rounded-xl bg-white mt-1 text-sm font-semibold"
+                        placeholder="Judul kegiatan"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                      <div>
+                        <Label className="text-[10px] font-bold uppercase text-slate-600">Tanggal</Label>
+                        <Input
+                          type="date"
+                          value={editForm.date}
+                          onChange={(e) => setEditForm((p) => ({ ...p, date: e.target.value }))}
+                          className="h-10 rounded-xl bg-white mt-1 text-xs font-bold"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-[10px] font-bold uppercase text-slate-600">Jam Mulai</Label>
+                        <Input
+                          type="time"
+                          value={editForm.startTime}
+                          onChange={(e) => setEditForm((p) => ({ ...p, startTime: e.target.value }))}
+                          className="h-10 rounded-xl bg-white mt-1 text-xs font-bold"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-[10px] font-bold uppercase text-slate-600">Jam Selesai</Label>
+                        <Input
+                          type="time"
+                          value={editForm.endTime}
+                          onChange={(e) => setEditForm((p) => ({ ...p, endTime: e.target.value }))}
+                          className="h-10 rounded-xl bg-white mt-1 text-xs font-bold"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label className="text-[10px] font-bold uppercase text-slate-600">Lokasi / Tempat</Label>
+                      <Input
+                        value={editForm.location}
+                        onChange={(e) => setEditForm((p) => ({ ...p, location: e.target.value }))}
+                        className="h-10 rounded-xl bg-white mt-1 text-sm"
+                        placeholder="Lokasi kegiatan"
+                      />
+                    </div>
+
+                    <div>
+                      <Label className="text-[10px] font-bold uppercase text-slate-600">Jenis Agenda</Label>
+                      <div className="grid grid-cols-2 gap-2 mt-1">
+                        {(["Internal", "Eksternal"] as const).map((t) => (
+                          <button
+                            key={t}
+                            type="button"
+                            onClick={() => setEditForm((p) => ({ ...p, eventType: t }))}
+                            className={cn(
+                              "h-9 rounded-xl text-xs font-bold border transition-all",
+                              editForm.eventType === t
+                                ? "bg-[#0E7490] text-white border-[#0E7490]"
+                                : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
+                            )}
+                          >
+                            {t}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label className="text-[10px] font-bold uppercase text-slate-600">Catatan / Deskripsi</Label>
+                      <Textarea
+                        value={editForm.notes}
+                        onChange={(e) => setEditForm((p) => ({ ...p, notes: e.target.value }))}
+                        className="min-h-[76px] rounded-xl bg-white mt-1 text-xs"
+                        placeholder="Catatan tambahan agenda..."
+                      />
+                    </div>
+
+                    <div className="flex gap-2 pt-1">
+                      <Button
+                        type="button"
+                        onClick={handleSaveEditEvent}
+                        disabled={isSavingEdit}
+                        className="flex-1 h-10 rounded-xl bg-[#0E7490] hover:bg-[#061E2B] text-white font-bold text-xs gap-2"
+                      >
+                        {isSavingEdit ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                        <span>{isSavingEdit ? "Menyimpan ke Kalender..." : "Simpan Perubahan ke Google Calendar"}</span>
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* EDITOR JENIS AGENDA (HANYA INTERNAL & EKSTERNAL) */}
               <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200/80 space-y-2">

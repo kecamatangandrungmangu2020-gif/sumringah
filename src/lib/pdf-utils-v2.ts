@@ -65,8 +65,8 @@ export const generateDaftarHadirPDF = async (values: PDFData, logoBase64?: strin
 
     currentY += 8;
     // Lebar kolom total: 180mm (pageWidth 210 - margin 2x15)
-    // NO: 10, NAMA: 62, L/P: 10, JABATAN: 66, TTD: 32
-    const colW = [10, 62, 10, 66, 32];
+    // NO: 10, NAMA: 54, L/P: 10, JABATAN: 56, TTD: 50
+    const colW = [10, 54, 10, 56, 50];
     const headerHeight = 10;
     const tableHeaders = ["NO", "NAMA", "L/P", "JABATAN", "TTD"];
 
@@ -199,11 +199,11 @@ export const generateDaftarHadirPDF = async (values: PDFData, logoBase64?: strin
         cX += colW[3];
 
         // TTD
-        const signX = (i % 2 === 0) ? cX + 2 : cX + (colW[4] / 2);
+        const signX = (i % 2 === 0) ? cX + 3 : cX + (colW[4] / 2) + 1;
         doc.setFont("helvetica", "normal");
         doc.setFontSize(8);
         const signY = startY + (rowHeight / 2) + 1.0;
-        doc.text(`${i + 1}. .......`, signX, signY);
+        doc.text(`${i + 1}. ............`, signX, signY);
 
         currentY += rowHeight;
     }
@@ -268,7 +268,8 @@ export const generateDaftarHadirPesertaPDF = async (values: PDFData, logoBase64?
     addHeaderDetail("Tempat", values.location || "Balai Kecamatan Gandrungmangu");
 
     currentY += 8;
-    const colW = [10, 75, 63, 32]; // NO, NAMA PESERTA, ALAMAT, TTD
+    // Lebar kolom total: 180mm (NO: 10, NAMA PESERTA: 64, ALAMAT: 56, TTD: 50)
+    const colW = [10, 64, 56, 50]; // NO, NAMA PESERTA, ALAMAT, TTD
     const headerHeight = 10;
     const tableHeaders = ["NO", "NAMA PESERTA", "ALAMAT", "TTD"];
 
@@ -352,11 +353,11 @@ export const generateDaftarHadirPesertaPDF = async (values: PDFData, logoBase64?
         cX += colW[2];
 
         // TTD
-        const signX = (i % 2 === 0) ? cX + 2 : cX + (colW[3] / 2);
+        const signX = (i % 2 === 0) ? cX + 3 : cX + (colW[3] / 2) + 1;
         doc.setFont("helvetica", "normal");
         doc.setFontSize(8);
         const signY = startY + (rowHeight / 2) + 1.0;
-        doc.text(`${i + 1}. .......`, signX, signY);
+        doc.text(`${i + 1}. ............`, signX, signY);
 
         currentY += rowHeight;
     }

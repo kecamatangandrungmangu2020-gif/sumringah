@@ -134,6 +134,7 @@ export async function POST(req: NextRequest) {
     let date = "";
     let time = "";
     let activityType = "Eksternal";
+    let manualNotes = "";
 
     const contentType = req.headers.get("content-type") || "";
 
@@ -155,6 +156,7 @@ export async function POST(req: NextRequest) {
       date = (formData.get("date") as string) || "";
       time = (formData.get("time") as string) || "";
       activityType = (formData.get("activityType") as string) || "Eksternal";
+      manualNotes = (formData.get("manualNotes") as string) || "";
 
       const arrayBuffer = await file.arrayBuffer();
       buffer = Buffer.from(arrayBuffer);
@@ -168,6 +170,7 @@ export async function POST(req: NextRequest) {
       date = json.date || "";
       time = json.time || "";
       activityType = json.activityType || "Eksternal";
+      manualNotes = json.manualNotes || "";
 
       if (!fileDataUri || typeof fileDataUri !== "string") {
         return NextResponse.json(
@@ -207,8 +210,9 @@ export async function POST(req: NextRequest) {
       extractedText = await extractTextFromZipDoc(buffer, mimeType, name);
     }
 
+    const hasManualNotes = Boolean(manualNotes && manualNotes.trim().length > 0);
     const promptText = `Anda adalah asisten administrasi profesional Pemerintah Kecamatan Gandrungmangu, Kabupaten Cilacap.
-Tugas Anda adalah memindai dan menganalisis berkas acuan rapat/kegiatan yang diunggah. Berkas ini bisa berupa foto notulen tulisan tangan, dokumen PDF laporan/undangan/materi, atau presentasi PowerPoint (PPT).
+Tugas Anda adalah memindai dan menganalisis berkas acuan rapat/kegiatan yang diunggah${hasManualNotes ? " SEKALIGUS MENGGABUNGKANNYA dengan catatan rapat manual yang ditulis petugas" : ""}. Berkas ini bisa berupa foto notulen tulisan tangan, dokumen PDF laporan/undangan/materi, atau presentasi PowerPoint (PPT).
 
 Konteks Kegiatan (bila tersedia):
 - Judul Kegiatan: ${title || "Kegiatan Dinas Kecamatan Gandrungmangu"}
@@ -217,24 +221,29 @@ Konteks Kegiatan (bila tersedia):
 - Waktu: ${time || "09:00 WIB"}
 - Jenis Kegiatan: ${activityType || "Eksternal"}
 - Nama Berkas: ${fileName}
+${hasManualNotes ? `\nCATATAN RAPAT MANUAL DARI PETUGAS (WAJIB DIGABUNGKAN & DIPRIORITASKAN):\n${manualNotes}\n` : ""}
+ATURAN PENTING:
+- Jika ada CATATAN RAPAT MANUAL dari petugas, WAJIB gabungkan seluruh nama peserta/pejabat, poin hasil rapat, dan poin diskusi/tanya jawab dari catatan manual tersebut bersama materi dari berkas yang diunggah.
+- Jangan menghapus atau mengganti fakta yang sudah ditulis petugas pada catatan manual.
 
 TUGAS ANDA:
 1. "aiPromptNotes":
-Buat rangkuman poin-poin acuan yang padat, terstruktur, dan akurat berdasarkan isi berkas:
+Buat rangkuman poin-poin acuan yang padat, terstruktur, dan akurat berdasarkan ${hasManualNotes ? "GABUNGAN catatan manual petugas dan isi berkas" : "isi berkas"}:
 - Nama / Topik Bahasan Acara
-- Unsur Pejabat / Pihak yang hadir (disarikan dari catatan/daftar hadir)
-- Pokok-pokok materi, arahan pimpinan, atau poin pembahasan
-- Kesepakatan / Hasil keputusan rapat
-- Rencana aksi / Tindak lanjut berikutnya
+- Unsur Pejabat / Pihak yang hadir
+- Pokok-pokok materi, arahan pimpinan, atau hasil rapat
+- Diskusi / tanya jawab & kesepakatan / tindak lanjut
 
-2. "notulen":
-Tulis narasi formal kedinasan dalam 3 paragraf utuh (tanpa kop surat):
-- Paragraf 1: Pembukaan (waktu, tanggal, tempat, perihal kegiatan, dan unsur yang hadir).
-- Paragraf 2: Jalannya pembahasan & arahan pimpinan (uraikan pokok materi kegiatan).
-- Paragraf 3: Diskusi/tanya jawab, kesepakatan tindak lanjut, dan penutupan dalam keadaan tertib dan lancar.
+2. "notulen" (KHUSUS UNTUK CETAK PDF NOTA DINAS / NOTULEN RESMI):
+Tulis narasi formal kedinasan berformat alinea paragraf siap cetak PDF (TANPA kop surat, TANPA judul "NOTA DINAS", TANPA format markdown *bintang*, TANPA "Kepada Yth." atau "DUMP"), pisahkan setiap alinea dengan satu baris kosong (\\n\\n):
+- Alinea 1 (Pembukaan & Kehadiran): Hari, tanggal, waktu, tempat, perihal kegiatan, dan unsur pejabat/peserta yang hadir sesuai berkas${hasManualNotes ? " & catatan manual" : ""}.
+- Alinea 2 (Jalannya Pembahasan & Pokok Hasil Rapat): Uraian lengkap arahan pimpinan dan pokok materi kegiatan (boleh disertai daftar bernomor rapi 1., 2., 3. jika poinnya banyak).
+- Alinea 3 (Diskusi / Tanya Jawab & Kesepakatan): Uraian tanya jawab, masukan peserta, dan kesepakatan tindak lanjut.
+- Alinea 4 (Penutup): Pernyataan penutupan kegiatan dalam keadaan tertib, aman, dan lancar.
 
 3. "notulenWa":
 Format laporan WhatsApp resmi kepada Camat Gandrungmangu (format DUMP standar Gandrungmangu).
+WAJIB mengisi *II. Hadir*, *III. Hasil Rapat*, dan *IV. Diskusi/tanya jawab* sesuai dengan ${hasManualNotes ? "gabungan catatan manual petugas dan berkas acuan" : "berkas acuan"}!
 Format:
 Kepada Yth.
 Camat Gandrungmangu
@@ -245,18 +254,17 @@ Hari/ Tgl : [Hari dan Tanggal lengkap bahasa Indonesia]
 Waktu : Pukul [Waktu] WIB s.d selesai
 Tempat : ${location || "Balai Kecamatan Gandrungmangu"}
 
-*II. Hadir* 
-[Daftar pihak/tamu yang hadir berdasarkan berkas]
+*II. Hadir*
+[Daftar bernomor 1, 2, 3... pihak/pejabat yang hadir sesuai ${hasManualNotes ? "catatan manual & berkas" : "berkas"}]
 
 *III. Hasil Rapat*
-[Poin-poin pokok hasil rapat & arahan pimpinan dengan tanda -]
+[Poin-poin pokok hasil rapat, materi & arahan pimpinan dengan tanda -]
 
 *IV. Diskusi/tanya jawab*
-[Poin tanya jawab dan masukan peserta]
+[Poin tanya jawab, masukan peserta, dan kesepakatan tindak lanjut sesuai ${hasManualNotes ? "catatan manual & berkas" : "berkas"}]
 
 *V. Penutup*
-[Kalimat penutup, kondisi aman dan tertib]
-selesai pada [waktu selesai]
+[Kalimat penutup, kondisi aman, tertib, dan lancar]
 
 DUMP
 
@@ -303,11 +311,9 @@ Keluarkan output dalam format JSON valid persis:
     }
 
     const candidateModels = [
+      "gemini-2.5-flash",
       "gemini-flash-latest",
-      "gemini-3.5-flash",
-      "gemini-3.1-flash-lite",
-      "gemini-3.8-flash",
-      "gemini-3.7-flash",
+      "gemini-2.0-flash",
     ];
 
     let lastError: Error | null = null;
