@@ -146,7 +146,7 @@ export function AppSidebar() {
   }
 
   return (
-    <Sidebar className="border-r border-white/10 bg-[#061E2B] text-white shadow-none" collapsible="icon">
+    <Sidebar className="border-r border-white/10 bg-[#041E17] text-white shadow-none" collapsible="icon">
       <SidebarHeader className="p-6 border-b border-white/10">
         <div className="flex items-center gap-4">
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/95 shadow-lg shadow-black/25 border border-white/20 overflow-hidden shrink-0">
@@ -160,14 +160,14 @@ export function AppSidebar() {
                 unoptimized
               />
             ) : (
-              <div className="flex h-full w-full items-center justify-center bg-[#0E7490] text-white">
+              <div className="flex h-full w-full items-center justify-center bg-[#065F46] text-white">
                 <Home className="h-7 w-7" />
               </div>
             )}
           </div>
           <div className="flex flex-col overflow-hidden">
             <span className="font-hero font-extrabold text-lg leading-tight tracking-tight text-white">Gandrungmangu</span>
-            <span className="text-[10px] font-mono text-cyan-300/85 uppercase tracking-[0.14em] font-bold mt-0.5">DATABASE TERPADU</span>
+            <span className="text-[10px] font-mono text-[#E5C882]/85 uppercase tracking-[0.14em] font-bold mt-0.5">DATABASE TERPADU</span>
           </div>
         </div>
       </SidebarHeader>
@@ -175,7 +175,7 @@ export function AppSidebar() {
       <SidebarContent className="px-4">
         {menuGroups.map((group) => (
           <SidebarGroup key={group.label} className="mt-2">
-            <SidebarGroupLabel className="px-2 py-3 text-[10px] font-mono uppercase tracking-[0.16em] font-bold text-cyan-200/60">
+            <SidebarGroupLabel className="px-2 py-3 text-[10px] font-mono uppercase tracking-[0.16em] font-bold text-[#E5C882]/60">
               {group.label}
             </SidebarGroupLabel>
             <SidebarMenu className="gap-1.5">
@@ -203,14 +203,14 @@ export function AppSidebar() {
                         className={cn(
                           "h-11 px-4 rounded-xl transition-all duration-200 group justify-between",
                           isSubActive
-                            ? "bg-[#0E7490] text-white font-bold hover:bg-[#0E7490]/90"
+                            ? "bg-[#065F46] text-white font-bold hover:bg-[#065F46]/90"
                             : "text-slate-200 hover:bg-white/10 hover:text-white"
                         )}
                       >
                         <div className="flex items-center gap-3">
                           <div className={cn(
                             "shrink-0 transition-colors",
-                            isSubActive ? "text-white" : "text-cyan-300/80 group-hover:text-cyan-200"
+                            isSubActive ? "text-white" : "text-[#E5C882]/80 group-hover:text-[#E5C882]"
                           )}>
                             <item.icon className={cn("h-5 w-5", isSubActive && "stroke-[2.5px]")} />
                           </div>
@@ -222,13 +222,13 @@ export function AppSidebar() {
                           </span>
                         </div>
                         <ChevronDown className={cn(
-                          "h-4 w-4 shrink-0 transition-transform duration-200 text-cyan-200/70",
-                          isOpen && "rotate-180 text-[#f4c430]"
+                          "h-4 w-4 shrink-0 transition-transform duration-200 text-[#E5C882]/70",
+                          isOpen && "rotate-180 text-[#C8A253]"
                         )} />
                       </SidebarMenuButton>
 
                       {isOpen && (
-                        <div className="flex flex-col gap-1 pl-4 mt-1 border-l-2 border-cyan-400/30 ml-4 py-1">
+                        <div className="flex flex-col gap-1 pl-4 mt-1 border-l-2 border-[#C8A253]/30 ml-4 py-1">
                           {item.subItems.map((sub) => {
                             const subPath = sub.href.replace(/\/$/, "")
                             const isSubItemActive = mounted && (
@@ -245,12 +245,12 @@ export function AppSidebar() {
                                 className={cn(
                                   "h-10 px-3 rounded-lg transition-all text-xs font-bold",
                                   isSubItemActive
-                                    ? "bg-[#0E7490] text-white shadow-sm hover:bg-[#0E7490]/90"
+                                    ? "bg-[#065F46] text-white shadow-sm hover:bg-[#065F46]/90"
                                     : "text-slate-200 hover:bg-white/10 hover:text-white"
                                 )}
                               >
                                 <Link href={sub.href} className="flex items-center gap-2.5 w-full">
-                                  <sub.icon className={cn("h-4 w-4 shrink-0", isSubItemActive ? "text-[#f4c430]" : "text-cyan-300/80")} />
+                                  <sub.icon className={cn("h-4 w-4 shrink-0", isSubItemActive ? "text-[#C8A253]" : "text-[#E5C882]/80")} />
                                   <span>{sub.label}</span>
                                 </Link>
                               </SidebarMenuButton>
@@ -272,14 +272,14 @@ export function AppSidebar() {
                       className={cn(
                         "h-11 px-4 rounded-xl transition-all duration-200 group",
                         isActive
-                          ? "bg-[#0E7490] text-white border-none hover:bg-[#0E7490]/90 shadow-md shadow-black/20"
+                          ? "bg-[#065F46] text-white border-none hover:bg-[#065F46]/90 shadow-md shadow-black/20"
                           : "text-slate-200 hover:bg-white/10 hover:text-white"
                       )}
                     >
                       <Link href={item.href} className="flex items-center gap-3 w-full">
                         <div className={cn(
                           "shrink-0 transition-colors",
-                          isActive ? "text-white" : "text-cyan-300/80 group-hover:text-cyan-200"
+                          isActive ? "text-white" : "text-[#E5C882]/80 group-hover:text-[#E5C882]"
                         )}>
                           <item.icon className={cn("h-5 w-5", isActive && "stroke-[2.5px]")} />
                         </div>
@@ -289,7 +289,7 @@ export function AppSidebar() {
                         )}>
                           {item.label}
                         </span>
-                        {isActive && <div className="ml-auto h-2 w-2 rounded-full bg-[#f4c430] shadow-[0_0_8px_#f4c430]" />}
+                        {isActive && <div className="ml-auto h-2 w-2 rounded-full bg-[#C8A253] shadow-[0_0_8px_#C8A253]" />}
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -300,7 +300,7 @@ export function AppSidebar() {
         ))}
 
         <SidebarGroup className="mt-4">
-          <SidebarGroupLabel className="px-2 py-3 text-[10px] font-mono uppercase tracking-[0.16em] font-bold text-cyan-200/60">
+          <SidebarGroupLabel className="px-2 py-3 text-[10px] font-mono uppercase tracking-[0.16em] font-bold text-[#E5C882]/60">
             SISTEM &amp; LAYANAN
           </SidebarGroupLabel>
           <SidebarMenu className="gap-1.5">
@@ -312,7 +312,7 @@ export function AppSidebar() {
                 className="h-11 px-4 rounded-xl text-slate-200 hover:bg-white/10 hover:text-white transition-all"
               >
                 <Link href="/settings/" className="flex items-center gap-3">
-                  <Settings className="h-5 w-5 shrink-0 text-cyan-300/80" />
+                  <Settings className="h-5 w-5 shrink-0 text-[#E5C882]/80" />
                   <span className="font-hero font-semibold text-[13px] text-slate-100">Pengaturan</span>
                 </Link>
               </SidebarMenuButton>
@@ -325,12 +325,12 @@ export function AppSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <div className="flex items-center gap-3 w-full px-2 py-2.5 overflow-hidden">
-              <div className="h-10 w-10 rounded-full bg-[#0E7490]/30 flex items-center justify-center shrink-0 border border-cyan-300/30">
-                <span className="text-xs font-mono font-bold text-cyan-200 uppercase">{user?.email?.substring(0, 2).toUpperCase() || 'AD'}</span>
+              <div className="h-10 w-10 rounded-full bg-[#065F46]/30 flex items-center justify-center shrink-0 border border-[#C8A253]/30">
+                <span className="text-xs font-mono font-bold text-[#E5C882] uppercase">{user?.email?.substring(0, 2).toUpperCase() || 'AD'}</span>
               </div>
               <div className="flex flex-col text-left overflow-hidden flex-1">
                 <span className="text-sm font-hero font-bold text-white truncate">{user?.email?.split('@')[0].toUpperCase() || 'Pengguna'}</span>
-                <span className="text-[10px] font-mono text-cyan-300/80 font-semibold uppercase truncate">Karyawan Kecamatan</span>
+                <span className="text-[10px] font-mono text-[#E5C882]/80 font-semibold uppercase truncate">Karyawan Kecamatan</span>
               </div>
               <button
                 onClick={handleLogout}

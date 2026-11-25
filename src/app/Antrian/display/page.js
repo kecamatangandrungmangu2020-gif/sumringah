@@ -585,14 +585,14 @@ export default function Display() {
     <div
       className="antrian-display-root"
       style={{
-        background: 'linear-gradient(155deg, #f8fbfd 0%, #ebf5f8 52%, #dff0f6 100%)',
+        background: 'linear-gradient(155deg, #FAF8F5 0%, #F3EFE6 52%, #EFE9DC 100%)',
         height: '100vh',
         maxHeight: '100vh',
         display: 'flex',
         flexDirection: 'column',
         padding: '12px 18px',
         boxSizing: 'border-box',
-        color: '#061E2B',
+        color: '#041E17',
         overflow: 'hidden',
         position: 'relative',
         transition: 'background 0.5s ease-in-out'
@@ -606,7 +606,7 @@ export default function Display() {
           inset: 0,
           pointerEvents: 'none',
           zIndex: 0,
-          backgroundImage: `radial-gradient(circle at 12% 14%, rgba(14, 116, 144, 0.12), transparent 44%), radial-gradient(circle at 88% 86%, rgba(56, 189, 248, 0.14), transparent 44%)`
+          backgroundImage: `radial-gradient(circle at 12% 14%, rgba(6, 95, 70, 0.12), transparent 44%), radial-gradient(circle at 88% 86%, rgba(200, 162, 83, 0.14), transparent 44%)`
         }}
       />
       <div
@@ -637,18 +637,18 @@ export default function Display() {
             className="position-fixed top-0 start-50 translate-middle-x mt-2 shadow-lg d-flex align-items-center gap-2 px-3.5 py-1.5 rounded-pill"
             style={{
               zIndex: 9999,
-              background: 'linear-gradient(135deg, #0E7490, #061E2B)',
+              background: 'linear-gradient(135deg, #065F46, #041E17)',
               color: '#ffffff',
               cursor: 'pointer',
               border: '2px solid rgba(255, 255, 255, 0.92)',
               backdropFilter: 'blur(12px)',
-              boxShadow: '0 10px 30px rgba(14, 116, 144, 0.38)'
+              boxShadow: '0 10px 30px rgba(6, 95, 70, 0.38)'
             }}
             title="Klik untuk mengaktifkan suara panggilan"
           >
             <i className="bi bi-volume-mute-fill fs-6 text-white"></i>
             <span className="fw-bold small font-hero">Klik layar di mana saja untuk mengaktifkan suara</span>
-            <span className="badge rounded-pill ms-1" style={{ background: '#ffffff', color: '#0E7490' }}>Aktifkan</span>
+            <span className="badge rounded-pill ms-1" style={{ background: '#ffffff', color: '#065F46' }}>Aktifkan</span>
           </motion.div>
         )}
       </AnimatePresence>
@@ -668,8 +668,8 @@ export default function Display() {
           background: 'rgba(255, 255, 255, 0.94)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
-          border: '1px solid rgba(14, 116, 144, 0.16)',
-          boxShadow: '0 10px 30px rgba(6, 30, 43, 0.08)'
+          border: '1px solid rgba(6, 95, 70, 0.16)',
+          boxShadow: '0 10px 30px rgba(4, 30, 23, 0.08)'
         }}
       >
         {/* Sisi Kiri: Tombol Portal, Fullscreen & Logo + Identitas Instansi */}
@@ -679,9 +679,9 @@ export default function Display() {
               href="/Antrian/"
               className="btn btn-sm rounded-pill px-3 py-1.5 text-white d-inline-flex align-items-center gap-1.5 text-decoration-none font-hero"
               style={{
-                background: 'linear-gradient(135deg, #0E7490, #061E2B)',
-                border: '1px solid rgba(14, 116, 144, 0.25)',
-                boxShadow: '0 4px 12px rgba(14, 116, 144, 0.22)',
+                background: 'linear-gradient(135deg, #065F46, #041E17)',
+                border: '1px solid rgba(6, 95, 70, 0.25)',
+                boxShadow: '0 4px 12px rgba(6, 95, 70, 0.22)',
                 transition: 'all 0.25s ease'
               }}
               title="Kembali ke Portal Sistem Pelayanan"
@@ -694,9 +694,9 @@ export default function Display() {
               onClick={toggleFullscreen}
               className="btn btn-sm rounded-pill px-2.5 py-1.5 d-inline-flex align-items-center"
               style={{
-                background: '#ebf5f8',
-                color: '#0E7490',
-                border: '1px solid rgba(14, 116, 144, 0.22)'
+                background: '#F3EFE6',
+                color: '#065F46',
+                border: '1px solid rgba(6, 95, 70, 0.22)'
               }}
               title={isFullscreen ? "Keluar Layar Penuh" : "Mode TV Layar Penuh"}
             >
@@ -715,7 +715,7 @@ export default function Display() {
                 height: '46px',
                 maxWidth: '240px',
                 objectFit: 'contain',
-                filter: 'drop-shadow(0 2px 6px rgba(6, 30, 43, 0.15))'
+                filter: 'drop-shadow(0 2px 6px rgba(4, 30, 23, 0.15))'
               }}
             />
           )}
@@ -728,7 +728,7 @@ export default function Display() {
                   fontSize: 'clamp(1.1rem, 1.55vw, 1.7rem)',
                   letterSpacing: '-0.02em',
                   lineHeight: 1.12,
-                  color: '#061E2B'
+                  color: '#041E17'
                 }}
               >
                 {settings.instansi_nama}
@@ -740,9 +740,9 @@ export default function Display() {
                   fontWeight: 700,
                   letterSpacing: '0.14em',
                   textTransform: 'uppercase',
-                  background: '#ebf5f8',
-                  border: '1px solid rgba(14, 116, 144, 0.25)',
-                  color: '#0E7490'
+                  background: '#F3EFE6',
+                  border: '1px solid rgba(6, 95, 70, 0.25)',
+                  color: '#065F46'
                 }}
               >
                 <span
@@ -750,8 +750,8 @@ export default function Display() {
                     width: '6px',
                     height: '6px',
                     borderRadius: '999px',
-                    background: '#0E7490',
-                    boxShadow: '0 0 8px rgba(14, 116, 144, 0.65)',
+                    background: '#065F46',
+                    boxShadow: '0 0 8px rgba(6, 95, 70, 0.65)',
                     animation: 'pulse-live 2s ease-in-out infinite'
                   }}
                 />
@@ -775,9 +775,9 @@ export default function Display() {
         <div
           className="text-end px-3.5 py-1.5 rounded-4 shrink-0"
           style={{
-            background: 'linear-gradient(135deg, #0E7490, #061E2B)',
-            border: '1px solid rgba(14, 116, 144, 0.35)',
-            boxShadow: '0 8px 20px rgba(14, 116, 144, 0.22)'
+            background: 'linear-gradient(135deg, #065F46, #041E17)',
+            border: '1px solid rgba(6, 95, 70, 0.35)',
+            boxShadow: '0 8px 20px rgba(6, 95, 70, 0.22)'
           }}
         >
           <div className="d-flex align-items-baseline justify-content-end gap-1.5">
@@ -796,7 +796,7 @@ export default function Display() {
             </span>
             <span
               className="font-mono fw-bold"
-              style={{ fontSize: '0.72rem', color: '#bae6fd', letterSpacing: '0.12em' }}
+              style={{ fontSize: '0.72rem', color: '#F5E9CC', letterSpacing: '0.12em' }}
             >
               WIB
             </span>
@@ -805,7 +805,7 @@ export default function Display() {
             className="font-mono fw-semibold mt-0.5 text-uppercase"
             style={{
               fontSize: 'clamp(0.65rem, 0.8vw, 0.82rem)',
-              color: 'rgba(224, 242, 254, 0.90)',
+              color: 'rgba(245, 233, 204, 0.90)',
               letterSpacing: '0.08em'
             }}
           >
@@ -857,8 +857,8 @@ export default function Display() {
                 : '4px solid #ffffff',
               boxShadow: displayMode === 'tv'
                 ? '0 16px 38px rgba(239, 68, 68, 0.22)'
-                : '0 16px 40px rgba(6, 30, 43, 0.14)',
-              background: '#061E2B',
+                : '0 16px 40px rgba(4, 30, 23, 0.14)',
+              background: '#041E17',
               position: 'relative',
               transition: 'border 0.4s ease, box-shadow 0.4s ease'
             }}
@@ -875,12 +875,12 @@ export default function Display() {
                 backdropFilter: 'blur(10px)',
                 border: displayMode === 'tv'
                   ? '1px solid rgba(239, 68, 68, 0.35)'
-                  : '1px solid rgba(14, 116, 144, 0.25)',
+                  : '1px solid rgba(6, 95, 70, 0.25)',
                 fontSize: '10px',
                 fontWeight: 700,
                 letterSpacing: '0.14em',
-                color: displayMode === 'tv' ? '#dc2626' : '#0E7490',
-                boxShadow: '0 4px 12px rgba(6, 30, 43, 0.14)'
+                color: displayMode === 'tv' ? '#dc2626' : '#065F46',
+                boxShadow: '0 4px 12px rgba(4, 30, 23, 0.14)'
               }}
             >
               <span
@@ -888,7 +888,7 @@ export default function Display() {
                   width: '7px',
                   height: '7px',
                   borderRadius: '999px',
-                  background: displayMode === 'tv' ? '#ef4444' : '#0E7490',
+                  background: displayMode === 'tv' ? '#ef4444' : '#065F46',
                   animation: 'pulse-live 1.8s ease-in-out infinite'
                 }}
               />
@@ -917,17 +917,17 @@ export default function Display() {
                 WebkitBackdropFilter: 'blur(12px)',
                 background: (displayMode === 'tv' ? isTvMuted : isVideoMuted)
                   ? 'rgba(255, 255, 255, 0.92)'
-                  : 'linear-gradient(135deg, #0E7490, #061E2B)',
-                color: (displayMode === 'tv' ? isTvMuted : isVideoMuted) ? '#061E2B' : '#ffffff',
-                border: '1.5px solid rgba(14, 116, 144, 0.35)',
+                  : 'linear-gradient(135deg, #065F46, #041E17)',
+                color: (displayMode === 'tv' ? isTvMuted : isVideoMuted) ? '#041E17' : '#ffffff',
+                border: '1.5px solid rgba(6, 95, 70, 0.35)',
                 padding: '7px 11px',
                 fontSize: '1.05rem',
                 cursor: 'pointer',
-                boxShadow: '0 8px 20px rgba(6, 30, 43, 0.28)'
+                boxShadow: '0 8px 20px rgba(4, 30, 23, 0.28)'
               }}
               title={(displayMode === 'tv' ? isTvMuted : isVideoMuted) ? 'Aktifkan suara' : 'Matikan suara'}
             >
-              <i className={(displayMode === 'tv' ? isTvMuted : isVideoMuted) ? 'bi bi-volume-mute-fill fs-5' : 'bi bi-volume-up-fill text-white fs-5'} style={(displayMode === 'tv' ? isTvMuted : isVideoMuted) ? { color: '#0E7490' } : undefined}></i>
+              <i className={(displayMode === 'tv' ? isTvMuted : isVideoMuted) ? 'bi bi-volume-mute-fill fs-5' : 'bi bi-volume-up-fill text-white fs-5'} style={(displayMode === 'tv' ? isTvMuted : isVideoMuted) ? { color: '#065F46' } : undefined}></i>
             </motion.button>
           </div>
 
@@ -938,9 +938,9 @@ export default function Display() {
               flexShrink: 0,
               height: '46px',
               background: '#ffffff',
-              border: '1.5px solid rgba(14, 116, 144, 0.22)',
+              border: '1.5px solid rgba(6, 95, 70, 0.22)',
               borderRadius: '15px',
-              boxShadow: '0 8px 22px rgba(6, 30, 43, 0.08)',
+              boxShadow: '0 8px 22px rgba(4, 30, 23, 0.08)',
               display: 'flex',
               alignItems: 'center',
               overflow: 'hidden'
@@ -949,7 +949,7 @@ export default function Display() {
             <div
               className="px-3.5 fw-black text-uppercase d-flex align-items-center gap-1.5 h-100 font-hero text-white"
               style={{
-                background: 'linear-gradient(135deg, #0E7490, #061E2B)',
+                background: 'linear-gradient(135deg, #065F46, #041E17)',
                 fontSize: '0.82rem',
                 fontWeight: 800,
                 flexShrink: 0,
@@ -979,7 +979,7 @@ export default function Display() {
                   animation: 'scroll-text 28s linear infinite',
                   fontSize: 'clamp(0.92rem, 1.08vw, 1.12rem)',
                   fontWeight: 700,
-                  color: '#061E2B',
+                  color: '#041E17',
                   letterSpacing: '0.01em'
                 }}
               >
@@ -1011,10 +1011,10 @@ export default function Display() {
               minHeight: 0,
               borderRadius: '22px',
               border: '2px solid rgba(255, 255, 255, 0.85)',
-              background: 'linear-gradient(135deg, #0E7490 0%, #095972 52%, #061E2B 100%)',
+              background: 'linear-gradient(135deg, #065F46 0%, #064E3B 52%, #041E17 100%)',
               boxShadow: latestCalling
-                ? '0 20px 48px rgba(14, 116, 144, 0.34), inset 0 0 36px rgba(186, 230, 253, 0.14)'
-                : '0 16px 38px rgba(6, 30, 43, 0.22)',
+                ? '0 20px 48px rgba(6, 95, 70, 0.34), inset 0 0 36px rgba(229, 200, 130, 0.14)'
+                : '0 16px 38px rgba(4, 30, 23, 0.22)',
               padding: '14px 16px',
               display: 'flex',
               overflow: 'hidden',
@@ -1071,7 +1071,7 @@ export default function Display() {
                   className="d-inline-flex align-items-center gap-2 px-3.5 py-1 rounded-pill shadow mb-1.5 font-hero"
                   style={{
                     background: '#ffffff',
-                    color: '#0E7490'
+                    color: '#065F46'
                   }}
                 >
                   <span
@@ -1079,7 +1079,7 @@ export default function Display() {
                       width: '8px',
                       height: '8px',
                       borderRadius: '999px',
-                      background: '#0E7490',
+                      background: '#065F46',
                       animation: 'pulse-live 1.2s ease-in-out infinite'
                     }}
                   />
@@ -1126,7 +1126,7 @@ export default function Display() {
                           letterSpacing: '-0.03em',
                           color: '#ffffff',
                           fontVariantNumeric: 'tabular-nums',
-                          textShadow: '0 0 36px rgba(186, 230, 253, 0.55), 0 6px 20px rgba(6, 30, 43, 0.5)'
+                          textShadow: '0 0 36px rgba(229, 200, 130, 0.55), 0 6px 20px rgba(4, 30, 23, 0.5)'
                         }}
                       >
                         {latestCalling ? latestCalling.nomor_lengkap : '---'}
@@ -1151,7 +1151,7 @@ export default function Display() {
                   style={{
                     fontSize: 'clamp(0.88rem, 1.15vw, 1.25rem)',
                     letterSpacing: '0.28em',
-                    color: '#bae6fd'
+                    color: '#F5E9CC'
                   }}
                 >
                   MENUJU
@@ -1173,7 +1173,7 @@ export default function Display() {
                         fontWeight: 900,
                         lineHeight: 1.02,
                         color: '#ffffff',
-                        textShadow: '0 4px 16px rgba(6, 30, 43, 0.45)',
+                        textShadow: '0 4px 16px rgba(4, 30, 23, 0.45)',
                         letterSpacing: '-0.02em'
                       }}
                     >
@@ -1185,10 +1185,10 @@ export default function Display() {
                       style={{
                         background: 'rgba(255, 255, 255, 0.94)',
                         border: '1px solid #ffffff',
-                        color: '#061E2B',
+                        color: '#041E17',
                         fontSize: 'clamp(0.82rem, 1.08vw, 1.15rem)',
                         maxWidth: '94%',
-                        boxShadow: '0 6px 18px rgba(6, 30, 43, 0.25)'
+                        boxShadow: '0 6px 18px rgba(4, 30, 23, 0.25)'
                       }}
                     >
                       {latestCalling?.pelayanan_nama || 'Pelayanan Terpadu'}
@@ -1241,21 +1241,21 @@ export default function Display() {
                     position: 'relative',
                     overflow: 'hidden',
                     background: isCurrentCallingLoket
-                      ? 'linear-gradient(135deg, #0E7490 0%, #061E2B 100%)'
+                      ? 'linear-gradient(135deg, #065F46 0%, #041E17 100%)'
                       : active
-                      ? 'linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%)'
+                      ? 'linear-gradient(135deg, #ffffff 0%, #FAF8F5 100%)'
                       : '#ffffff',
                     border: isCurrentCallingLoket
-                      ? '2px solid #0E7490'
+                      ? '2px solid #065F46'
                       : active
-                      ? '1.5px solid rgba(14, 116, 144, 0.38)'
-                      : '1px solid rgba(14, 116, 144, 0.16)',
-                    borderLeft: `6px solid ${isCurrentCallingLoket ? '#38bdf8' : active ? '#0E7490' : '#cbd5e1'}`,
+                      ? '1.5px solid rgba(6, 95, 70, 0.38)'
+                      : '1px solid rgba(6, 95, 70, 0.16)',
+                    borderLeft: `6px solid ${isCurrentCallingLoket ? '#E5C882' : active ? '#065F46' : '#cbd5e1'}`,
                     boxShadow: isCurrentCallingLoket
-                      ? '0 14px 32px rgba(14, 116, 144, 0.34)'
+                      ? '0 14px 32px rgba(6, 95, 70, 0.34)'
                       : active
-                      ? '0 10px 24px rgba(14, 116, 144, 0.12)'
-                      : '0 6px 18px rgba(6, 30, 43, 0.06)',
+                      ? '0 10px 24px rgba(6, 95, 70, 0.12)'
+                      : '0 6px 18px rgba(4, 30, 23, 0.06)',
                     transition: 'border 0.35s ease, box-shadow 0.35s ease, background 0.35s ease'
                   }}
                 >
@@ -1266,7 +1266,7 @@ export default function Display() {
                       style={{
                         fontSize: 'clamp(0.84rem, 1.05vw, 1.15rem)',
                         letterSpacing: '0.02em',
-                        color: isCurrentCallingLoket ? '#ffffff' : active ? '#061E2B' : '#64748b'
+                        color: isCurrentCallingLoket ? '#ffffff' : active ? '#041E17' : '#64748b'
                       }}
                     >
                       {lok}
@@ -1280,13 +1280,13 @@ export default function Display() {
                         background: isCurrentCallingLoket
                           ? '#ffffff'
                           : active
-                          ? 'linear-gradient(135deg, #0E7490, #0891b2)'
+                          ? 'linear-gradient(135deg, #065F46, #047857)'
                           : '#f1f5f9',
-                        color: isCurrentCallingLoket ? '#0E7490' : active ? '#ffffff' : '#64748b',
+                        color: isCurrentCallingLoket ? '#065F46' : active ? '#ffffff' : '#64748b',
                         border: isCurrentCallingLoket
                           ? '1px solid #ffffff'
                           : active
-                          ? '1px solid rgba(14, 116, 144, 0.25)'
+                          ? '1px solid rgba(6, 95, 70, 0.25)'
                           : '1px solid #e2e8f0'
                       }}
                     >
@@ -1296,7 +1296,7 @@ export default function Display() {
                             width: '5px',
                             height: '5px',
                             borderRadius: '999px',
-                            background: isCurrentCallingLoket ? '#0E7490' : '#bae6fd',
+                            background: isCurrentCallingLoket ? '#065F46' : '#F5E9CC',
                             animation: 'pulse-live 1.5s ease-in-out infinite'
                           }}
                         />
@@ -1320,7 +1320,7 @@ export default function Display() {
                           lineHeight: 1,
                           fontWeight: 900,
                           fontVariantNumeric: 'tabular-nums',
-                          color: isCurrentCallingLoket ? '#ffffff' : active ? '#0E7490' : '#cbd5e1',
+                          color: isCurrentCallingLoket ? '#ffffff' : active ? '#065F46' : '#cbd5e1',
                           textShadow: isCurrentCallingLoket
                             ? '0 2px 14px rgba(0, 0, 0, 0.35)'
                             : 'none'
@@ -1338,9 +1338,9 @@ export default function Display() {
                       style={{
                         fontSize: 'clamp(0.64rem, 0.74vw, 0.8rem)',
                         color: isCurrentCallingLoket
-                          ? '#bae6fd'
+                          ? '#F5E9CC'
                           : active
-                          ? '#0E7490'
+                          ? '#065F46'
                           : '#94a3b8'
                       }}
                     >
@@ -1399,7 +1399,7 @@ export default function Display() {
           }
           .display-panggilan-split > div:first-child {
             border-right: none !important;
-            border-bottom: 1.5px dashed rgba(103, 232, 249, 0.35) !important;
+            border-bottom: 1.5px dashed rgba(200, 162, 83, 0.35) !important;
           }
         }
 

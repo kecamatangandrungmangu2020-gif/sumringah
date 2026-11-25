@@ -143,7 +143,7 @@ export default function RootLayout({
 
         {/* ── PWA / Android APK ────────────────────────────────── */}
         <link rel="manifest" href="/site.webmanifest" />
-        <meta name="theme-color" content="#0E7490" />
+        <meta name="theme-color" content="#065F46" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="application-name" content="Gandrungmangu" />
 
@@ -201,7 +201,7 @@ export default function RootLayout({
           }
         `}} />
       </head>
-      <body className="font-sans antialiased bg-background text-foreground overflow-x-hidden selection:bg-[#0E7490] selection:text-white" suppressHydrationWarning>
+      <body className="font-sans antialiased bg-background text-foreground overflow-x-hidden selection:bg-[#065F46] selection:text-white" suppressHydrationWarning>
         <ThemeProvider>
           {!mounted ? (
             <div className="flex h-screen w-full items-center justify-center bg-background">
@@ -221,17 +221,17 @@ export default function RootLayout({
                     <div className="system-shell flex min-h-screen w-full overflow-hidden relative z-10">
                       <AppSidebar />
                       <SidebarInset className="flex-1 flex flex-col min-w-0 bg-transparent">
-                        <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center justify-between gap-3 border-b border-slate-200/80 dark:border-white/10 bg-white/90 dark:bg-[#0c1622]/90 backdrop-blur-xl px-4 md:px-6 shadow-[0_4px_20px_rgba(6,30,43,0.04)]">
+                        <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center justify-between gap-3 border-b border-slate-200/80 dark:border-white/10 bg-white/90 dark:bg-[#0A1F1A]/90 backdrop-blur-xl px-4 md:px-6 shadow-[0_4px_20px_rgba(4,30,23,0.04)]">
                           <div className="flex items-center gap-3 min-w-0">
-                            <SidebarTrigger className="h-9 w-9 rounded-full bg-[#EBF5F8] hover:bg-[#0E7490] text-[#0E7490] hover:text-white dark:bg-white/10 dark:text-cyan-300 transition-colors" />
+                            <SidebarTrigger className="h-9 w-9 rounded-full bg-[#F3EFE6] hover:bg-[#065F46] text-[#065F46] hover:text-white dark:bg-white/10 dark:text-[#E5C882] transition-colors" />
                             <div className="flex flex-col min-w-0">
                               <div className="flex items-center gap-1.5">
-                                <span className="h-2 w-2 rounded-full bg-[#0E7490] dark:bg-cyan-400 shrink-0" />
-                                <span className="font-mono text-[9.5px] font-bold uppercase tracking-[0.16em] text-[#0E7490] dark:text-cyan-300 truncate">
+                                <span className="h-2 w-2 rounded-full bg-[#065F46] dark:bg-[#C8A253] shrink-0" />
+                                <span className="font-mono text-[9.5px] font-bold uppercase tracking-[0.16em] text-[#065F46] dark:text-[#E5C882] truncate">
                                   Kecamatan Gandrungmangu
                                 </span>
                               </div>
-                              <span className="font-hero font-extrabold text-sm sm:text-base text-[#061E2B] dark:text-white truncate leading-tight">
+                              <span className="font-hero font-extrabold text-sm sm:text-base text-[#041E17] dark:text-white truncate leading-tight">
                                 {getSystemPageTitle(pathname)}
                               </span>
                             </div>
@@ -240,28 +240,28 @@ export default function RootLayout({
                           <div className="flex items-center gap-2 shrink-0">
                             <Link
                               href="/kunjungan-tamu/?channel=front_office"
-                              className="hidden lg:inline-flex items-center gap-1.5 h-8 px-3.5 rounded-full bg-[#EBF5F8] hover:bg-[#0E7490] text-[#0E7490] hover:text-white dark:bg-white/10 dark:text-cyan-300 font-hero text-[11px] font-bold transition-all"
+                              className="hidden lg:inline-flex items-center gap-1.5 h-8 px-3.5 rounded-full bg-[#F3EFE6] hover:bg-[#065F46] text-[#065F46] hover:text-white dark:bg-white/10 dark:text-[#E5C882] font-hero text-[11px] font-bold transition-all"
                             >
                               <Users className="h-3.5 w-3.5" />
                               <span>Kunjungan Tamu</span>
                             </Link>
                             <Link
                               href="/"
-                              className="hidden sm:inline-flex items-center gap-1.5 h-8 px-3.5 rounded-full bg-[#061E2B] hover:bg-[#0E7490] text-white font-hero text-[11px] font-bold transition-all"
+                              className="hidden sm:inline-flex items-center gap-1.5 h-8 px-3.5 rounded-full bg-[#041E17] hover:bg-[#065F46] text-white font-hero text-[11px] font-bold transition-all"
                             >
-                              <Globe className="h-3.5 w-3.5 text-cyan-300" />
+                              <Globe className="h-3.5 w-3.5 text-[#E5C882]" />
                               <span>Portal Warga</span>
                             </Link>
                             <Link
                               href="/admin/"
-                              className="inline-flex items-center gap-1.5 h-8 px-3 sm:px-3.5 rounded-full bg-[#0E7490] hover:bg-[#0884A6] text-white dark:bg-cyan-500/20 dark:text-cyan-200 dark:border dark:border-cyan-400/30 dark:hover:bg-cyan-500/30 font-hero text-[11px] font-bold shadow-sm transition-all"
+                              className="inline-flex items-center gap-1.5 h-8 px-3 sm:px-3.5 rounded-full bg-[#065F46] hover:bg-[#047857] text-white dark:bg-[#C8A253]/20 dark:text-[#E5C882] dark:border dark:border-[#C8A253]/30 dark:hover:bg-[#C8A253]/30 font-hero text-[11px] font-bold shadow-sm transition-all"
                               title="Kembali ke Portal Admin"
                             >
                               <ArrowLeft className="h-3.5 w-3.5" />
                               <span className="hidden xs:inline sm:inline">Kembali ke Admin</span>
                             </Link>
                             <NightModeSwitch size="sm" />
-                            <Button variant="ghost" size="icon" asChild className="rounded-full h-9 w-9 bg-[#F3F7F9] hover:bg-[#EBF5F8] dark:bg-white/10 text-[#061E2B] dark:text-slate-200">
+                            <Button variant="ghost" size="icon" asChild className="rounded-full h-9 w-9 bg-[#FAF8F5] hover:bg-[#F3EFE6] dark:bg-white/10 text-[#041E17] dark:text-slate-200">
                               <Link href="/settings/" title="Pengaturan">
                                 <Settings className="h-4 w-4" />
                               </Link>

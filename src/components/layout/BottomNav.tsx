@@ -25,7 +25,7 @@ export function BottomNav() {
   if (!mounted) return null
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-slate-200/80 dark:border-white/10 bg-white/95 dark:bg-[#0c1622]/95 backdrop-blur-xl px-2 pb-safe-area-inset-bottom md:hidden shadow-[0_-8px_30px_rgba(6,30,43,0.08)]">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-slate-200/80 dark:border-white/10 bg-white/95 dark:bg-[#0A1F1A]/95 backdrop-blur-xl px-2 pb-safe-area-inset-bottom md:hidden shadow-[0_-8px_30px_rgba(4,30,23,0.08)]">
       <div className="flex justify-around py-2.5">
         {navItems.map((item) => {
           const isActive =
@@ -39,7 +39,7 @@ export function BottomNav() {
               className={cn(
                 "flex flex-col items-center gap-1 px-3 py-1 rounded-2xl transition-all active:scale-95 relative",
                 isActive
-                  ? "text-[#0E7490] dark:text-cyan-300"
+                  ? "text-[#065F46] dark:text-[#E5C882]"
                   : "text-slate-500 dark:text-slate-400"
               )}
             >
@@ -48,7 +48,7 @@ export function BottomNav() {
                 {item.label}
               </span>
               {isActive && (
-                <div className="absolute -top-0.5 w-1.5 h-1.5 rounded-full bg-[#f4c430] shadow-[0_0_6px_#f4c430]" />
+                <div className="absolute -top-0.5 w-1.5 h-1.5 rounded-full bg-[#C8A253] shadow-[0_0_6px_#C8A253]" />
               )}
             </Link>
           )

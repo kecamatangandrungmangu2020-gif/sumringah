@@ -49,8 +49,8 @@ export function NewsSection({ newsList, formatNewsDate, onSelectNews }: NewsSect
     >
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6 sm:mb-7">
         <div>
-          <h2 className="font-hero font-bold text-2xl sm:text-3xl lg:text-[34px] tracking-tight text-[#061E2B] dark:text-white leading-tight">
-            Informasi &amp; Warta <span className="text-[#0E7490] dark:text-cyan-400">Gandrungmangu</span>
+          <h2 className="font-hero font-bold text-2xl sm:text-3xl lg:text-[34px] tracking-tight text-[#041E17] dark:text-white leading-tight">
+            Informasi &amp; Warta <span className="text-[#065F46] dark:text-[#E5C882]">Gandrungmangu</span>
           </h2>
           <p className="mt-1 font-hero text-xs sm:text-sm text-slate-500 dark:text-slate-400">
             Publikasi resmi kegiatan pemerintahan, pelayanan publik, dan kabar masyarakat Kecamatan
@@ -59,7 +59,7 @@ export function NewsSection({ newsList, formatNewsDate, onSelectNews }: NewsSect
 
         <Link
           href="/informasi"
-          className="inline-flex items-center gap-1.5 self-start md:self-auto px-4 py-2 rounded-full bg-[#EBF5F8] hover:bg-[#0E7490] text-[#0E7490] hover:text-white dark:bg-cyan-950/60 dark:text-cyan-300 font-hero text-xs font-semibold transition-all"
+          className="inline-flex items-center gap-1.5 self-start md:self-auto px-4 py-2 rounded-full bg-[#F3EFE6] hover:bg-[#065F46] text-[#065F46] hover:text-white dark:bg-[#064E3B]/60 dark:text-[#E5C882] font-hero text-xs font-semibold transition-all"
         >
           <span>Semua Informasi</span>
           <ArrowRight className="h-3.5 w-3.5" />
@@ -67,11 +67,11 @@ export function NewsSection({ newsList, formatNewsDate, onSelectNews }: NewsSect
       </div>
 
       {!featuredNews ? (
-        <div className="p-12 sm:p-16 rounded-[24px] bg-[#F3F7F9] dark:bg-white/[0.03] border border-dashed border-slate-300/80 dark:border-white/15 text-center space-y-3 max-w-lg mx-auto">
-          <div className="w-14 h-14 rounded-full bg-[#EBF5F8] dark:bg-cyan-950/60 text-[#0E7490] dark:text-cyan-300 flex items-center justify-center mx-auto">
+        <div className="p-12 sm:p-16 rounded-[24px] bg-[#FAF8F5] dark:bg-white/[0.03] border border-dashed border-slate-300/80 dark:border-white/15 text-center space-y-3 max-w-lg mx-auto">
+          <div className="w-14 h-14 rounded-full bg-[#F3EFE6] dark:bg-[#064E3B]/60 text-[#065F46] dark:text-[#E5C882] flex items-center justify-center mx-auto">
             <Newspaper className="w-7 h-7" />
           </div>
-          <h4 className="font-hero text-base font-bold text-[#061E2B] dark:text-white">
+          <h4 className="font-hero text-base font-bold text-[#041E17] dark:text-white">
             Belum Ada Informasi Terkini
           </h4>
           <p className="font-hero text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
@@ -104,7 +104,7 @@ export function NewsSection({ newsList, formatNewsDate, onSelectNews }: NewsSect
                     >
                       <div className="space-y-2 w-full">
                         <div className="flex items-center justify-between gap-2">
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#0E7490] text-white font-hero text-[9.5px] font-bold uppercase tracking-wider truncate max-w-[60%]">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#065F46] text-white font-hero text-[9.5px] font-bold uppercase tracking-wider truncate max-w-[60%]">
                             {art.youtubeVideoId && <Video className="h-2.5 w-2.5 shrink-0" />}
                             {art.category || 'INFORMASI'}
                           </span>
@@ -112,14 +112,14 @@ export function NewsSection({ newsList, formatNewsDate, onSelectNews }: NewsSect
                             {formatNewsDate(art.date)}
                           </span>
                         </div>
-                        <h3 className="font-hero font-bold text-sm text-[#061E2B] dark:text-white group-hover:text-[#0E7490] dark:group-hover:text-cyan-300 transition-colors line-clamp-2 leading-snug">
+                        <h3 className="font-hero font-bold text-sm text-[#041E17] dark:text-white group-hover:text-[#065F46] dark:group-hover:text-[#E5C882] transition-colors line-clamp-2 leading-snug">
                           {art.title}
                         </h3>
                         <p className="font-hero text-xs text-slate-600 dark:text-slate-400 line-clamp-2 leading-relaxed">
                           {art.excerpt || art.content}
                         </p>
                       </div>
-                      <div className="pt-3 mt-2 w-full flex items-center justify-between text-[11px] font-hero font-semibold text-[#0E7490] dark:text-cyan-400">
+                      <div className="pt-3 mt-2 w-full flex items-center justify-between text-[11px] font-hero font-semibold text-[#065F46] dark:text-[#E5C882]">
                         <span className="truncate text-slate-500 dark:text-slate-400 font-normal">
                           {art.author || 'Redaksi Kecamatan'}
                         </span>
@@ -140,15 +140,15 @@ export function NewsSection({ newsList, formatNewsDate, onSelectNews }: NewsSect
             )}
 
             {/* Dark Marine Navy Bottom Quick-News Strip */}
-            <div className="relative overflow-hidden rounded-2xl bg-[#061E2B] dark:bg-[#08131d] text-white p-4 space-y-2.5">
+            <div className="relative overflow-hidden rounded-2xl bg-[#041E17] dark:bg-[#08131d] text-white p-4 space-y-2.5">
               <CardSilhouetteOverlay pattern="geometric" />
               <div className="relative z-10 flex items-center justify-between">
-                <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-cyan-300">
+                <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#E5C882]">
                   Arsip &amp; Indeks Publikasi
                 </span>
                 <Link
                   href="/informasi"
-                  className="font-hero text-[11px] font-semibold text-[#f4c430] hover:underline"
+                  className="font-hero text-[11px] font-semibold text-[#C8A253] hover:underline"
                 >
                   Indeks Informasi →
                 </Link>
@@ -162,15 +162,15 @@ export function NewsSection({ newsList, formatNewsDate, onSelectNews }: NewsSect
                       onClick={() => onSelectNews(art)}
                       className="group flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 transition-colors text-left cursor-pointer"
                     >
-                      <span className="font-hero text-xs font-medium text-white/95 group-hover:text-[#f4c430] line-clamp-1">
+                      <span className="font-hero text-xs font-medium text-white/95 group-hover:text-[#C8A253] line-clamp-1">
                         {art.title}
                       </span>
-                      <ArrowRight className="h-3.5 w-3.5 text-cyan-300 shrink-0 transition-transform group-hover:translate-x-0.5" />
+                      <ArrowRight className="h-3.5 w-3.5 text-[#E5C882] shrink-0 transition-transform group-hover:translate-x-0.5" />
                     </button>
                   ))}
                 </div>
               ) : (
-                <p className="relative z-10 font-hero text-xs text-cyan-100/80">
+                <p className="relative z-10 font-hero text-xs text-[#F5E9CC]/80">
                   Jelajahi seluruh dokumentasi warta, pengumuman, dan galeri kegiatan resmi Kecamatan Gandrungmangu.
                 </p>
               )}
@@ -192,7 +192,7 @@ export function NewsSection({ newsList, formatNewsDate, onSelectNews }: NewsSect
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') onSelectNews(featuredNews);
               }}
-              className="group relative flex flex-col justify-end h-full min-h-[360px] lg:min-h-[430px] rounded-[24px] overflow-hidden bg-[#061E2B] p-6 text-white shadow-[0_16px_42px_rgba(6,30,43,0.18)] cursor-pointer"
+              className="group relative flex flex-col justify-end h-full min-h-[360px] lg:min-h-[430px] rounded-[24px] overflow-hidden bg-[#041E17] p-6 text-white shadow-[0_16px_42px_rgba(4,30,23,0.18)] cursor-pointer"
             >
               <div className="absolute inset-0">
                 {featuredNews.imageUrl || (featuredNews.images && featuredNews.images.length > 0) || featuredNews.youtubeVideoId ? (
@@ -205,23 +205,23 @@ export function NewsSection({ newsList, formatNewsDate, onSelectNews }: NewsSect
                     className="w-full h-full"
                   />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-[#0E7490] via-[#084C61] to-[#061E2B]" />
+                  <div className="w-full h-full bg-gradient-to-br from-[#065F46] via-[#084C61] to-[#041E17]" />
                 )}
               </div>
-              <div className="absolute inset-0 bg-gradient-to-t from-[#061E2B]/95 via-[#061E2B]/50 to-transparent pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#041E17]/95 via-[#041E17]/50 to-transparent pointer-events-none" />
 
               <div className="relative z-10 space-y-2.5">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="px-3 py-1 rounded-full bg-[#0E7490] text-white font-hero text-[10px] font-bold uppercase tracking-wider">
+                  <span className="px-3 py-1 rounded-full bg-[#065F46] text-white font-hero text-[10px] font-bold uppercase tracking-wider">
                     {featuredNews.category || 'SOROTAN UTAMA'}
                   </span>
-                  <span className="inline-flex items-center gap-1 font-mono text-[10.5px] text-cyan-100/90">
-                    <Calendar className="h-3 w-3 text-[#f4c430]" />
+                  <span className="inline-flex items-center gap-1 font-mono text-[10.5px] text-[#F5E9CC]/90">
+                    <Calendar className="h-3 w-3 text-[#C8A253]" />
                     {formatNewsDate(featuredNews.date)}
                   </span>
                 </div>
 
-                <h3 className="font-hero font-bold text-lg sm:text-xl text-white leading-snug line-clamp-3 group-hover:text-cyan-200 transition-colors">
+                <h3 className="font-hero font-bold text-lg sm:text-xl text-white leading-snug line-clamp-3 group-hover:text-[#E5C882] transition-colors">
                   {featuredNews.title}
                 </h3>
 
@@ -230,11 +230,11 @@ export function NewsSection({ newsList, formatNewsDate, onSelectNews }: NewsSect
                 </p>
 
                 <div className="pt-2 flex items-center justify-between border-t border-white/15">
-                  <span className="inline-flex items-center gap-1.5 font-hero text-[11px] text-cyan-100/85">
-                    <User className="h-3.5 w-3.5 text-[#f4c430]" />
+                  <span className="inline-flex items-center gap-1.5 font-hero text-[11px] text-[#F5E9CC]/85">
+                    <User className="h-3.5 w-3.5 text-[#C8A253]" />
                     {featuredNews.author || 'Redaksi Kecamatan'}
                   </span>
-                  <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#f4c430] text-[#061E2B] font-hero text-[11px] font-bold transition-transform group-hover:scale-105">
+                  <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#C8A253] text-[#041E17] font-hero text-[11px] font-bold transition-transform group-hover:scale-105">
                     <span>Selengkapnya</span>
                     <ArrowRight className="h-3.5 w-3.5" />
                   </span>

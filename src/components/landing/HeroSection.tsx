@@ -51,25 +51,25 @@ const QUICK_DOCK_ITEMS = [
     label: 'Antrian Online',
     href: '/Antrian/online/',
     icon: Ticket,
-    accent: 'text-cyan-300 group-hover:text-white',
+    accent: 'text-[#E5C882] group-hover:text-white',
   },
   {
     label: 'Register Kunjungan',
     href: '/kunjungan-tamu/',
     icon: Users,
-    accent: 'text-sky-300 group-hover:text-white',
+    accent: 'text-[#E5C882] group-hover:text-white',
   },
   {
     label: 'Agenda Acara',
     href: '#agenda',
     icon: Calendar,
-    accent: 'text-cyan-200 group-hover:text-white',
+    accent: 'text-[#E5C882] group-hover:text-white',
   },
   {
     label: 'Data SOLID',
     href: 'https://solid.gandrungmangu.id/',
     icon: Layers,
-    accent: 'text-teal-300 group-hover:text-white',
+    accent: 'text-[#E5C882] group-hover:text-white',
     external: true,
   },
 ];
@@ -108,18 +108,18 @@ const HeroDigitalClock = React.memo(function HeroDigitalClock() {
   }, [currentDateTime]);
 
   return (
-    <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-2xl bg-[#061E2B]/80 backdrop-blur-md border border-cyan-300/25 shadow-sm min-w-[146px]">
+    <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-2xl bg-[#041E17]/80 backdrop-blur-md border border-[#C8A253]/25 shadow-sm min-w-[146px]">
       <div className="flex flex-col items-start leading-none">
         <div className="flex items-center gap-1.5 font-mono text-[11px] sm:text-xs font-bold text-white tracking-widest">
-          <span className="w-1.5 h-1.5 rounded-full bg-cyan-300 animate-pulse shadow-[0_0_8px_#67e8f9]" />
+          <span className="w-1.5 h-1.5 rounded-full bg-[#E5C882] animate-pulse shadow-[0_0_8px_#E5C882]" />
           <span className="tabular-nums">
             {formattedDateTime ? formattedDateTime.time : '00:00:00'}
           </span>
-          <span className="text-[9px] text-cyan-300 font-semibold tracking-normal font-mono ml-0.5">
+          <span className="text-[9px] text-[#E5C882] font-semibold tracking-normal font-mono ml-0.5">
             WIB
           </span>
         </div>
-        <span className="text-[8.5px] sm:text-[9px] font-mono font-medium uppercase tracking-[0.12em] text-cyan-100/75 mt-0.5">
+        <span className="text-[8.5px] sm:text-[9px] font-mono font-medium uppercase tracking-[0.12em] text-[#F5E9CC]/75 mt-0.5">
           {formattedDateTime ? formattedDateTime.date : 'WIB • GANDRUNGMANGU'}
         </span>
       </div>
@@ -160,7 +160,7 @@ export function HeroSection({
         videoUrl: MASCOT_VIDEO_URL,
         actionText: 'Ambil Antrian Online',
         actionUrl: '/Antrian/online/',
-        colorTone: 'from-[#08384a]/78 via-[#146a80]/60 to-[#062230]/86',
+        colorTone: 'from-[#064E3B]/78 via-[#0D6E52]/60 to-[#04231B]/86',
       },
       {
         id: 'slide-pelayanan-digital',
@@ -172,7 +172,7 @@ export function HeroSection({
         imageUrl: primaryImg,
         actionText: 'Isi Register Kunjungan',
         actionUrl: '/kunjungan-tamu/',
-        colorTone: 'from-[#0a3d50]/78 via-[#166e85]/62 to-[#072636]/86',
+        colorTone: 'from-[#064E3B]/78 via-[#0D6E52]/62 to-[#04231B]/86',
       },
       {
         id: 'slide-wilayah-solid',
@@ -184,7 +184,7 @@ export function HeroSection({
         imageUrl: territoryImg,
         actionText: 'Jelajahi Data Wilayah',
         actionUrl: '#wilayah',
-        colorTone: 'from-[#0b4254]/78 via-[#18778f]/60 to-[#082838]/86',
+        colorTone: 'from-[#064E3B]/78 via-[#0D6E52]/60 to-[#04231B]/86',
       },
       {
         id: 'slide-agenda-publik',
@@ -197,7 +197,7 @@ export function HeroSection({
           'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?q=80&w=1280&auto=format&fit=crop',
         actionText: 'Lihat Agenda Kegiatan',
         actionUrl: '#agenda',
-        colorTone: 'from-[#093b4d]/78 via-[#16738a]/62 to-[#072433]/86',
+        colorTone: 'from-[#064E3B]/78 via-[#0D6E52]/62 to-[#04231B]/86',
       },
     ];
   }, [heroImage, wilayahBgImage]);
@@ -274,9 +274,9 @@ export function HeroSection({
   return (
     <section
       id="hero-roto-section"
-      className="relative min-h-[100svh] lg:h-[100dvh] lg:max-h-[1080px] lg:min-h-[600px] w-full bg-white dark:bg-[#070b10] p-2 sm:p-3 lg:p-3.5 snap-section"
+      className="relative min-h-[100svh] lg:h-[100dvh] lg:max-h-[1080px] lg:min-h-[600px] w-full bg-white dark:bg-[#05110E] p-2 sm:p-3 lg:p-3.5 snap-section"
     >
-      <div className="relative h-full min-h-[calc(100svh-16px)] sm:min-h-[calc(100svh-24px)] lg:min-h-0 w-full rounded-[20px] sm:rounded-[26px] lg:rounded-[28px] overflow-hidden bg-[#072636] text-white flex flex-col justify-between select-none shadow-[0_12px_40px_rgba(7,22,30,0.12)]">
+      <div className="relative h-full min-h-[calc(100svh-16px)] sm:min-h-[calc(100svh-24px)] lg:min-h-0 w-full rounded-[20px] sm:rounded-[26px] lg:rounded-[28px] overflow-hidden bg-[#04231B] text-white flex flex-col justify-between select-none shadow-[0_12px_40px_rgba(7,22,30,0.12)]">
         {/* 1. ATMOSPHERIC LUMINOUS TEAL/CYAN BACKDROP */}
         <div className="absolute inset-0 z-0 overflow-hidden">
           <AnimatePresence mode="popLayout" initial={false}>
@@ -311,11 +311,11 @@ export function HeroSection({
             className="absolute inset-0 pointer-events-none"
             style={{
               background:
-                'radial-gradient(ellipse 72% 58% at 58% 44%, rgba(56, 189, 248, 0.28) 0%, rgba(14, 116, 144, 0.1) 52%, rgba(4, 20, 30, 0.52) 100%)',
+                'radial-gradient(ellipse 72% 58% at 58% 44%, rgba(200, 162, 83, 0.28) 0%, rgba(6, 95, 70, 0.1) 52%, rgba(4, 20, 30, 0.52) 100%)',
             }}
           />
-          <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-[#041620]/80 via-[#041620]/28 to-transparent pointer-events-none" />
-          <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[#041620]/75 via-[#041620]/20 to-transparent pointer-events-none" />
+          <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-[#031712]/80 via-[#031712]/28 to-transparent pointer-events-none" />
+          <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[#031712]/75 via-[#031712]/20 to-transparent pointer-events-none" />
         </div>
 
         {/* Center Banner Video / 5-Column Reveal */}
@@ -365,10 +365,10 @@ export function HeroSection({
                     initial={transitionTick === 0 ? false : { opacity: 0, y: -8 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.45, delay: 0.08, ease: EASE_CINEMATIC }}
-                    className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-[#061E2B]/75 backdrop-blur-md border border-cyan-300/35 mb-3 sm:mb-4 shadow-[0_6px_20px_rgba(6,30,43,0.35)]"
+                    className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-[#041E17]/75 backdrop-blur-md border border-[#C8A253]/35 mb-3 sm:mb-4 shadow-[0_6px_20px_rgba(4,30,23,0.35)]"
                   >
-                    <span className="h-2 w-2 rounded-full bg-cyan-300 shadow-[0_0_8px_#67e8f9]" />
-                    <span className="font-mono text-[9.5px] sm:text-[10.5px] font-semibold uppercase tracking-[0.22em] text-cyan-50">
+                    <span className="h-2 w-2 rounded-full bg-[#E5C882] shadow-[0_0_8px_#E5C882]" />
+                    <span className="font-mono text-[9.5px] sm:text-[10.5px] font-semibold uppercase tracking-[0.22em] text-[#FAF8F5]">
                       {activeSlide.tag}
                     </span>
                   </motion.div>
@@ -386,11 +386,11 @@ export function HeroSection({
                     transition={{ duration: 0.48, delay: 0.28, ease: EASE_CINEMATIC }}
                     className="mt-3 sm:mt-4 flex items-center justify-center gap-2.5 sm:gap-3.5"
                   >
-                    <span className="hidden sm:block w-8 sm:w-12 h-[1.5px] bg-cyan-300/75" />
-                    <p className="font-hero text-[11px] sm:text-[13px] font-bold uppercase tracking-[0.2em] text-cyan-200 drop-shadow-[0_2px_10px_rgba(0,0,0,0.85)]">
+                    <span className="hidden sm:block w-8 sm:w-12 h-[1.5px] bg-[#E5C882]/75" />
+                    <p className="font-hero text-[11px] sm:text-[13px] font-bold uppercase tracking-[0.2em] text-[#E5C882] drop-shadow-[0_2px_10px_rgba(0,0,0,0.85)]">
                       {activeSlide.subtitle}
                     </p>
-                    <span className="hidden sm:block w-8 sm:w-12 h-[1.5px] bg-cyan-300/75" />
+                    <span className="hidden sm:block w-8 sm:w-12 h-[1.5px] bg-[#E5C882]/75" />
                   </motion.div>
 
                   <motion.p
@@ -410,7 +410,7 @@ export function HeroSection({
                   >
                     <Link
                       href={activeSlide.actionUrl}
-                      className="group inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#0E7490] hover:bg-white text-white hover:text-[#061E2B] border border-cyan-300/40 font-hero font-bold text-[11px] sm:text-xs uppercase tracking-[0.16em] shadow-[0_12px_30px_rgba(14,116,144,0.45)] transition-all duration-300 active:scale-95"
+                      className="group inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#065F46] hover:bg-white text-white hover:text-[#041E17] border border-[#C8A253]/40 font-hero font-bold text-[11px] sm:text-xs uppercase tracking-[0.16em] shadow-[0_12px_30px_rgba(6,95,70,0.45)] transition-all duration-300 active:scale-95"
                     >
                       <span>{activeSlide.actionText}</span>
                       <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
@@ -420,9 +420,9 @@ export function HeroSection({
                       href="https://sisukma.cilacapkab.go.id/Home/pelayanan/4012001"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="group inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-[#061E2B]/70 hover:bg-[#f4c430] text-white hover:text-[#061E2B] border border-white/25 backdrop-blur-md font-hero font-bold text-[11px] uppercase tracking-[0.14em] transition-all duration-300"
+                      className="group inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-[#041E17]/70 hover:bg-[#C8A253] text-white hover:text-[#041E17] border border-white/25 backdrop-blur-md font-hero font-bold text-[11px] uppercase tracking-[0.14em] transition-all duration-300"
                     >
-                      <Star className="h-3.5 w-3.5 text-[#f4c430] group-hover:text-[#061E2B] fill-current" />
+                      <Star className="h-3.5 w-3.5 text-[#C8A253] group-hover:text-[#041E17] fill-current" />
                       <span>Bantu Nilai Kami</span>
                     </a>
 
@@ -431,7 +431,7 @@ export function HeroSection({
                         type="button"
                         onClick={handlePrev}
                         aria-label="Slide Sebelumnya"
-                        className="h-9 w-9 sm:h-10 sm:w-10 rounded-full border border-cyan-200/35 bg-[#061E2B]/65 hover:bg-[#0E7490] hover:border-cyan-200/60 text-white backdrop-blur-md flex items-center justify-center transition-all cursor-pointer active:scale-90"
+                        className="h-9 w-9 sm:h-10 sm:w-10 rounded-full border border-[#E5C882]/35 bg-[#041E17]/65 hover:bg-[#065F46] hover:border-[#E5C882]/60 text-white backdrop-blur-md flex items-center justify-center transition-all cursor-pointer active:scale-90"
                       >
                         <ArrowLeft className="h-3.5 w-3.5" />
                       </button>
@@ -439,7 +439,7 @@ export function HeroSection({
                         type="button"
                         onClick={handleNext}
                         aria-label="Slide Berikutnya"
-                        className="h-9 w-9 sm:h-10 sm:w-10 rounded-full border border-cyan-200/35 bg-[#061E2B]/65 hover:bg-[#0E7490] hover:border-cyan-200/60 text-white backdrop-blur-md flex items-center justify-center transition-all cursor-pointer active:scale-90"
+                        className="h-9 w-9 sm:h-10 sm:w-10 rounded-full border border-[#E5C882]/35 bg-[#041E17]/65 hover:bg-[#065F46] hover:border-[#E5C882]/60 text-white backdrop-blur-md flex items-center justify-center transition-all cursor-pointer active:scale-90"
                       >
                         <ArrowRight className="h-3.5 w-3.5" />
                       </button>
@@ -467,7 +467,7 @@ export function HeroSection({
                       className="flex items-center gap-2.5 mb-2.5 sm:mb-3 max-w-full"
                     >
                       <DottedMatrixBar activeIndex={safeIndex} totalSlides={slides.length} align="left" />
-                      <span className="px-3 py-0.5 rounded-full bg-[#0E7490]/80 border border-cyan-300/35 backdrop-blur-sm font-mono text-[9.5px] sm:text-[10px] font-semibold uppercase tracking-[0.16em] text-white truncate">
+                      <span className="px-3 py-0.5 rounded-full bg-[#065F46]/80 border border-[#C8A253]/35 backdrop-blur-sm font-mono text-[9.5px] sm:text-[10px] font-semibold uppercase tracking-[0.16em] text-white truncate">
                         {activeSlide.tag}
                       </span>
                     </motion.div>
@@ -486,14 +486,14 @@ export function HeroSection({
                       className="flex items-center gap-1 origin-left my-3 sm:my-3.5"
                     >
                       <span className="w-20 sm:w-24 h-[2px] bg-white/85" />
-                      <span className="w-6 h-[2px] bg-cyan-300" />
+                      <span className="w-6 h-[2px] bg-[#E5C882]" />
                     </motion.div>
 
                     <motion.p
                       initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.42, delay: 0.32, ease: EASE_CINEMATIC }}
-                      className="font-hero text-[11px] sm:text-xs font-semibold uppercase tracking-[0.13em] text-cyan-200"
+                      className="font-hero text-[11px] sm:text-xs font-semibold uppercase tracking-[0.13em] text-[#E5C882]"
                     >
                       {activeSlide.subtitle}
                     </motion.p>
@@ -515,7 +515,7 @@ export function HeroSection({
                     >
                       <Link
                         href={activeSlide.actionUrl}
-                        className="group inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 rounded-full bg-white hover:bg-[#0E7490] text-[#061E2B] hover:text-white font-hero font-bold text-[11px] uppercase tracking-[0.15em] shadow-[0_10px_28px_rgba(6,30,43,0.35)] transition-all duration-300 active:scale-95"
+                        className="group inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 rounded-full bg-white hover:bg-[#065F46] text-[#041E17] hover:text-white font-hero font-bold text-[11px] uppercase tracking-[0.15em] shadow-[0_10px_28px_rgba(4,30,23,0.35)] transition-all duration-300 active:scale-95"
                       >
                         <span>{activeSlide.actionText}</span>
                         <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
@@ -526,7 +526,7 @@ export function HeroSection({
                           type="button"
                           onClick={handlePrev}
                           aria-label="Slide Sebelumnya"
-                          className="h-9 w-9 rounded-full border border-cyan-200/35 bg-[#061E2B]/55 hover:bg-[#0E7490] hover:border-cyan-200/60 text-white backdrop-blur-md flex items-center justify-center transition-all cursor-pointer active:scale-90"
+                          className="h-9 w-9 rounded-full border border-[#E5C882]/35 bg-[#041E17]/55 hover:bg-[#065F46] hover:border-[#E5C882]/60 text-white backdrop-blur-md flex items-center justify-center transition-all cursor-pointer active:scale-90"
                         >
                           <ArrowLeft className="h-3.5 w-3.5" />
                         </button>
@@ -534,7 +534,7 @@ export function HeroSection({
                           type="button"
                           onClick={handleNext}
                           aria-label="Slide Berikutnya"
-                          className="h-9 w-9 rounded-full border border-cyan-200/35 bg-[#061E2B]/55 hover:bg-[#0E7490] hover:border-cyan-200/60 text-white backdrop-blur-md flex items-center justify-center transition-all cursor-pointer active:scale-90"
+                          className="h-9 w-9 rounded-full border border-[#E5C882]/35 bg-[#041E17]/55 hover:bg-[#065F46] hover:border-[#E5C882]/60 text-white backdrop-blur-md flex items-center justify-center transition-all cursor-pointer active:scale-90"
                         >
                           <ArrowRight className="h-3.5 w-3.5" />
                         </button>
@@ -547,7 +547,7 @@ export function HeroSection({
                       transition={{ duration: 0.45, delay: 0.52 }}
                       className="hidden sm:flex items-center gap-2 mt-3"
                     >
-                      <span className="h-[1px] w-5 bg-cyan-200/50" />
+                      <span className="h-[1px] w-5 bg-[#E5C882]/50" />
                       <BroadcastTimecode activeIndex={safeIndex} />
                     </motion.div>
                   </div>
@@ -580,7 +580,7 @@ export function HeroSection({
           className="relative z-30 w-full pb-3 sm:pb-4 px-4 sm:px-8 lg:px-12 shrink-0 space-y-2"
         >
           <motion.div variants={listItemStagger} className="mx-auto max-w-2xl flex items-center justify-center">
-            <div className="grid grid-cols-4 gap-1 sm:gap-1.5 p-1.5 rounded-2xl sm:rounded-full bg-[#061E2B]/80 backdrop-blur-xl border border-cyan-300/25 shadow-[0_14px_36px_rgba(6,30,43,0.5)] w-full sm:w-auto">
+            <div className="grid grid-cols-4 gap-1 sm:gap-1.5 p-1.5 rounded-2xl sm:rounded-full bg-[#041E17]/80 backdrop-blur-xl border border-[#C8A253]/25 shadow-[0_14px_36px_rgba(4,30,23,0.5)] w-full sm:w-auto">
               {QUICK_DOCK_ITEMS.map((item) => {
                 const Icon = item.icon;
                 const inner = (
@@ -598,7 +598,7 @@ export function HeroSection({
                       href={item.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="group flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 rounded-xl sm:rounded-full hover:bg-[#0E7490] hover:-translate-y-0.5 active:scale-95 transition-all text-center"
+                      className="group flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 rounded-xl sm:rounded-full hover:bg-[#065F46] hover:-translate-y-0.5 active:scale-95 transition-all text-center"
                     >
                       {inner}
                     </a>
@@ -608,7 +608,7 @@ export function HeroSection({
                   <Link
                     key={item.label}
                     href={item.href}
-                    className="group flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 rounded-xl sm:rounded-full hover:bg-[#0E7490] hover:-translate-y-0.5 active:scale-95 transition-all text-center"
+                    className="group flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 rounded-xl sm:rounded-full hover:bg-[#065F46] hover:-translate-y-0.5 active:scale-95 transition-all text-center"
                   >
                     {inner}
                   </Link>
@@ -629,10 +629,10 @@ export function HeroSection({
                 onClick={handleDiscover}
                 className="group flex flex-col items-center justify-center gap-0.5 cursor-pointer text-white/90 hover:text-white transition-all text-center"
               >
-                <span className="text-[10.5px] font-hero font-semibold uppercase tracking-[0.26em] pl-[0.26em] border-b border-white/40 group-hover:border-cyan-300 pb-0.5 transition-colors whitespace-nowrap">
+                <span className="text-[10.5px] font-hero font-semibold uppercase tracking-[0.26em] pl-[0.26em] border-b border-white/40 group-hover:border-[#C8A253] pb-0.5 transition-colors whitespace-nowrap">
                   Jelajahi Kecamatan Kami
                 </span>
-                <ChevronDown className="h-3.5 w-3.5 text-cyan-300 animate-bounce transition-colors" />
+                <ChevronDown className="h-3.5 w-3.5 text-[#E5C882] animate-bounce transition-colors" />
               </a>
             </div>
 
@@ -658,7 +658,7 @@ export function HeroSection({
                             initial={{ scaleX: 0 }}
                             animate={{ scaleX: 1 }}
                             transition={{ duration: autoSlideSeconds, ease: 'linear' }}
-                            className="absolute inset-0 bg-cyan-300 origin-left"
+                            className="absolute inset-0 bg-[#E5C882] origin-left"
                           />
                         )}
                       </span>
@@ -671,7 +671,7 @@ export function HeroSection({
                 type="button"
                 onClick={handleRandomize}
                 aria-label="Acak Slide"
-                className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-[#0E7490] hover:bg-white text-white hover:text-[#061E2B] border border-cyan-300/35 transition-all cursor-pointer shadow-[0_6px_20px_rgba(14,116,144,0.45)] hover:scale-105 active:scale-95"
+                className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-[#065F46] hover:bg-white text-white hover:text-[#041E17] border border-[#C8A253]/35 transition-all cursor-pointer shadow-[0_6px_20px_rgba(6,95,70,0.45)] hover:scale-105 active:scale-95"
                 title="Acak Slide"
               >
                 <RotateCw className="h-3.5 w-3.5 sm:h-4 sm:w-4 stroke-[2.2] transition-transform active:rotate-180" />

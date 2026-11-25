@@ -507,8 +507,8 @@ export function InputAgendaForm() {
                       className={cn(
                         "px-2.5 py-1 rounded-full text-[10px] font-bold border transition-all cursor-pointer",
                         selectedDatesList.length === d
-                          ? "bg-[#0E7490] text-white border-[#0E7490]"
-                          : "bg-slate-50 text-slate-600 border-slate-200 hover:border-[#0E7490]/50"
+                          ? "bg-[#065F46] text-white border-[#065F46]"
+                          : "bg-slate-50 text-slate-600 border-slate-200 hover:border-[#065F46]/50"
                       )}
                     >
                       {d} Hari
@@ -565,8 +565,8 @@ export function InputAgendaForm() {
               </div>
 
               {selectedDatesList.length > 1 && (
-                <div className="p-3.5 rounded-2xl bg-cyan-50/80 border border-cyan-200 text-xs space-y-1.5">
-                  <div className="font-bold text-[#0E7490] flex items-center gap-1.5">
+                <div className="p-3.5 rounded-2xl bg-[#F3EFE6]/80 border border-[#E5C882] text-xs space-y-1.5">
+                  <div className="font-bold text-[#065F46] flex items-center gap-1.5">
                     <CalendarDays className="h-4 w-4 shrink-0" />
                     <span>
                       Kegiatan Multi-Hari ({selectedDatesList.length} Hari) — Otomatis dibuat {selectedDatesList.length} agenda di Google Calendar:
@@ -576,7 +576,7 @@ export function InputAgendaForm() {
                     {selectedDatesList.map((dt, idx) => (
                       <span
                         key={idx}
-                        className="px-2.5 py-0.5 rounded-full bg-white border border-cyan-200 text-[11px] font-semibold text-[#061E2B]"
+                        className="px-2.5 py-0.5 rounded-full bg-white border border-[#E5C882] text-[11px] font-semibold text-[#041E17]"
                       >
                         Hari {idx + 1}: {format(dt, "EEE, dd MMM yyyy", { locale: localeID })}
                       </span>

@@ -20,8 +20,8 @@ export function CardSilhouetteOverlay({
       aria-hidden="true"
     >
       {/* Ambient Cyan/Sky Glow Orbs */}
-      <div className="absolute -top-20 -right-20 w-72 h-72 rounded-full bg-cyan-300/20 blur-3xl" />
-      <div className="absolute -bottom-24 -left-16 w-64 h-64 rounded-full bg-cyan-200/10 blur-3xl" />
+      <div className="absolute -top-20 -right-20 w-72 h-72 rounded-full bg-[#E5C882]/20 blur-3xl" />
+      <div className="absolute -bottom-24 -left-16 w-64 h-64 rounded-full bg-[#E5C882]/10 blur-3xl" />
 
       {/* Micro Dot Matrix Pattern */}
       <div
@@ -137,8 +137,8 @@ export function PresentationSheet({
         className={cn(
           'relative overflow-hidden rounded-[24px] sm:rounded-[32px] transition-colors duration-300',
           isOcean
-            ? 'bg-gradient-to-br from-[#0a4d60] via-[#0d6278] to-[#062230] text-white border border-cyan-300/20 shadow-[0_22px_60px_rgba(6,30,43,0.2)]'
-            : 'bg-white dark:bg-[#0c1622] text-[#061E2B] dark:text-slate-100 border border-slate-200/90 dark:border-white/10 shadow-[0_12px_40px_rgba(6,30,43,0.06)] dark:shadow-[0_20px_55px_rgba(0,0,0,0.48)]',
+            ? 'bg-gradient-to-br from-[#064E3B] via-[#065F46] to-[#04231B] text-white border border-[#C8A253]/20 shadow-[0_22px_60px_rgba(4,30,23,0.2)]'
+            : 'bg-white dark:bg-[#0A1F1A] text-[#041E17] dark:text-slate-100 border border-slate-200/90 dark:border-white/10 shadow-[0_12px_40px_rgba(4,30,23,0.06)] dark:shadow-[0_20px_55px_rgba(0,0,0,0.48)]',
           !noPadding && 'p-5 sm:p-8 lg:p-10',
           innerClassName
         )}
@@ -160,16 +160,16 @@ export function PresentationSheet({
               className={cn(
                 'h-2.5 w-2.5 rounded-full shrink-0',
                 isOcean
-                  ? 'bg-[#f4c430] shadow-[0_0_8px_rgba(244,196,48,0.6)]'
-                  : 'bg-[#0E7490] dark:bg-cyan-400'
+                  ? 'bg-[#C8A253] shadow-[0_0_8px_rgba(200,162,83,0.6)]'
+                  : 'bg-[#065F46] dark:bg-[#C8A253]'
               )}
             />
             <span
               className={cn(
                 'font-hero text-[10.5px] sm:text-[11px] font-bold uppercase tracking-[0.14em] truncate',
                 isOcean
-                  ? 'text-cyan-100/90'
-                  : 'text-[#061E2B]/80 dark:text-slate-300'
+                  ? 'text-[#F5E9CC]/90'
+                  : 'text-[#041E17]/80 dark:text-slate-300'
               )}
             >
               Kecamatan Gandrungmangu
@@ -180,7 +180,7 @@ export function PresentationSheet({
             <span
               className={cn(
                 'font-mono text-[10px] font-semibold tracking-[0.14em]',
-                isOcean ? 'text-cyan-200' : 'text-slate-600 dark:text-slate-300'
+                isOcean ? 'text-[#E5C882]' : 'text-slate-600 dark:text-slate-300'
               )}
             >
               {sectionNumber}
@@ -190,7 +190,7 @@ export function PresentationSheet({
                 'px-2.5 py-0.5 rounded-full font-hero text-[9.5px] sm:text-[10px] font-semibold tracking-[0.06em]',
                 isOcean
                   ? 'bg-white/15 text-white border border-white/20 backdrop-blur-xs'
-                  : 'bg-[#EBF5F8] dark:bg-cyan-950/60 text-[#095C73] dark:text-cyan-300'
+                  : 'bg-[#F3EFE6] dark:bg-[#064E3B]/60 text-[#064E3B] dark:text-[#E5C882]'
               )}
             >
               {deckLabel}

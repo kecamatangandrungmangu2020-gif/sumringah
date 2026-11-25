@@ -370,7 +370,7 @@ export default function HomePage() {
   const activeDay = agendaDays[selectedDayTab] || agendaDays[0];
 
   return (
-    <div className="relative flex min-h-screen flex-col bg-white dark:bg-[#070b10] text-slate-900 dark:text-slate-100 overflow-x-clip transition-colors duration-300">
+    <div className="relative flex min-h-screen flex-col bg-white dark:bg-[#05110E] text-slate-900 dark:text-slate-100 overflow-x-clip transition-colors duration-300">
       <BackgroundPattern />
       <FullpageScrollController />
 
@@ -440,34 +440,34 @@ export default function HomePage() {
 
       {/* ── MODAL 1: RINCIAN ACARA AGENDA ───────────────────────────────────── */}
       <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
-        <DialogContent className="max-w-xl rounded-[26px] p-6 sm:p-8 bg-white dark:bg-[#0c1622] border border-slate-200/80 dark:border-white/10 shadow-2xl">
+        <DialogContent className="max-w-xl rounded-[26px] p-6 sm:p-8 bg-white dark:bg-[#0A1F1A] border border-slate-200/80 dark:border-white/10 shadow-2xl">
           {selectedDetailEvent && (
             <div className="space-y-5">
               <DialogHeader className="text-left space-y-2 border-b border-slate-200/80 dark:border-white/10 pb-4">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="font-mono text-[9.5px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#0E7490] text-white">
+                  <span className="font-mono text-[9.5px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#065F46] text-white">
                     Agenda {getEventType(selectedDetailEvent.description)}
                   </span>
-                  <div className="flex items-center gap-1.5 font-mono text-xs font-semibold text-[#061E2B] dark:text-cyan-200 bg-[#EBF5F8] dark:bg-cyan-950/60 px-3 py-0.5 rounded-full">
-                    <Clock className="w-3 h-3 text-[#0E7490] dark:text-cyan-300" />
+                  <div className="flex items-center gap-1.5 font-mono text-xs font-semibold text-[#041E17] dark:text-[#E5C882] bg-[#F3EFE6] dark:bg-[#064E3B]/60 px-3 py-0.5 rounded-full">
+                    <Clock className="w-3 h-3 text-[#065F46] dark:text-[#E5C882]" />
                     <span>{formatTimeRange(selectedDetailEvent.start, selectedDetailEvent.end)}</span>
                   </div>
                 </div>
-                <DialogTitle className="font-hero text-xl sm:text-2xl font-bold text-[#061E2B] dark:text-white leading-snug">
+                <DialogTitle className="font-hero text-xl sm:text-2xl font-bold text-[#041E17] dark:text-white leading-snug">
                   {selectedDetailEvent.summary}
                 </DialogTitle>
                 <DialogDescription className="font-hero text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-                  <Calendar className="w-3.5 h-3.5 text-[#0E7490] dark:text-cyan-400" />
+                  <Calendar className="w-3.5 h-3.5 text-[#065F46] dark:text-[#E5C882]" />
                   <span>{activeDay.fullDate}</span>
                 </DialogDescription>
               </DialogHeader>
 
               <div className="space-y-4 text-xs sm:text-sm text-slate-700 dark:text-slate-200">
-                <div className="p-3.5 rounded-2xl bg-[#F3F7F9] dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/10 space-y-1">
-                  <span className="font-mono text-[10px] font-bold uppercase text-[#0E7490] dark:text-cyan-400 tracking-wider flex items-center gap-1">
+                <div className="p-3.5 rounded-2xl bg-[#FAF8F5] dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/10 space-y-1">
+                  <span className="font-mono text-[10px] font-bold uppercase text-[#065F46] dark:text-[#E5C882] tracking-wider flex items-center gap-1">
                     <MapPin className="w-3 h-3" /> Lokasi Kegiatan
                   </span>
-                  <p className="font-hero font-bold text-[#061E2B] dark:text-white">
+                  <p className="font-hero font-bold text-[#041E17] dark:text-white">
                     {selectedDetailEvent.location || 'Lokasi belum diatur'}
                   </p>
                 </div>
@@ -488,7 +488,7 @@ export default function HomePage() {
                     <span className="font-mono text-[10px] font-bold uppercase text-slate-400 tracking-wider">
                       Keterangan Acara
                     </span>
-                    <p className="p-3.5 rounded-2xl bg-[#F3F7F9] dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/10 leading-relaxed whitespace-pre-line">
+                    <p className="p-3.5 rounded-2xl bg-[#FAF8F5] dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/10 leading-relaxed whitespace-pre-line">
                       {getCleanDescription(selectedDetailEvent.description)}
                     </p>
                   </div>
@@ -496,10 +496,10 @@ export default function HomePage() {
 
                 {getNotulensi(selectedDetailEvent.description) && (
                   <div className="space-y-1.5">
-                    <span className="font-mono text-[10px] font-bold uppercase text-[#0E7490] dark:text-cyan-400 tracking-wider flex items-center gap-1">
+                    <span className="font-mono text-[10px] font-bold uppercase text-[#065F46] dark:text-[#E5C882] tracking-wider flex items-center gap-1">
                       <FileCheck className="w-3.5 h-3.5" /> Catatan / Notulensi Rapat
                     </span>
-                    <div className="p-3.5 rounded-2xl bg-[#EBF5F8] dark:bg-cyan-950/40 border border-cyan-200/70 dark:border-cyan-800/40 leading-relaxed whitespace-pre-line font-medium">
+                    <div className="p-3.5 rounded-2xl bg-[#F3EFE6] dark:bg-[#064E3B]/40 border border-[#E5C882]/70 dark:border-cyan-800/40 leading-relaxed whitespace-pre-line font-medium">
                       {getNotulensi(selectedDetailEvent.description)}
                     </div>
                   </div>
@@ -517,13 +517,13 @@ export default function HomePage() {
                           href={att.fileUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="p-3 rounded-xl bg-[#EBF5F8] hover:bg-[#0E7490] hover:text-white dark:bg-white/5 border border-cyan-200/70 dark:border-white/10 text-[#061E2B] dark:text-cyan-200 font-bold flex items-center justify-between transition-colors"
+                          className="p-3 rounded-xl bg-[#F3EFE6] hover:bg-[#065F46] hover:text-white dark:bg-white/5 border border-[#E5C882]/70 dark:border-white/10 text-[#041E17] dark:text-[#E5C882] font-bold flex items-center justify-between transition-colors"
                         >
                           <span className="flex items-center gap-2 truncate">
                             <Paperclip className="w-4 h-4 shrink-0" />
                             <span className="truncate">{att.title || 'Undangan.pdf'}</span>
                           </span>
-                          <span className="font-mono text-[10px] uppercase font-bold tracking-wider bg-[#061E2B] text-white px-2.5 py-0.5 rounded-full">
+                          <span className="font-mono text-[10px] uppercase font-bold tracking-wider bg-[#041E17] text-white px-2.5 py-0.5 rounded-full">
                             Unduh
                           </span>
                         </a>
@@ -539,7 +539,7 @@ export default function HomePage() {
                     href={selectedDetailEvent.htmlLink}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-full bg-[#EBF5F8] hover:bg-[#0E7490] text-[#0E7490] hover:text-white dark:bg-white/10 dark:text-cyan-300 font-hero font-bold text-xs uppercase tracking-wider transition-colors"
+                    className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-full bg-[#F3EFE6] hover:bg-[#065F46] text-[#065F46] hover:text-white dark:bg-white/10 dark:text-[#E5C882] font-hero font-bold text-xs uppercase tracking-wider transition-colors"
                   >
                     <Globe className="w-3.5 h-3.5" />
                     <span>Google Calendar</span>
@@ -550,7 +550,7 @@ export default function HomePage() {
                 <button
                   type="button"
                   onClick={() => setIsDetailOpen(false)}
-                  className="px-6 py-2 rounded-full bg-[#061E2B] hover:bg-[#0E7490] text-white font-hero font-bold text-xs uppercase tracking-wider transition-colors ml-auto cursor-pointer"
+                  className="px-6 py-2 rounded-full bg-[#041E17] hover:bg-[#065F46] text-white font-hero font-bold text-xs uppercase tracking-wider transition-colors ml-auto cursor-pointer"
                 >
                   Tutup
                 </button>
@@ -562,7 +562,7 @@ export default function HomePage() {
 
       {/* ── MODAL 2: BACA BERITA / INFORMASI TERKINI ────────────────────────── */}
       <Dialog open={isNewsModalOpen} onOpenChange={setIsNewsModalOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 rounded-[26px] border border-slate-200/80 dark:border-white/10 bg-white dark:bg-[#0c1622] shadow-2xl">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 rounded-[26px] border border-slate-200/80 dark:border-white/10 bg-white dark:bg-[#0A1F1A] shadow-2xl">
           {selectedNewsDetail && (
             <div>
               {(selectedNewsDetail.imageUrl ||
@@ -577,11 +577,11 @@ export default function HomePage() {
                     mode="detail"
                   />
                   <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-                    <span className="px-3 py-1 rounded-full bg-[#0E7490] text-white font-mono text-xs font-bold">
+                    <span className="px-3 py-1 rounded-full bg-[#065F46] text-white font-mono text-xs font-bold">
                       {formatNewsDate(selectedNewsDetail.date)}
                     </span>
                     {selectedNewsDetail.category && (
-                      <span className="px-3 py-1 rounded-full bg-[#EBF5F8] dark:bg-cyan-950/60 text-[#0E7490] dark:text-cyan-300 font-hero text-xs font-bold uppercase tracking-wider">
+                      <span className="px-3 py-1 rounded-full bg-[#F3EFE6] dark:bg-[#064E3B]/60 text-[#065F46] dark:text-[#E5C882] font-hero text-xs font-bold uppercase tracking-wider">
                         {selectedNewsDetail.category}
                       </span>
                     )}
@@ -589,11 +589,11 @@ export default function HomePage() {
                 </div>
               ) : (
                 <div className="px-6 sm:px-8 pt-6 flex flex-wrap items-center gap-2">
-                  <span className="px-3 py-1 rounded-full bg-[#0E7490] text-white font-mono text-xs font-bold">
+                  <span className="px-3 py-1 rounded-full bg-[#065F46] text-white font-mono text-xs font-bold">
                     {formatNewsDate(selectedNewsDetail.date)}
                   </span>
                   {selectedNewsDetail.category && (
-                    <span className="px-3 py-1 rounded-full bg-[#EBF5F8] dark:bg-cyan-950/60 text-[#0E7490] dark:text-cyan-300 font-hero text-xs font-bold uppercase tracking-wider">
+                    <span className="px-3 py-1 rounded-full bg-[#F3EFE6] dark:bg-[#064E3B]/60 text-[#065F46] dark:text-[#E5C882] font-hero text-xs font-bold uppercase tracking-wider">
                       {selectedNewsDetail.category}
                     </span>
                   )}
@@ -602,13 +602,13 @@ export default function HomePage() {
 
               <div className="p-6 sm:p-8 space-y-5">
                 <DialogHeader className="text-left space-y-2">
-                  <DialogTitle className="font-hero text-2xl sm:text-3xl font-bold text-[#061E2B] dark:text-white leading-tight">
+                  <DialogTitle className="font-hero text-2xl sm:text-3xl font-bold text-[#041E17] dark:text-white leading-tight">
                     {selectedNewsDetail.title}
                   </DialogTitle>
                   {selectedNewsDetail.author && (
                     <div className="font-hero text-xs text-slate-400 font-medium">
                       Redaksi / Penulis:{' '}
-                      <span className="text-[#061E2B] dark:text-slate-200 font-semibold">
+                      <span className="text-[#041E17] dark:text-slate-200 font-semibold">
                         {selectedNewsDetail.author}
                       </span>
                     </div>
@@ -616,7 +616,7 @@ export default function HomePage() {
                 </DialogHeader>
 
                 {selectedNewsDetail.excerpt && (
-                  <div className="p-4 rounded-2xl bg-[#EBF5F8] dark:bg-cyan-950/40 border border-cyan-200/70 dark:border-cyan-800/40 text-[#061E2B] dark:text-cyan-100 font-medium text-sm sm:text-base italic leading-relaxed">
+                  <div className="p-4 rounded-2xl bg-[#F3EFE6] dark:bg-[#064E3B]/40 border border-[#E5C882]/70 dark:border-cyan-800/40 text-[#041E17] dark:text-[#F5E9CC] font-medium text-sm sm:text-base italic leading-relaxed">
                     &ldquo;{selectedNewsDetail.excerpt}&rdquo;
                   </div>
                 )}
@@ -627,7 +627,7 @@ export default function HomePage() {
 
                 {selectedNewsDetail.youtubeVideoId && (
                   <div className="space-y-2 pt-2">
-                    <div className="flex items-center justify-between text-xs font-hero font-bold uppercase tracking-wider text-[#0E7490] dark:text-cyan-400">
+                    <div className="flex items-center justify-between text-xs font-hero font-bold uppercase tracking-wider text-[#065F46] dark:text-[#E5C882]">
                       <div className="flex items-center gap-2">
                         <Video className="w-4 h-4" />
                         <span>Video Dokumentasi Terkait</span>
@@ -659,7 +659,7 @@ export default function HomePage() {
                   <button
                     type="button"
                     onClick={() => setIsNewsModalOpen(false)}
-                    className="px-5 py-2.5 rounded-full bg-[#061E2B] hover:bg-[#0E7490] text-white font-hero font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer"
+                    className="px-5 py-2.5 rounded-full bg-[#041E17] hover:bg-[#065F46] text-white font-hero font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer"
                   >
                     Tutup
                   </button>
@@ -672,10 +672,10 @@ export default function HomePage() {
 
       {/* ── MODAL 3: SHOWCASE 14 DESA ───────────────────────────────────────── */}
       <Dialog open={isDesaModalOpen} onOpenChange={setIsDesaModalOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 rounded-[26px] border border-slate-200/80 dark:border-white/10 bg-white dark:bg-[#0c1622] shadow-2xl">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0 rounded-[26px] border border-slate-200/80 dark:border-white/10 bg-white dark:bg-[#0A1F1A] shadow-2xl">
           {selectedDesaShowcase && (
             <div>
-              <div className="relative aspect-[16/9] w-full overflow-hidden bg-[#061E2B]">
+              <div className="relative aspect-[16/9] w-full overflow-hidden bg-[#041E17]">
                 {selectedDesaShowcase.imageUrl ? (
                   <Image
                     src={selectedDesaShowcase.imageUrl}
@@ -685,17 +685,17 @@ export default function HomePage() {
                     className="object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-[#061E2B] via-[#0E7490] to-[#061E2B] text-white/60 p-6 text-center">
-                    <Landmark className="w-16 h-16 text-[#f4c430] opacity-70 mb-2" />
-                    <span className="font-mono text-xs uppercase tracking-widest text-cyan-200 font-bold">
+                  <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-[#041E17] via-[#065F46] to-[#041E17] text-white/60 p-6 text-center">
+                    <Landmark className="w-16 h-16 text-[#C8A253] opacity-70 mb-2" />
+                    <span className="font-mono text-xs uppercase tracking-widest text-[#E5C882] font-bold">
                       Kecamatan Gandrungmangu
                     </span>
                   </div>
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#061E2B]/90 via-[#061E2B]/30 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#041E17]/90 via-[#041E17]/30 to-transparent" />
                 <div className="absolute bottom-4 left-5 right-5 text-white">
                   <DialogHeader className="text-left space-y-1">
-                    <span className="px-3 py-1 rounded-full bg-[#f4c430] text-[#061E2B] font-mono text-[10px] font-bold uppercase tracking-wider inline-block w-fit">
+                    <span className="px-3 py-1 rounded-full bg-[#C8A253] text-[#041E17] font-mono text-[10px] font-bold uppercase tracking-wider inline-block w-fit">
                       Kecamatan Gandrungmangu
                     </span>
                     <DialogTitle className="font-hero text-2xl sm:text-3xl font-extrabold text-white mt-1">
@@ -709,12 +709,12 @@ export default function HomePage() {
               </div>
 
               <div className="p-6 sm:p-8 space-y-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-2xl bg-[#F3F7F9] dark:bg-white/[0.04] border border-slate-200/80 dark:border-white/10 text-xs">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-2xl bg-[#FAF8F5] dark:bg-white/[0.04] border border-slate-200/80 dark:border-white/10 text-xs">
                   <div>
                     <span className="font-mono font-bold text-slate-400 uppercase tracking-wider block text-[10px]">
                       Kepala Desa
                     </span>
-                    <p className="font-hero font-bold text-[#061E2B] dark:text-white text-sm mt-0.5">
+                    <p className="font-hero font-bold text-[#041E17] dark:text-white text-sm mt-0.5">
                       {selectedDesaShowcase.kepalaDesa || 'Belum diisi'}
                     </p>
                   </div>
@@ -722,7 +722,7 @@ export default function HomePage() {
                     <span className="font-mono font-bold text-slate-400 uppercase tracking-wider block text-[10px]">
                       Kontak Balai Desa
                     </span>
-                    <p className="font-hero font-bold text-[#061E2B] dark:text-white text-sm mt-0.5">
+                    <p className="font-hero font-bold text-[#041E17] dark:text-white text-sm mt-0.5">
                       {selectedDesaShowcase.kontak || 'Belum diisi'}
                     </p>
                   </div>
@@ -732,7 +732,7 @@ export default function HomePage() {
                         Alamat Kantor Desa
                       </span>
                       <p className="font-hero font-medium text-slate-700 dark:text-slate-300 text-xs mt-0.5 flex items-center gap-1.5">
-                        <MapPin className="w-3.5 h-3.5 text-[#0E7490] dark:text-cyan-400 shrink-0" />
+                        <MapPin className="w-3.5 h-3.5 text-[#065F46] dark:text-[#E5C882] shrink-0" />
                         <span>{selectedDesaShowcase.alamat}</span>
                       </p>
                     </div>
@@ -740,7 +740,7 @@ export default function HomePage() {
                 </div>
 
                 <div className="space-y-2">
-                  <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-[#0E7490] dark:text-cyan-400">
+                  <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-[#065F46] dark:text-[#E5C882]">
                     Rincian Informasi &amp; Profil Desa
                   </h4>
                   <p className="font-hero text-sm text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-line">
@@ -754,7 +754,7 @@ export default function HomePage() {
                       href={selectedDesaShowcase.websiteUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-3.5 rounded-2xl bg-[#EBF5F8] hover:bg-[#0E7490] text-[#061E2B] hover:text-white dark:bg-white/5 dark:text-cyan-200 border border-cyan-200/70 dark:border-white/10 font-hero font-bold text-xs uppercase tracking-wider flex items-center justify-between transition-colors"
+                      className="p-3.5 rounded-2xl bg-[#F3EFE6] hover:bg-[#065F46] text-[#041E17] hover:text-white dark:bg-white/5 dark:text-[#E5C882] border border-[#E5C882]/70 dark:border-white/10 font-hero font-bold text-xs uppercase tracking-wider flex items-center justify-between transition-colors"
                     >
                       <span className="flex items-center gap-2">
                         <Globe className="w-4 h-4" />
@@ -774,10 +774,10 @@ export default function HomePage() {
                       href={selectedDesaShowcase.pelayananUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-3.5 rounded-2xl bg-[#061E2B] hover:bg-[#0E7490] text-white font-hero font-bold text-xs uppercase tracking-wider flex items-center justify-between transition-colors"
+                      className="p-3.5 rounded-2xl bg-[#041E17] hover:bg-[#065F46] text-white font-hero font-bold text-xs uppercase tracking-wider flex items-center justify-between transition-colors"
                     >
                       <span className="flex items-center gap-2">
-                        <FileText className="w-4 h-4 text-[#f4c430]" />
+                        <FileText className="w-4 h-4 text-[#C8A253]" />
                         <span>Layanan Online Desa</span>
                       </span>
                       <ExternalLink className="w-4 h-4" />
@@ -794,7 +794,7 @@ export default function HomePage() {
                   <button
                     type="button"
                     onClick={() => setIsDesaModalOpen(false)}
-                    className="px-5 py-2.5 rounded-full bg-[#061E2B] hover:bg-[#0E7490] text-white font-hero font-bold text-xs uppercase tracking-wider transition-colors ml-auto cursor-pointer"
+                    className="px-5 py-2.5 rounded-full bg-[#041E17] hover:bg-[#065F46] text-white font-hero font-bold text-xs uppercase tracking-wider transition-colors ml-auto cursor-pointer"
                   >
                     Tutup
                   </button>

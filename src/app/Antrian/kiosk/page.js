@@ -250,14 +250,14 @@ export default function Kiosk() {
         id="kiosk-main-container"
         className="kiosk-screen-root"
         style={{
-          background: 'linear-gradient(155deg, #f8fbfd 0%, #ebf5f8 52%, #dff0f6 100%)',
+          background: 'linear-gradient(155deg, #FAF8F5 0%, #F3EFE6 52%, #EFE9DC 100%)',
           height: '100vh',
           maxHeight: '100vh',
           display: 'flex',
           flexDirection: 'column',
           padding: '14px 20px',
           boxSizing: 'border-box',
-          color: '#061E2B',
+          color: '#041E17',
           overflow: 'hidden',
           position: 'relative'
         }}
@@ -270,7 +270,7 @@ export default function Kiosk() {
             inset: 0,
             pointerEvents: 'none',
             zIndex: 0,
-            backgroundImage: 'radial-gradient(circle at 12% 14%, rgba(14, 116, 144, 0.12), transparent 45%), radial-gradient(circle at 88% 86%, rgba(56, 189, 248, 0.14), transparent 45%)'
+            backgroundImage: 'radial-gradient(circle at 12% 14%, rgba(6, 95, 70, 0.12), transparent 45%), radial-gradient(circle at 88% 86%, rgba(200, 162, 83, 0.14), transparent 45%)'
           }}
         />
         <div
@@ -311,8 +311,8 @@ export default function Kiosk() {
               borderRadius: '20px',
               background: 'rgba(255, 255, 255, 0.95)',
               backdropFilter: 'blur(20px)',
-              border: '1px solid rgba(14, 116, 144, 0.16)',
-              boxShadow: '0 10px 30px rgba(6, 30, 43, 0.07)'
+              border: '1px solid rgba(6, 95, 70, 0.16)',
+              boxShadow: '0 10px 30px rgba(4, 30, 23, 0.07)'
             }}
           >
             {/* Kiri: Tombol Portal + Logo + Judul */}
@@ -321,9 +321,9 @@ export default function Kiosk() {
                 href="/Antrian/"
                 className="btn btn-sm rounded-pill px-3 py-1.5 text-white d-inline-flex align-items-center gap-1.5 text-decoration-none font-hero shrink-0"
                 style={{
-                  background: 'linear-gradient(135deg, #0E7490, #061E2B)',
+                  background: 'linear-gradient(135deg, #065F46, #041E17)',
                   border: 'none',
-                  boxShadow: '0 4px 12px rgba(14, 116, 144, 0.22)',
+                  boxShadow: '0 4px 12px rgba(6, 95, 70, 0.22)',
                   fontSize: '0.8rem',
                   fontWeight: 700
                 }}
@@ -340,7 +340,7 @@ export default function Kiosk() {
                     height: '44px',
                     maxWidth: '210px',
                     objectFit: 'contain',
-                    filter: 'drop-shadow(0 2px 6px rgba(6, 30, 43, 0.14))'
+                    filter: 'drop-shadow(0 2px 6px rgba(4, 30, 23, 0.14))'
                   }}
                 />
               ) : (
@@ -359,7 +359,7 @@ export default function Kiosk() {
                       fontSize: 'clamp(1.25rem, 2vw, 1.9rem)',
                       fontWeight: 900,
                       letterSpacing: '-0.02em',
-                      color: '#061E2B',
+                      color: '#041E17',
                       lineHeight: 1.15
                     }}
                   >
@@ -371,9 +371,9 @@ export default function Kiosk() {
                       fontSize: '11px',
                       fontWeight: 700,
                       letterSpacing: '0.1em',
-                      background: '#ebf5f8',
-                      border: '1px solid rgba(14, 116, 144, 0.24)',
-                      color: '#0E7490'
+                      background: '#F3EFE6',
+                      border: '1px solid rgba(6, 95, 70, 0.24)',
+                      color: '#065F46'
                     }}
                   >
                     SEMRINGAH
@@ -389,16 +389,16 @@ export default function Kiosk() {
             <div
               className="text-end px-3 py-1.5 rounded-4 shrink-0 d-none d-md-block"
               style={{
-                background: 'linear-gradient(135deg, #0E7490, #061E2B)',
+                background: 'linear-gradient(135deg, #065F46, #041E17)',
                 color: '#ffffff',
-                boxShadow: '0 6px 16px rgba(14, 116, 144, 0.22)'
+                boxShadow: '0 6px 16px rgba(6, 95, 70, 0.22)'
               }}
             >
               <div className="font-mono fw-black" style={{ fontSize: '1.2rem', lineHeight: 1.05, fontVariantNumeric: 'tabular-nums' }}>
                 {currentTime ? currentTime.toLocaleTimeString('id-ID', { hour12: false }) : '--.--.--'}{' '}
-                <span style={{ fontSize: '0.68rem', color: '#bae6fd' }}>WIB</span>
+                <span style={{ fontSize: '0.68rem', color: '#F5E9CC' }}>WIB</span>
               </div>
-              <div className="font-mono text-uppercase" style={{ fontSize: '0.65rem', color: 'rgba(224,242,254,0.88)', letterSpacing: '0.06em' }}>
+              <div className="font-mono text-uppercase" style={{ fontSize: '0.65rem', color: 'rgba(245, 233, 204,0.88)', letterSpacing: '0.06em' }}>
                 {currentTime ? currentTime.toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }) : ''}
               </div>
             </div>
@@ -414,7 +414,7 @@ export default function Kiosk() {
                 className="text-white px-4 py-2.5 text-center rounded-4 shadow-lg fw-bold d-flex align-items-center justify-content-center gap-2 font-hero"
                 style={{
                   flexShrink: 0,
-                  background: 'linear-gradient(135deg, #0E7490, #059669)',
+                  background: 'linear-gradient(135deg, #065F46, #059669)',
                   border: '1px solid rgba(255,255,255,0.4)',
                   fontSize: '0.95rem'
                 }}
@@ -436,7 +436,7 @@ export default function Kiosk() {
             }}
           >
             {pelayanan.map((p, idx) => {
-              const badgeBg = idx === 0 ? '#0E7490' : idx === 1 ? '#0369a1' : '#061E2B';
+              const badgeBg = idx === 0 ? '#065F46' : idx === 1 ? '#047857' : '#041E17';
               return (
                 <motion.button
                   key={p.id || p.kode}
@@ -453,9 +453,9 @@ export default function Kiosk() {
                     borderRadius: '22px',
                     cursor: 'pointer',
                     background: '#ffffff',
-                    border: '1.5px solid rgba(14, 116, 144, 0.18)',
-                    boxShadow: '0 12px 30px rgba(6, 30, 43, 0.08)',
-                    color: '#061E2B'
+                    border: '1.5px solid rgba(6, 95, 70, 0.18)',
+                    boxShadow: '0 12px 30px rgba(4, 30, 23, 0.08)',
+                    color: '#041E17'
                   }}
                 >
                   {/* Top Blue Accent Strip */}
@@ -466,7 +466,7 @@ export default function Kiosk() {
                       left: 0,
                       right: 0,
                       height: '6px',
-                      background: `linear-gradient(90deg, ${badgeBg}, #38bdf8)`
+                      background: `linear-gradient(90deg, ${badgeBg}, #E5C882)`
                     }}
                   />
 
@@ -487,9 +487,9 @@ export default function Kiosk() {
                     <span
                       className="badge rounded-pill font-mono fw-bold px-3.5 py-2"
                       style={{
-                        background: '#ebf5f8',
-                        color: '#0E7490',
-                        border: '1.5px solid rgba(14, 116, 144, 0.25)',
+                        background: '#F3EFE6',
+                        color: '#065F46',
+                        border: '1.5px solid rgba(6, 95, 70, 0.25)',
                         fontSize: '0.88rem'
                       }}
                     >
@@ -498,7 +498,7 @@ export default function Kiosk() {
                   </div>
 
                   <div className="my-auto pt-3">
-                    <div className="font-mono text-uppercase fw-bold" style={{ fontSize: '0.85rem', letterSpacing: '0.14em', color: '#0E7490' }}>
+                    <div className="font-mono text-uppercase fw-bold" style={{ fontSize: '0.85rem', letterSpacing: '0.14em', color: '#065F46' }}>
                       Layanan Antrian • {p.loket_nama || `Loket ${idx + 1}`}
                     </div>
                     <h2
@@ -508,7 +508,7 @@ export default function Kiosk() {
                         fontWeight: 900,
                         lineHeight: 1.12,
                         letterSpacing: '-0.02em',
-                        color: '#061E2B'
+                        color: '#041E17'
                       }}
                     >
                       {p.nama}
@@ -517,7 +517,7 @@ export default function Kiosk() {
 
                   <div
                     className="d-flex align-items-center justify-content-between pt-3 mt-2 w-100"
-                    style={{ borderTop: '1.5px solid rgba(14, 116, 144, 0.14)' }}
+                    style={{ borderTop: '1.5px solid rgba(6, 95, 70, 0.14)' }}
                   >
                     <span className="font-hero fw-bold" style={{ fontSize: '0.95rem', color: '#334155' }}>
                       Tekan ({p.kode}) atau sentuh
@@ -553,9 +553,9 @@ export default function Kiosk() {
               padding: '18px 26px',
               borderRadius: '22px',
               cursor: 'pointer',
-              background: 'linear-gradient(135deg, #0E7490 0%, #095972 52%, #061E2B 100%)',
+              background: 'linear-gradient(135deg, #065F46 0%, #064E3B 52%, #041E17 100%)',
               border: '2px solid rgba(255, 255, 255, 0.85)',
-              boxShadow: '0 16px 38px rgba(14, 116, 144, 0.28)',
+              boxShadow: '0 16px 38px rgba(6, 95, 70, 0.28)',
               color: '#ffffff'
             }}
           >
@@ -586,7 +586,7 @@ export default function Kiosk() {
                   borderRadius: '18px',
                   background: 'rgba(255, 255, 255, 0.16)',
                   border: '1.5px solid rgba(255, 255, 255, 0.35)',
-                  boxShadow: '0 8px 20px rgba(6, 30, 43, 0.25)'
+                  boxShadow: '0 8px 20px rgba(4, 30, 23, 0.25)'
                 }}
               >
                 <i className="bi bi-journal-check text-white" style={{ fontSize: '1.85rem' }}></i>
@@ -598,14 +598,14 @@ export default function Kiosk() {
                     className="badge rounded-pill font-mono fw-bold px-3 py-1"
                     style={{
                       background: '#ffffff',
-                      color: '#0E7490',
+                      color: '#065F46',
                       fontSize: '0.78rem',
                       letterSpacing: '0.1em'
                     }}
                   >
                     FRONT OFFICE • NON-PATEN
                   </span>
-                  <span className="font-mono d-none d-sm-inline fw-semibold" style={{ fontSize: '0.8rem', color: '#bae6fd' }}>
+                  <span className="font-mono d-none d-sm-inline fw-semibold" style={{ fontSize: '0.8rem', color: '#F5E9CC' }}>
                     Pintasan Keyboard: (R)
                   </span>
                 </div>
@@ -615,7 +615,7 @@ export default function Kiosk() {
                 >
                   Register Kunjungan
                 </h2>
-                <p className="m-0 mt-1 font-hero fw-medium" style={{ fontSize: '0.96rem', color: 'rgba(224, 242, 254, 0.94)' }}>
+                <p className="m-0 mt-1 font-hero fw-medium" style={{ fontSize: '0.96rem', color: 'rgba(245, 233, 204, 0.94)' }}>
                   Tamu Dinas, Pengajuan Proposal, Penyerahan SPJ/Berkas, Pengiriman Barang &amp; Pengaduan + Cetak Tanda Terima
                 </p>
               </div>
@@ -626,14 +626,14 @@ export default function Kiosk() {
                 className="d-inline-flex align-items-center gap-2 px-4 py-3 rounded-pill font-hero fw-black shadow"
                 style={{
                   background: '#ffffff',
-                  color: '#061E2B',
+                  color: '#041E17',
                   fontSize: '0.98rem',
                   fontWeight: 800,
                   letterSpacing: '0.03em'
                 }}
               >
                 <span>Buka Formulir</span>
-                <i className="bi bi-arrow-right-circle-fill" style={{ color: '#0E7490', fontSize: '1.2rem' }}></i>
+                <i className="bi bi-arrow-right-circle-fill" style={{ color: '#065F46', fontSize: '1.2rem' }}></i>
               </span>
             </div>
           </motion.button>
@@ -649,7 +649,7 @@ export default function Kiosk() {
             exit={{ opacity: 0 }}
             className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center p-2 p-md-3"
             style={{
-              background: 'rgba(6, 30, 43, 0.72)',
+              background: 'rgba(4, 30, 23, 0.72)',
               backdropFilter: 'blur(10px)',
               zIndex: 1060
             }}
@@ -664,7 +664,7 @@ export default function Kiosk() {
                 maxWidth: '1080px',
                 maxHeight: '94vh',
                 borderRadius: '26px',
-                background: '#F3F7F9',
+                background: '#FAF8F5',
                 border: '2px solid rgba(255, 255, 255, 0.85)',
                 display: 'flex',
                 flexDirection: 'column'
@@ -690,7 +690,7 @@ export default function Kiosk() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center px-3"
-            style={{ background: 'rgba(6, 30, 43, 0.65)', backdropFilter: 'blur(10px)', zIndex: 1050 }}
+            style={{ background: 'rgba(4, 30, 23, 0.65)', backdropFilter: 'blur(10px)', zIndex: 1050 }}
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.94, y: 16 }}
@@ -701,35 +701,35 @@ export default function Kiosk() {
               style={{
                 maxWidth: '540px',
                 background: '#ffffff',
-                border: '1.5px solid rgba(14, 116, 144, 0.22)',
+                border: '1.5px solid rgba(6, 95, 70, 0.22)',
                 borderRadius: '26px',
-                boxShadow: '0 25px 60px rgba(6, 30, 43, 0.28)',
-                color: '#061E2B'
+                boxShadow: '0 25px 60px rgba(4, 30, 23, 0.28)',
+                color: '#041E17'
               }}
             >
               <div className="text-center mb-4">
                 <span
                   className="badge px-3.5 py-1.5 rounded-pill mb-2.5 fw-bold font-mono"
                   style={{
-                    background: '#ebf5f8',
-                    color: '#0E7490',
-                    border: '1px solid rgba(14, 116, 144, 0.25)',
+                    background: '#F3EFE6',
+                    color: '#065F46',
+                    border: '1px solid rgba(6, 95, 70, 0.25)',
                     fontSize: '0.78rem'
                   }}
                 >
                   KATEGORI LAYANAN {selectedLayananForForm.kode}
                 </span>
-                <h2 className="fw-extrabold font-hero m-0" style={{ color: '#061E2B' }}>{selectedLayananForForm.nama}</h2>
+                <h2 className="fw-extrabold font-hero m-0" style={{ color: '#041E17' }}>{selectedLayananForForm.nama}</h2>
                 <p className="m-0 mt-1 small" style={{ color: '#64748b' }}>Silakan lengkapi data diri Anda sebelum mencetak tiket antrian.</p>
               </div>
 
               <form onSubmit={handleSubmitForm}>
                 <div className="mb-3">
-                  <label className="form-label fw-bold small font-hero" style={{ color: '#061E2B' }}>Nama Lengkap</label>
+                  <label className="form-label fw-bold small font-hero" style={{ color: '#041E17' }}>Nama Lengkap</label>
                   <input
                     type="text"
                     className="form-control py-2.5 rounded-3"
-                    style={{ background: '#f8fbfd', border: '1.5px solid rgba(14, 116, 144, 0.22)', color: '#061E2B' }}
+                    style={{ background: '#FAF8F5', border: '1.5px solid rgba(6, 95, 70, 0.22)', color: '#041E17' }}
                     placeholder="Masukkan nama lengkap"
                     required
                     value={wargaForm.nama}
@@ -738,11 +738,11 @@ export default function Kiosk() {
                 </div>
 
                 <div className="mb-3">
-                  <label className="form-label fw-bold small font-hero" style={{ color: '#061E2B' }}>Alamat Rumah</label>
+                  <label className="form-label fw-bold small font-hero" style={{ color: '#041E17' }}>Alamat Rumah</label>
                   <input
                     type="text"
                     className="form-control py-2.5 rounded-3"
-                    style={{ background: '#f8fbfd', border: '1.5px solid rgba(14, 116, 144, 0.22)', color: '#061E2B' }}
+                    style={{ background: '#FAF8F5', border: '1.5px solid rgba(6, 95, 70, 0.22)', color: '#041E17' }}
                     placeholder="Masukkan alamat lengkap (Desa / RT / RW)"
                     required
                     value={wargaForm.alamat}
@@ -751,11 +751,11 @@ export default function Kiosk() {
                 </div>
 
                 <div className="mb-4">
-                  <label className="form-label fw-bold small font-hero" style={{ color: '#061E2B' }}>Nomor HP / WhatsApp</label>
+                  <label className="form-label fw-bold small font-hero" style={{ color: '#041E17' }}>Nomor HP / WhatsApp</label>
                   <input
                     type="tel"
                     className="form-control py-2.5 rounded-3"
-                    style={{ background: '#f8fbfd', border: '1.5px solid rgba(14, 116, 144, 0.22)', color: '#061E2B' }}
+                    style={{ background: '#FAF8F5', border: '1.5px solid rgba(6, 95, 70, 0.22)', color: '#041E17' }}
                     placeholder="Contoh: 0812xxxxxxxx"
                     required
                     value={wargaForm.hp}
@@ -782,7 +782,7 @@ export default function Kiosk() {
                       type="submit"
                       disabled={loading}
                       className="btn w-100 py-2.5 rounded-pill fw-bold text-white shadow font-hero"
-                      style={{ background: 'linear-gradient(135deg, #0E7490, #061E2B)', border: 'none' }}
+                      style={{ background: 'linear-gradient(135deg, #065F46, #041E17)', border: 'none' }}
                     >
                       {loading ? 'Memproses...' : 'Ambil & Cetak'}
                     </button>

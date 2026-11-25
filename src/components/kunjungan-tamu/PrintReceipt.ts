@@ -218,20 +218,20 @@ export function printKunjunganReceipt(record: KunjunganTamuRecord, mode: 'resi' 
   <title>Lembar Disposisi - ${record.ticket_id}</title>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
-    body { margin: 0; padding: 24px; color: #061E2B; background: #fff; }
-    .sheet { max-width: 720px; margin: 0 auto; border: 2px solid #061E2B; border-radius: 12px; padding: 24px 28px; }
-    .kop { text-align: center; border-bottom: 3px double #061E2B; padding-bottom: 12px; margin-bottom: 16px; }
+    body { margin: 0; padding: 24px; color: #041E17; background: #fff; }
+    .sheet { max-width: 720px; margin: 0 auto; border: 2px solid #041E17; border-radius: 12px; padding: 24px 28px; }
+    .kop { text-align: center; border-bottom: 3px double #041E17; padding-bottom: 12px; margin-bottom: 16px; }
     .kop h2 { margin: 0; font-size: 14px; letter-spacing: 1px; text-transform: uppercase; }
-    .kop h1 { margin: 2px 0; font-size: 19px; letter-spacing: 1.5px; text-transform: uppercase; color: #0E7490; }
+    .kop h1 { margin: 2px 0; font-size: 19px; letter-spacing: 1.5px; text-transform: uppercase; color: #065F46; }
     .kop p { margin: 2px 0 0; font-size: 11px; color: #475569; }
-    .title-bar { display: flex; justify-content: space-between; align-items: center; background: #F3F7F9; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; }
+    .title-bar { display: flex; justify-content: space-between; align-items: center; background: #FAF8F5; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; }
     .title-bar .doc-title { font-size: 14px; font-weight: 800; text-transform: uppercase; }
-    .title-bar .ticket { font-family: 'Consolas', monospace; font-size: 18px; font-weight: 800; color: #0E7490; }
+    .title-bar .ticket { font-family: 'Consolas', monospace; font-size: 18px; font-weight: 800; color: #065F46; }
     table { width: 100%; border-collapse: collapse; margin-bottom: 14px; font-size: 12.5px; }
     td { padding: 5px 4px; vertical-align: top; }
     td.lbl { width: 34%; font-weight: 700; color: #334155; }
     td.sep { width: 14px; text-align: center; }
-    .sec-head { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #0E7490; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; margin: 14px 0 8px; }
+    .sec-head { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #065F46; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; margin: 14px 0 8px; }
     .disposisi-box { border: 1px dashed #64748b; border-radius: 8px; padding: 12px; min-height: 95px; margin-top: 12px; font-size: 12px; color: #475569; }
     .sign-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 28px; text-align: center; font-size: 12px; }
     .sign-space { height: 58px; }

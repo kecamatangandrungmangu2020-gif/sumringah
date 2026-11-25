@@ -349,16 +349,16 @@ export function KunjunganTamuPortal({
   };
 
   return (
-    <div className={`${embedded ? 'min-h-0 pb-8' : 'min-h-screen pb-16'} bg-[#F3F7F9] dark:bg-[#070b10] text-[#061E2B] dark:text-slate-100`}>
+    <div className={`${embedded ? 'min-h-0 pb-8' : 'min-h-screen pb-16'} bg-[#FAF8F5] dark:bg-[#05110E] text-[#041E17] dark:text-slate-100`}>
       {/* Top Bar */}
-      <header className="sticky top-0 z-40 bg-white/95 dark:bg-[#0c1622]/95 backdrop-blur-xl border-b border-slate-200/80 dark:border-white/10">
+      <header className="sticky top-0 z-40 bg-white/95 dark:bg-[#0A1F1A]/95 backdrop-blur-xl border-b border-slate-200/80 dark:border-white/10">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             {embedded && onClose ? (
               <button
                 type="button"
                 onClick={onClose}
-                className="h-9 w-9 rounded-full bg-[#EBF5F8] hover:bg-[#0E7490] text-[#0E7490] hover:text-white dark:bg-white/10 dark:text-cyan-300 flex items-center justify-center transition-colors cursor-pointer"
+                className="h-9 w-9 rounded-full bg-[#F3EFE6] hover:bg-[#065F46] text-[#065F46] hover:text-white dark:bg-white/10 dark:text-[#E5C882] flex items-center justify-center transition-colors cursor-pointer"
                 title="Kembali ke Kiosk"
               >
                 <ArrowLeft className="h-4 w-4" />
@@ -366,17 +366,17 @@ export function KunjunganTamuPortal({
             ) : (
               <Link
                 href="/"
-                className="h-9 w-9 rounded-full bg-[#EBF5F8] hover:bg-[#0E7490] text-[#0E7490] hover:text-white dark:bg-white/10 dark:text-cyan-300 flex items-center justify-center transition-colors"
+                className="h-9 w-9 rounded-full bg-[#F3EFE6] hover:bg-[#065F46] text-[#065F46] hover:text-white dark:bg-white/10 dark:text-[#E5C882] flex items-center justify-center transition-colors"
                 title="Kembali ke Beranda"
               >
                 <ArrowLeft className="h-4 w-4" />
               </Link>
             )}
             <div>
-              <h1 className="font-hero font-extrabold text-sm sm:text-base text-[#061E2B] dark:text-white leading-none">
+              <h1 className="font-hero font-extrabold text-sm sm:text-base text-[#041E17] dark:text-white leading-none">
                 {embedded ? 'Register Kunjungan' : 'Kunjungan Tamu & Front Office'}
               </h1>
-              <p className="font-mono text-[10px] uppercase tracking-wider text-[#0E7490] dark:text-cyan-300 mt-0.5">
+              <p className="font-mono text-[10px] uppercase tracking-wider text-[#065F46] dark:text-[#E5C882] mt-0.5">
                 Kecamatan Gandrungmangu • Non-PATEN
               </p>
             </div>
@@ -387,7 +387,7 @@ export function KunjunganTamuPortal({
               <button
                 type="button"
                 onClick={onClose}
-                className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#061E2B] hover:bg-[#0E7490] text-white font-hero text-xs font-bold transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#041E17] hover:bg-[#065F46] text-white font-hero text-xs font-bold transition-colors cursor-pointer"
               >
                 <ArrowLeft className="h-3.5 w-3.5" />
                 <span>Kembali ke Kiosk</span>
@@ -395,9 +395,9 @@ export function KunjunganTamuPortal({
             ) : (
               <Link
                 href="/Antrian/"
-                className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#F3F7F9] hover:bg-[#EBF5F8] dark:bg-white/5 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 font-hero text-xs font-semibold text-slate-700 dark:text-slate-200 transition-colors"
+                className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#FAF8F5] hover:bg-[#F3EFE6] dark:bg-white/5 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 font-hero text-xs font-semibold text-slate-700 dark:text-slate-200 transition-colors"
               >
-                <Building2 className="h-3.5 w-3.5 text-[#0E7490] dark:text-cyan-300" />
+                <Building2 className="h-3.5 w-3.5 text-[#065F46] dark:text-[#E5C882]" />
                 <span>Rekap di /Antrian</span>
               </Link>
             )}
@@ -407,29 +407,29 @@ export function KunjunganTamuPortal({
 
       <div className="mx-auto max-w-5xl px-4 sm:px-6 pt-6 space-y-6">
         {/* Hero Banner Ringkas + Mode Switcher */}
-        <div className="rounded-[26px] bg-gradient-to-br from-[#061E2B] via-[#0a4658] to-[#0E7490] text-white p-5 sm:p-7 shadow-xl relative overflow-hidden">
+        <div className="rounded-[26px] bg-gradient-to-br from-[#041E17] via-[#064E3B] to-[#065F46] text-white p-5 sm:p-7 shadow-xl relative overflow-hidden">
           <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="space-y-1.5 max-w-2xl">
-              <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-white/15 font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-[#f4c430]">
+              <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-white/15 font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-[#C8A253]">
                 Satu Pintu Front Office (Di Luar Layanan PATEN)
               </span>
               <h2 className="font-hero font-bold text-xl sm:text-2xl lg:text-[26px] tracking-tight">
                 Registrasi Tamu, Proposal, SPJ, Barang &amp; Pengaduan
               </h2>
-              <p className="font-hero text-xs sm:text-sm text-cyan-100/85">
+              <p className="font-hero text-xs sm:text-sm text-[#F5E9CC]/85">
                 Seluruh kunjungan dan serah terima dokumen dicatat otomatis dengan kode tiket resmi dan dapat dipantau real-time.
               </p>
             </div>
 
             {/* Tab Utama: Form Baru vs Lacak Status */}
-            <div className="inline-flex p-1 rounded-full bg-[#061E2B]/65 border border-white/15 self-start md:self-center shrink-0">
+            <div className="inline-flex p-1 rounded-full bg-[#041E17]/65 border border-white/15 self-start md:self-center shrink-0">
               <button
                 type="button"
                 onClick={() => setActiveMode('form')}
                 className={`px-4 py-2 rounded-full font-hero text-xs font-bold transition-all cursor-pointer ${
                   activeMode === 'form'
-                    ? 'bg-white text-[#061E2B] shadow-sm'
-                    : 'text-cyan-100 hover:text-white'
+                    ? 'bg-white text-[#041E17] shadow-sm'
+                    : 'text-[#F5E9CC] hover:text-white'
                 }`}
               >
                 Isi Formulir
@@ -439,8 +439,8 @@ export function KunjunganTamuPortal({
                 onClick={() => setActiveMode('track')}
                 className={`px-4 py-2 rounded-full font-hero text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                   activeMode === 'track'
-                    ? 'bg-[#f4c430] text-[#061E2B] shadow-sm'
-                    : 'text-cyan-100 hover:text-white'
+                    ? 'bg-[#C8A253] text-[#041E17] shadow-sm'
+                    : 'text-[#F5E9CC] hover:text-white'
                 }`}
               >
                 <Search className="h-3.5 w-3.5" />
@@ -455,16 +455,16 @@ export function KunjunganTamuPortal({
           <>
             {submittedRecord ? (
               /* BUKTI TANDA TERIMA INSTAN */
-              <div className="rounded-[26px] bg-white dark:bg-[#0c1622] border border-slate-200/80 dark:border-white/10 p-6 sm:p-10 shadow-lg text-center space-y-6">
+              <div className="rounded-[26px] bg-white dark:bg-[#0A1F1A] border border-slate-200/80 dark:border-white/10 p-6 sm:p-10 shadow-lg text-center space-y-6">
                 <div className="w-16 h-16 rounded-full bg-emerald-50 dark:bg-emerald-950/50 border-2 border-emerald-500 flex items-center justify-center mx-auto">
                   <CheckCircle2 className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
                 </div>
 
                 <div className="space-y-1.5">
-                  <span className="font-mono text-[11px] font-bold uppercase tracking-widest text-[#0E7490] dark:text-cyan-400">
+                  <span className="font-mono text-[11px] font-bold uppercase tracking-widest text-[#065F46] dark:text-[#E5C882]">
                     Registrasi Berhasil Tercatat
                   </span>
-                  <h3 className="font-hero text-2xl sm:text-3xl font-extrabold text-[#061E2B] dark:text-white">
+                  <h3 className="font-hero text-2xl sm:text-3xl font-extrabold text-[#041E17] dark:text-white">
                     Bukti Tanda Terima Kunjungan
                   </h3>
                   <p className="font-hero text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto">
@@ -472,16 +472,16 @@ export function KunjunganTamuPortal({
                   </p>
                 </div>
 
-                <div className="mx-auto max-w-md rounded-2xl bg-[#EBF5F8] dark:bg-cyan-950/40 border border-cyan-200 dark:border-cyan-800/50 p-5 space-y-2">
-                  <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-[#0E7490] dark:text-cyan-300">
+                <div className="mx-auto max-w-md rounded-2xl bg-[#F3EFE6] dark:bg-[#064E3B]/40 border border-[#E5C882] dark:border-cyan-800/50 p-5 space-y-2">
+                  <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-[#065F46] dark:text-[#E5C882]">
                     Kode Tiket / Nomor Resi
                   </span>
-                  <div className="font-mono text-2xl sm:text-3xl font-extrabold tracking-wider text-[#061E2B] dark:text-white">
+                  <div className="font-mono text-2xl sm:text-3xl font-extrabold tracking-wider text-[#041E17] dark:text-white">
                     {submittedRecord.ticket_id}
                   </div>
                   <div className="text-xs font-hero text-slate-600 dark:text-slate-300 pt-1">
                     <strong>{submittedRecord.visitor.nama}</strong> • {CATEGORY_META[submittedRecord.category].shortLabel} →{' '}
-                    <span className="text-[#0E7490] dark:text-cyan-300 font-semibold">
+                    <span className="text-[#065F46] dark:text-[#E5C882] font-semibold">
                       {submittedRecord.target_section}
                     </span>
                   </div>
@@ -500,7 +500,7 @@ export function KunjunganTamuPortal({
                   <button
                     type="button"
                     onClick={() => handleCopyTicket(submittedRecord.ticket_id)}
-                    className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-[#F3F7F9] hover:bg-[#EBF5F8] dark:bg-white/10 text-[#061E2B] dark:text-white border border-slate-200 dark:border-white/15 font-hero text-xs font-bold uppercase tracking-wider cursor-pointer"
+                    className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-[#FAF8F5] hover:bg-[#F3EFE6] dark:bg-white/10 text-[#041E17] dark:text-white border border-slate-200 dark:border-white/15 font-hero text-xs font-bold uppercase tracking-wider cursor-pointer"
                   >
                     {copiedTicket ? <Check className="h-4 w-4 text-emerald-600" /> : <Copy className="h-4 w-4" />}
                     <span>{copiedTicket ? 'Tersalin!' : 'Salin Kode Tiket'}</span>
@@ -513,7 +513,7 @@ export function KunjunganTamuPortal({
                       setActiveMode('track');
                       handleTrackSearch(undefined, submittedRecord.ticket_id);
                     }}
-                    className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-[#061E2B] hover:bg-[#0E7490] text-white font-hero text-xs font-bold uppercase tracking-wider cursor-pointer"
+                    className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-[#041E17] hover:bg-[#065F46] text-white font-hero text-xs font-bold uppercase tracking-wider cursor-pointer"
                   >
                     <Search className="h-4 w-4" />
                     <span>Lacak Status</span>
@@ -524,14 +524,14 @@ export function KunjunganTamuPortal({
                   <button
                     type="button"
                     onClick={handleResetForm}
-                    className="font-hero text-xs font-bold text-[#0E7490] dark:text-cyan-300 hover:underline cursor-pointer"
+                    className="font-hero text-xs font-bold text-[#065F46] dark:text-[#E5C882] hover:underline cursor-pointer"
                   >
                     + Catat Kunjungan Tamu Baru
                   </button>
                 </div>
               </div>
             ) : (
-              <div className="rounded-[26px] bg-white dark:bg-[#0c1622] border border-slate-200/80 dark:border-white/10 p-5 sm:p-8 shadow-sm space-y-6">
+              <div className="rounded-[26px] bg-white dark:bg-[#0A1F1A] border border-slate-200/80 dark:border-white/10 p-5 sm:p-8 shadow-sm space-y-6">
                 {/* Baris Mode Input & Stepper Indicator */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-200/80 dark:border-white/10">
                   {/* Stepper 1 - 2 - 3 */}
@@ -555,7 +555,7 @@ export function KunjunganTamuPortal({
                             <span
                               className={`h-7 w-7 rounded-full font-mono text-xs font-bold flex items-center justify-center transition-all ${
                                 active
-                                  ? 'bg-[#0E7490] text-white shadow-md'
+                                  ? 'bg-[#065F46] text-white shadow-md'
                                   : done
                                     ? 'bg-emerald-500 text-white'
                                     : 'bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-slate-400'
@@ -566,7 +566,7 @@ export function KunjunganTamuPortal({
                             <span
                               className={`font-hero text-xs font-bold ${
                                 active
-                                  ? 'text-[#061E2B] dark:text-white'
+                                  ? 'text-[#041E17] dark:text-white'
                                   : 'text-slate-400 dark:text-slate-500 hidden xs:inline'
                               }`}
                             >
@@ -580,13 +580,13 @@ export function KunjunganTamuPortal({
                   </div>
 
                   {/* Mode Pengisian Switch */}
-                  <div className="inline-flex items-center gap-1 p-1 rounded-full bg-[#F3F7F9] dark:bg-white/5 border border-slate-200/80 dark:border-white/10 self-start">
+                  <div className="inline-flex items-center gap-1 p-1 rounded-full bg-[#FAF8F5] dark:bg-white/5 border border-slate-200/80 dark:border-white/10 self-start">
                     <button
                       type="button"
                       onClick={() => setInputChannel('mandiri_hp')}
                       className={`px-3 py-1 rounded-full font-hero text-[11px] font-bold transition-all cursor-pointer ${
                         inputChannel !== 'front_office'
-                          ? 'bg-[#061E2B] dark:bg-[#0E7490] text-white'
+                          ? 'bg-[#041E17] dark:bg-[#065F46] text-white'
                           : 'text-slate-500 dark:text-slate-400'
                       }`}
                     >
@@ -597,7 +597,7 @@ export function KunjunganTamuPortal({
                       onClick={() => setInputChannel('front_office')}
                       className={`px-3 py-1 rounded-full font-hero text-[11px] font-bold transition-all cursor-pointer ${
                         inputChannel === 'front_office'
-                          ? 'bg-[#061E2B] dark:bg-[#0E7490] text-white'
+                          ? 'bg-[#041E17] dark:bg-[#065F46] text-white'
                           : 'text-slate-500 dark:text-slate-400'
                       }`}
                     >
@@ -618,7 +618,7 @@ export function KunjunganTamuPortal({
                   {step === 1 && (
                     <div className="space-y-5">
                       <div>
-                        <h3 className="font-hero font-bold text-lg text-[#061E2B] dark:text-white">
+                        <h3 className="font-hero font-bold text-lg text-[#041E17] dark:text-white">
                           1. Identitas Pengunjung / Pengirim
                         </h3>
                         <p className="font-hero text-xs text-slate-500 dark:text-slate-400">
@@ -627,7 +627,7 @@ export function KunjunganTamuPortal({
                       </div>
 
                       <div>
-                        <label className="block font-hero text-[11px] font-bold uppercase tracking-wider text-[#061E2B] dark:text-slate-200 mb-2">
+                        <label className="block font-hero text-[11px] font-bold uppercase tracking-wider text-[#041E17] dark:text-slate-200 mb-2">
                           Status / Asal Pengunjung <span className="text-rose-500">*</span>
                         </label>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
@@ -638,13 +638,13 @@ export function KunjunganTamuPortal({
                               onClick={() => setVisitorStatus(opt.value)}
                               className={`p-3 rounded-xl border text-left font-hero text-xs font-semibold transition-all cursor-pointer flex items-center gap-2.5 ${
                                 visitorStatus === opt.value
-                                  ? 'bg-[#EBF5F8] dark:bg-cyan-950/60 border-[#0E7490] text-[#061E2B] dark:text-cyan-200 shadow-xs'
-                                  : 'bg-[#F8FAFC] dark:bg-white/[0.03] border-slate-200/80 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:border-[#0E7490]/40'
+                                  ? 'bg-[#F3EFE6] dark:bg-[#064E3B]/60 border-[#065F46] text-[#041E17] dark:text-[#E5C882] shadow-xs'
+                                  : 'bg-[#F8FAFC] dark:bg-white/[0.03] border-slate-200/80 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:border-[#065F46]/40'
                               }`}
                             >
                               <UserCheck
                                 className={`h-4 w-4 shrink-0 ${
-                                  visitorStatus === opt.value ? 'text-[#0E7490] dark:text-cyan-300' : 'text-slate-400'
+                                  visitorStatus === opt.value ? 'text-[#065F46] dark:text-[#E5C882]' : 'text-slate-400'
                                 }`}
                               />
                               <span>{opt.label}</span>
@@ -655,19 +655,19 @@ export function KunjunganTamuPortal({
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                          <label className="block font-hero text-[11px] font-bold uppercase tracking-wider text-[#061E2B] dark:text-slate-200 mb-1.5">
+                          <label className="block font-hero text-[11px] font-bold uppercase tracking-wider text-[#041E17] dark:text-slate-200 mb-1.5">
                             Nama Lengkap <span className="text-rose-500">*</span>
                           </label>
                           <input
                             value={nama}
                             onChange={(e) => setNama(e.target.value)}
                             placeholder="Nama lengkap sesuai identitas"
-                            className="w-full px-4 py-2.5 rounded-xl bg-[#F3F7F9] dark:bg-white/[0.04] border border-slate-200/90 dark:border-white/15 text-sm focus:outline-none focus:border-[#0E7490] focus:bg-white dark:focus:bg-[#0c1622]"
+                            className="w-full px-4 py-2.5 rounded-xl bg-[#FAF8F5] dark:bg-white/[0.04] border border-slate-200/90 dark:border-white/15 text-sm focus:outline-none focus:border-[#065F46] focus:bg-white dark:focus:bg-[#0A1F1A]"
                           />
                         </div>
 
                         <div>
-                          <label className="block font-hero text-[11px] font-bold uppercase tracking-wider text-[#061E2B] dark:text-slate-200 mb-1.5">
+                          <label className="block font-hero text-[11px] font-bold uppercase tracking-wider text-[#041E17] dark:text-slate-200 mb-1.5">
                             Nomor WhatsApp Aktif <span className="text-rose-500">*</span>
                           </label>
                           <input
@@ -675,19 +675,19 @@ export function KunjunganTamuPortal({
                             onChange={(e) => setWhatsapp(e.target.value)}
                             type="tel"
                             placeholder="Contoh: 081234567890"
-                            className="w-full px-4 py-2.5 rounded-xl bg-[#F3F7F9] dark:bg-white/[0.04] border border-slate-200/90 dark:border-white/15 text-sm focus:outline-none focus:border-[#0E7490] focus:bg-white dark:focus:bg-[#0c1622]"
+                            className="w-full px-4 py-2.5 rounded-xl bg-[#FAF8F5] dark:bg-white/[0.04] border border-slate-200/90 dark:border-white/15 text-sm focus:outline-none focus:border-[#065F46] focus:bg-white dark:focus:bg-[#0A1F1A]"
                           />
                         </div>
                       </div>
 
                       <div>
-                        <label className="block font-hero text-[11px] font-bold uppercase tracking-wider text-[#061E2B] dark:text-slate-200 mb-1.5">
+                        <label className="block font-hero text-[11px] font-bold uppercase tracking-wider text-[#041E17] dark:text-slate-200 mb-1.5">
                           Asal Desa / Instansi / Perusahaan <span className="text-rose-500">*</span>
                         </label>
                         <select
                           value={asalDesa}
                           onChange={(e) => setAsalDesa(e.target.value)}
-                          className="w-full px-4 py-2.5 rounded-xl bg-[#F3F7F9] dark:bg-[#0c1622] border border-slate-200/90 dark:border-white/15 text-sm focus:outline-none focus:border-[#0E7490]"
+                          className="w-full px-4 py-2.5 rounded-xl bg-[#FAF8F5] dark:bg-[#0A1F1A] border border-slate-200/90 dark:border-white/15 text-sm focus:outline-none focus:border-[#065F46]"
                         >
                           {DAFTAR_DESA_GANDRUNGMANGU.map((d) => (
                             <option key={d} value={d}>
@@ -700,14 +700,14 @@ export function KunjunganTamuPortal({
 
                       {asalDesa === 'INSTANSI_LUAR' && (
                         <div>
-                          <label className="block font-hero text-[11px] font-bold uppercase tracking-wider text-[#061E2B] dark:text-slate-200 mb-1.5">
+                          <label className="block font-hero text-[11px] font-bold uppercase tracking-wider text-[#041E17] dark:text-slate-200 mb-1.5">
                             Nama Instansi / Perusahaan / Alamat Luar Wilayah <span className="text-rose-500">*</span>
                           </label>
                           <input
                             value={asalManual}
                             onChange={(e) => setAsalManual(e.target.value)}
                             placeholder="Contoh: Dinas Kesehatan Kab. Cilacap / JNE / PT ..."
-                            className="w-full px-4 py-2.5 rounded-xl bg-[#F3F7F9] dark:bg-white/[0.04] border border-slate-200/90 dark:border-white/15 text-sm focus:outline-none focus:border-[#0E7490] focus:bg-white dark:focus:bg-[#0c1622]"
+                            className="w-full px-4 py-2.5 rounded-xl bg-[#FAF8F5] dark:bg-white/[0.04] border border-slate-200/90 dark:border-white/15 text-sm focus:outline-none focus:border-[#065F46] focus:bg-white dark:focus:bg-[#0A1F1A]"
                           />
                         </div>
                       )}
@@ -731,7 +731,7 @@ export function KunjunganTamuPortal({
                   {step === 2 && (
                     <div className="space-y-5">
                       <div>
-                        <h3 className="font-hero font-bold text-lg text-[#061E2B] dark:text-white">
+                        <h3 className="font-hero font-bold text-lg text-[#041E17] dark:text-white">
                           2. Pilih Kategori Keperluan (Non-PATEN)
                         </h3>
                         <p className="font-hero text-xs text-slate-500 dark:text-slate-400">
@@ -752,22 +752,22 @@ export function KunjunganTamuPortal({
                               onClick={() => handleSelectCategory(catKey)}
                               className={`p-4 rounded-2xl border text-left transition-all cursor-pointer flex items-start gap-3.5 ${
                                 isSelected
-                                  ? 'bg-[#EBF5F8] dark:bg-cyan-950/50 border-[#0E7490] ring-2 ring-[#0E7490]/20'
-                                  : 'bg-[#F8FAFC] dark:bg-white/[0.03] border-slate-200/80 dark:border-white/10 hover:border-[#0E7490]/45'
+                                  ? 'bg-[#F3EFE6] dark:bg-[#064E3B]/50 border-[#065F46] ring-2 ring-[#065F46]/20'
+                                  : 'bg-[#F8FAFC] dark:bg-white/[0.03] border-slate-200/80 dark:border-white/10 hover:border-[#065F46]/45'
                               }`}
                             >
                               <div
                                 className={`h-10 w-10 rounded-xl flex items-center justify-center shrink-0 ${
                                   isSelected
-                                    ? 'bg-[#0E7490] text-white'
-                                    : 'bg-white dark:bg-white/10 text-[#0E7490] dark:text-cyan-300 border border-slate-200/80 dark:border-white/10'
+                                    ? 'bg-[#065F46] text-white'
+                                    : 'bg-white dark:bg-white/10 text-[#065F46] dark:text-[#E5C882] border border-slate-200/80 dark:border-white/10'
                                 }`}
                               >
                                 <Icon className="h-5 w-5" />
                               </div>
                               <div className="min-w-0 space-y-1">
                                 <div className="flex items-center gap-2 flex-wrap">
-                                  <h4 className="font-hero font-bold text-sm text-[#061E2B] dark:text-white">
+                                  <h4 className="font-hero font-bold text-sm text-[#041E17] dark:text-white">
                                     {meta.label}
                                   </h4>
                                 </div>
@@ -806,17 +806,17 @@ export function KunjunganTamuPortal({
                     <div className="space-y-5">
                       <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-200/70 dark:border-white/10">
                         <div>
-                          <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#0E7490] dark:text-cyan-400">
+                          <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#065F46] dark:text-[#E5C882]">
                             Detail Kategori Terpilih
                           </span>
-                          <h3 className="font-hero font-bold text-lg text-[#061E2B] dark:text-white">
+                          <h3 className="font-hero font-bold text-lg text-[#041E17] dark:text-white">
                             {selectedMeta.label}
                           </h3>
                         </div>
                         <button
                           type="button"
                           onClick={() => setStep(2)}
-                          className="font-hero text-xs font-bold text-[#0E7490] dark:text-cyan-300 hover:underline cursor-pointer"
+                          className="font-hero text-xs font-bold text-[#065F46] dark:text-[#E5C882] hover:underline cursor-pointer"
                         >
                           Ganti Kategori
                         </button>
@@ -824,13 +824,13 @@ export function KunjunganTamuPortal({
 
                       {/* Tujuan Pejabat / Seksi */}
                       <div>
-                        <label className="block font-hero text-[11px] font-bold uppercase tracking-wider text-[#061E2B] dark:text-slate-200 mb-1.5">
+                        <label className="block font-hero text-[11px] font-bold uppercase tracking-wider text-[#041E17] dark:text-slate-200 mb-1.5">
                           Tujuan Pejabat / Seksi / Penerima <span className="text-rose-500">*</span>
                         </label>
                         <select
                           value={targetSection}
                           onChange={(e) => setTargetSection(e.target.value)}
-                          className="w-full px-4 py-2.5 rounded-xl bg-[#F3F7F9] dark:bg-[#0c1622] border border-slate-200/90 dark:border-white/15 text-sm focus:outline-none focus:border-[#0E7490]"
+                          className="w-full px-4 py-2.5 rounded-xl bg-[#FAF8F5] dark:bg-[#0A1F1A] border border-slate-200/90 dark:border-white/15 text-sm focus:outline-none focus:border-[#065F46]"
                         >
                           {TARGET_SECTION_OPTIONS.map((sec) => (
                             <option key={sec} value={sec}>
@@ -851,7 +851,7 @@ export function KunjunganTamuPortal({
                               <select
                                 value={details.jenis_pertemuan || 'Konsultasi / Koordinasi'}
                                 onChange={(e) => updateDetail('jenis_pertemuan', e.target.value)}
-                                className="w-full px-4 py-2.5 rounded-xl bg-[#F3F7F9] dark:bg-[#0c1622] border border-slate-200/90 dark:border-white/15 text-sm"
+                                className="w-full px-4 py-2.5 rounded-xl bg-[#FAF8F5] dark:bg-[#0A1F1A] border border-slate-200/90 dark:border-white/15 text-sm"
                               >
                                 <option>Konsultasi / Koordinasi</option>
                                 <option>Tamu Kedinasan</option>
@@ -868,7 +868,7 @@ export function KunjunganTamuPortal({
                                 min={1}
                                 value={details.jumlah_orang ?? 1}
                                 onChange={(e) => updateDetail('jumlah_orang', e.target.value)}
-                                className="w-full px-4 py-2.5 rounded-xl bg-[#F3F7F9] dark:bg-white/[0.04] border border-slate-200/90 dark:border-white/15 text-sm"
+                                className="w-full px-4 py-2.5 rounded-xl bg-[#FAF8F5] dark:bg-white/[0.04] border border-slate-200/90 dark:border-white/15 text-sm"
                               />
                             </div>
                           </div>
@@ -881,7 +881,7 @@ export function KunjunganTamuPortal({
                               value={details.topik || ''}
                               onChange={(e) => updateDetail('topik', e.target.value)}
                               placeholder="Uraikan secara singkat maksud kunjungan atau topik yang akan dibahas..."
-                              className="w-full px-4 py-2.5 rounded-xl bg-[#F3F7F9] dark:bg-white/[0.04] border border-slate-200/90 dark:border-white/15 text-sm"
+                              className="w-full px-4 py-2.5 rounded-xl bg-[#FAF8F5] dark:bg-white/[0.04] border border-slate-200/90 dark:border-white/15 text-sm"
                             />
                           </div>
                         </div>
@@ -897,7 +897,7 @@ export function KunjunganTamuPortal({
                               <select
                                 value={details.jenis_proposal || 'Bantuan Hibah / Bansos'}
                                 onChange={(e) => updateDetail('jenis_proposal', e.target.value)}
-                                className="w-full px-4 py-2.5 rounded-xl bg-[#F3F7F9] dark:bg-[#0c1622] border border-slate-200/90 dark:border-white/15 text-sm"
+                                className="w-full px-4 py-2.5 rounded-xl bg-[#FAF8F5] dark:bg-[#0A1F1A] border border-slate-200/90 dark:border-white/15 text-sm"
                               >
                                 <option>Bantuan Hibah / Bansos</option>
                                 <option>Kegiatan Kepemudaan / Olahraga / Seni</option>
@@ -912,7 +912,7 @@ export function KunjunganTamuPortal({
                               <select
                                 value={details.bentuk_penyerahan || 'Fisik'}
                                 onChange={(e) => updateDetail('bentuk_penyerahan', e.target.value)}
-                                className="w-full px-4 py-2.5 rounded-xl bg-[#F3F7F9] dark:bg-[#0c1622] border border-slate-200/90 dark:border-white/15 text-sm"
+                                className="w-full px-4 py-2.5 rounded-xl bg-[#FAF8F5] dark:bg-[#0A1F1A] border border-slate-200/90 dark:border-white/15 text-sm"
                               >
                                 <option>Fisik</option>
                                 <option>Softcopy</option>
@@ -930,7 +930,7 @@ export function KunjunganTamuPortal({
                                 value={details.nomor_proposal || ''}
                                 onChange={(e) => updateDetail('nomor_proposal', e.target.value)}
                                 placeholder="001/PROP/2026"
-                                className="w-full px-4 py-2.5 rounded-xl bg-[#F3F7F9] dark:bg-white/[0.04] border border-slate-200/90 dark:border-white/15 text-sm"
+                                className="w-full px-4 py-2.5 rounded-xl bg-[#FAF8F5] dark:bg-white/[0.04] border border-slate-200/90 dark:border-white/15 text-sm"
                               />
                             </div>
                             <div>
@@ -941,7 +941,7 @@ export function KunjunganTamuPortal({
                                 type="date"
                                 value={details.tanggal_proposal || ''}
                                 onChange={(e) => updateDetail('tanggal_proposal', e.target.value)}
-                                className="w-full px-4 py-2.5 rounded-xl bg-[#F3F7F9] dark:bg-white/[0.04] border border-slate-200/90 dark:border-white/15 text-sm"
+                                className="w-full px-4 py-2.5 rounded-xl bg-[#FAF8F5] dark:bg-white/[0.04] border border-slate-200/90 dark:border-white/15 text-sm"
                               />
                             </div>
                             <div>
@@ -952,7 +952,7 @@ export function KunjunganTamuPortal({
                                 value={details.estimasi_nominal || ''}
                                 onChange={(e) => updateDetail('estimasi_nominal', formatRupiahInput(e.target.value))}
                                 placeholder="Rp 10.000.000"
-                                className="w-full px-4 py-2.5 rounded-xl bg-[#F3F7F9] dark:bg-white/[0.04] border border-slate-200/90 dark:border-white/15 text-sm"
+                                className="w-full px-4 py-2.5 rounded-xl bg-[#FAF8F5] dark:bg-white/[0.04] border border-slate-200/90 dark:border-white/15 text-sm"
                               />
                             </div>
                           </div>
@@ -965,7 +965,7 @@ export function KunjunganTamuPortal({
                               value={details.judul_proposal || ''}
                               onChange={(e) => updateDetail('judul_proposal', e.target.value)}
                               placeholder="Contoh: Proposal Permohonan Bantuan Sarana Olahraga Karang Taruna"
-                              className="w-full px-4 py-2.5 rounded-xl bg-[#F3F7F9] dark:bg-white/[0.04] border border-slate-200/90 dark:border-white/15 text-sm"
+                              className="w-full px-4 py-2.5 rounded-xl bg-[#FAF8F5] dark:bg-white/[0.04] border border-slate-200/90 dark:border-white/15 text-sm"
                             />
                           </div>
                         </div>
@@ -981,7 +981,7 @@ export function KunjunganTamuPortal({
                               <select
                                 value={details.jenis_berkas || 'SPJ Keuangan Desa'}
                                 onChange={(e) => updateDetail('jenis_berkas', e.target.value)}
-                                className="w-full px-4 py-2.5 rounded-xl bg-[#F3F7F9] dark:bg-[#0c1622] border border-slate-200/90 dark:border-white/15 text-sm"
+                                className="w-full px-4 py-2.5 rounded-xl bg-[#FAF8F5] dark:bg-[#0A1F1A] border border-slate-200/90 dark:border-white/15 text-sm"
                               >
                                 <option>SPJ Keuangan Desa</option>
                                 <option>Laporan Bulanan / Triwulan</option>
@@ -997,7 +997,7 @@ export function KunjunganTamuPortal({
                                 value={details.periode || ''}
                                 onChange={(e) => updateDetail('periode', e.target.value)}
                                 placeholder="Contoh: Tahap II 2026 / Triwulan III"
-                                className="w-full px-4 py-2.5 rounded-xl bg-[#F3F7F9] dark:bg-white/[0.04] border border-slate-200/90 dark:border-white/15 text-sm"
+                                className="w-full px-4 py-2.5 rounded-xl bg-[#FAF8F5] dark:bg-white/[0.04] border border-slate-200/90 dark:border-white/15 text-sm"
                               />
                             </div>
                           </div>
@@ -1010,7 +1010,7 @@ export function KunjunganTamuPortal({
                               value={details.nomor_pengantar || ''}
                               onChange={(e) => updateDetail('nomor_pengantar', e.target.value)}
                               placeholder="Contoh: 140/045/SPJ/2026"
-                              className="w-full px-4 py-2.5 rounded-xl bg-[#F3F7F9] dark:bg-white/[0.04] border border-slate-200/90 dark:border-white/15 text-sm"
+                              className="w-full px-4 py-2.5 rounded-xl bg-[#FAF8F5] dark:bg-white/[0.04] border border-slate-200/90 dark:border-white/15 text-sm"
                             />
                           </div>
 
@@ -1023,7 +1023,7 @@ export function KunjunganTamuPortal({
                               value={details.keterangan_kelengkapan || ''}
                               onChange={(e) => updateDetail('keterangan_kelengkapan', e.target.value)}
                               placeholder="Contoh: 2 bundel SPJ ADD + 1 flashdisk lampiran foto..."
-                              className="w-full px-4 py-2.5 rounded-xl bg-[#F3F7F9] dark:bg-white/[0.04] border border-slate-200/90 dark:border-white/15 text-sm"
+                              className="w-full px-4 py-2.5 rounded-xl bg-[#FAF8F5] dark:bg-white/[0.04] border border-slate-200/90 dark:border-white/15 text-sm"
                             />
                           </div>
                         </div>
@@ -1039,7 +1039,7 @@ export function KunjunganTamuPortal({
                               <select
                                 value={details.jenis_dokumen || 'Surat Undangan'}
                                 onChange={(e) => updateDetail('jenis_dokumen', e.target.value)}
-                                className="w-full px-4 py-2.5 rounded-xl bg-[#F3F7F9] dark:bg-[#0c1622] border border-slate-200/90 dark:border-white/15 text-sm"
+                                className="w-full px-4 py-2.5 rounded-xl bg-[#FAF8F5] dark:bg-[#0A1F1A] border border-slate-200/90 dark:border-white/15 text-sm"
                               >
                                 <option>Surat Undangan</option>
                                 <option>Surat Pemberitahuan / Edaran</option>
@@ -1055,7 +1055,7 @@ export function KunjunganTamuPortal({
                                 value={details.nomor_surat || ''}
                                 onChange={(e) => updateDetail('nomor_surat', e.target.value)}
                                 placeholder="005/123/2026"
-                                className="w-full px-4 py-2.5 rounded-xl bg-[#F3F7F9] dark:bg-white/[0.04] border border-slate-200/90 dark:border-white/15 text-sm"
+                                className="w-full px-4 py-2.5 rounded-xl bg-[#FAF8F5] dark:bg-white/[0.04] border border-slate-200/90 dark:border-white/15 text-sm"
                               />
                             </div>
                             <div>
@@ -1066,7 +1066,7 @@ export function KunjunganTamuPortal({
                                 type="date"
                                 value={details.tanggal_surat || ''}
                                 onChange={(e) => updateDetail('tanggal_surat', e.target.value)}
-                                className="w-full px-4 py-2.5 rounded-xl bg-[#F3F7F9] dark:bg-white/[0.04] border border-slate-200/90 dark:border-white/15 text-sm"
+                                className="w-full px-4 py-2.5 rounded-xl bg-[#FAF8F5] dark:bg-white/[0.04] border border-slate-200/90 dark:border-white/15 text-sm"
                               />
                             </div>
                           </div>
@@ -1079,7 +1079,7 @@ export function KunjunganTamuPortal({
                               value={details.perihal_surat || ''}
                               onChange={(e) => updateDetail('perihal_surat', e.target.value)}
                               placeholder="Contoh: Undangan Musyawarah Perencanaan Pembangunan Desa"
-                              className="w-full px-4 py-2.5 rounded-xl bg-[#F3F7F9] dark:bg-white/[0.04] border border-slate-200/90 dark:border-white/15 text-sm"
+                              className="w-full px-4 py-2.5 rounded-xl bg-[#FAF8F5] dark:bg-white/[0.04] border border-slate-200/90 dark:border-white/15 text-sm"
                             />
                           </div>
                         </div>
@@ -1096,7 +1096,7 @@ export function KunjunganTamuPortal({
                                 value={details.nama_ekspedisi || ''}
                                 onChange={(e) => updateDetail('nama_ekspedisi', e.target.value)}
                                 placeholder="JNE / Pos / CV Rekanan"
-                                className="w-full px-4 py-2.5 rounded-xl bg-[#F3F7F9] dark:bg-white/[0.04] border border-slate-200/90 dark:border-white/15 text-sm"
+                                className="w-full px-4 py-2.5 rounded-xl bg-[#FAF8F5] dark:bg-white/[0.04] border border-slate-200/90 dark:border-white/15 text-sm"
                               />
                             </div>
                             <div>
@@ -1106,7 +1106,7 @@ export function KunjunganTamuPortal({
                               <select
                                 value={details.jenis_barang || 'Barang Pengadaan / ATK'}
                                 onChange={(e) => updateDetail('jenis_barang', e.target.value)}
-                                className="w-full px-4 py-2.5 rounded-xl bg-[#F3F7F9] dark:bg-[#0c1622] border border-slate-200/90 dark:border-white/15 text-sm"
+                                className="w-full px-4 py-2.5 rounded-xl bg-[#FAF8F5] dark:bg-[#0A1F1A] border border-slate-200/90 dark:border-white/15 text-sm"
                               >
                                 <option>Barang Pengadaan / ATK</option>
                                 <option>Logistik / Bantuan</option>
@@ -1123,7 +1123,7 @@ export function KunjunganTamuPortal({
                                 min={1}
                                 value={details.jumlah_koli ?? 1}
                                 onChange={(e) => updateDetail('jumlah_koli', e.target.value)}
-                                className="w-full px-4 py-2.5 rounded-xl bg-[#F3F7F9] dark:bg-white/[0.04] border border-slate-200/90 dark:border-white/15 text-sm"
+                                className="w-full px-4 py-2.5 rounded-xl bg-[#FAF8F5] dark:bg-white/[0.04] border border-slate-200/90 dark:border-white/15 text-sm"
                               />
                             </div>
                           </div>
@@ -1135,7 +1135,7 @@ export function KunjunganTamuPortal({
                               value={details.catatan_paket || ''}
                               onChange={(e) => updateDetail('catatan_paket', e.target.value)}
                               placeholder="Contoh: Diterima dalam kondisi tersegel baik"
-                              className="w-full px-4 py-2.5 rounded-xl bg-[#F3F7F9] dark:bg-white/[0.04] border border-slate-200/90 dark:border-white/15 text-sm"
+                              className="w-full px-4 py-2.5 rounded-xl bg-[#FAF8F5] dark:bg-white/[0.04] border border-slate-200/90 dark:border-white/15 text-sm"
                             />
                           </div>
                         </div>
@@ -1151,7 +1151,7 @@ export function KunjunganTamuPortal({
                               <select
                                 value={details.kategori_aduan || 'Infrastruktur & Lingkungan'}
                                 onChange={(e) => updateDetail('kategori_aduan', e.target.value)}
-                                className="w-full px-4 py-2.5 rounded-xl bg-[#F3F7F9] dark:bg-[#0c1622] border border-slate-200/90 dark:border-white/15 text-sm"
+                                className="w-full px-4 py-2.5 rounded-xl bg-[#FAF8F5] dark:bg-[#0A1F1A] border border-slate-200/90 dark:border-white/15 text-sm"
                               >
                                 <option>Infrastruktur &amp; Lingkungan</option>
                                 <option>Sosial &amp; Kemasyarakatan</option>
@@ -1167,7 +1167,7 @@ export function KunjunganTamuPortal({
                                 value={details.lokasi_kejadian || ''}
                                 onChange={(e) => updateDetail('lokasi_kejadian', e.target.value)}
                                 placeholder="Contoh: Dusun Krajan RT 02 RW 04 Desa..."
-                                className="w-full px-4 py-2.5 rounded-xl bg-[#F3F7F9] dark:bg-white/[0.04] border border-slate-200/90 dark:border-white/15 text-sm"
+                                className="w-full px-4 py-2.5 rounded-xl bg-[#FAF8F5] dark:bg-white/[0.04] border border-slate-200/90 dark:border-white/15 text-sm"
                               />
                             </div>
                           </div>
@@ -1180,17 +1180,17 @@ export function KunjunganTamuPortal({
                               value={details.uraian_pengaduan || ''}
                               onChange={(e) => updateDetail('uraian_pengaduan', e.target.value)}
                               placeholder="Jelaskan kronologi, permasalahan, atau aspirasi Anda secara lengkap..."
-                              className="w-full px-4 py-2.5 rounded-xl bg-[#F3F7F9] dark:bg-white/[0.04] border border-slate-200/90 dark:border-white/15 text-sm"
+                              className="w-full px-4 py-2.5 rounded-xl bg-[#FAF8F5] dark:bg-white/[0.04] border border-slate-200/90 dark:border-white/15 text-sm"
                             />
                           </div>
                         </div>
                       )}
 
                       {/* Lampiran Opsional (Foto / Kamera / PDF) */}
-                      <div className="p-4 rounded-2xl bg-[#F3F7F9] dark:bg-white/[0.03] border border-dashed border-slate-300 dark:border-white/15 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                      <div className="p-4 rounded-2xl bg-[#FAF8F5] dark:bg-white/[0.03] border border-dashed border-slate-300 dark:border-white/15 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                         <div className="space-y-0.5">
-                          <span className="font-hero text-xs font-bold text-[#061E2B] dark:text-white flex items-center gap-1.5">
-                            <Upload className="h-3.5 w-3.5 text-[#0E7490] dark:text-cyan-300" />
+                          <span className="font-hero text-xs font-bold text-[#041E17] dark:text-white flex items-center gap-1.5">
+                            <Upload className="h-3.5 w-3.5 text-[#065F46] dark:text-[#E5C882]" />
                             Lampiran Foto / Scan Dokumen (Opsional)
                           </span>
                           <p className="font-hero text-[11px] text-slate-500 dark:text-slate-400">
@@ -1208,7 +1208,7 @@ export function KunjunganTamuPortal({
                           <button
                             type="button"
                             onClick={() => fileInputRef.current?.click()}
-                            className="px-4 py-2 rounded-full bg-white dark:bg-white/10 border border-slate-200 dark:border-white/15 font-hero text-xs font-bold text-[#0E7490] dark:text-cyan-300 hover:bg-[#EBF5F8] cursor-pointer"
+                            className="px-4 py-2 rounded-full bg-white dark:bg-white/10 border border-slate-200 dark:border-white/15 font-hero text-xs font-bold text-[#065F46] dark:text-[#E5C882] hover:bg-[#F3EFE6] cursor-pointer"
                           >
                             {attachment ? 'Ganti File' : 'Pilih / Ambil Foto'}
                           </button>
@@ -1250,13 +1250,13 @@ export function KunjunganTamuPortal({
 
         {/* ═══════════════════ MODE 2: LACAK STATUS TIKET ═══════════════════ */}
         {activeMode === 'track' && (
-          <div className="rounded-[26px] bg-white dark:bg-[#0c1622] border border-slate-200/80 dark:border-white/10 p-5 sm:p-8 shadow-sm space-y-6">
+          <div className="rounded-[26px] bg-white dark:bg-[#0A1F1A] border border-slate-200/80 dark:border-white/10 p-5 sm:p-8 shadow-sm space-y-6">
             <div>
-              <h3 className="font-hero font-bold text-lg text-[#061E2B] dark:text-white">
+              <h3 className="font-hero font-bold text-lg text-[#041E17] dark:text-white">
                 Lacak Progres &amp; Riwayat Disposisi Tiket
               </h3>
               <p className="font-hero text-xs text-slate-500 dark:text-slate-400">
-                Masukkan Kode Tiket (misal <code className="font-mono font-bold text-[#0E7490]">TMI-20261124-001</code>) atau Nomor WhatsApp yang digunakan saat mendaftar.
+                Masukkan Kode Tiket (misal <code className="font-mono font-bold text-[#065F46]">TMI-20261124-001</code>) atau Nomor WhatsApp yang digunakan saat mendaftar.
               </p>
             </div>
 
@@ -1265,7 +1265,7 @@ export function KunjunganTamuPortal({
                 value={trackQuery}
                 onChange={(e) => setTrackQuery(e.target.value)}
                 placeholder="Ketik Kode Tiket (TMI-...) atau No. WhatsApp..."
-                className="flex-1 px-4 py-3 rounded-full bg-[#F3F7F9] dark:bg-white/[0.04] border border-slate-200/90 dark:border-white/15 text-sm focus:outline-none focus:border-[#0E7490]"
+                className="flex-1 px-4 py-3 rounded-full bg-[#FAF8F5] dark:bg-white/[0.04] border border-slate-200/90 dark:border-white/15 text-sm focus:outline-none focus:border-[#065F46]"
               />
               <button
                 type="submit"
@@ -1292,19 +1292,19 @@ export function KunjunganTamuPortal({
                   return (
                     <div
                       key={item.id || item.ticket_id}
-                      className="rounded-2xl bg-[#F3F7F9] dark:bg-white/[0.03] border border-slate-200/80 dark:border-white/10 p-5 space-y-4"
+                      className="rounded-2xl bg-[#FAF8F5] dark:bg-white/[0.03] border border-slate-200/80 dark:border-white/10 p-5 space-y-4"
                     >
                       <div className="flex flex-wrap items-start justify-between gap-3 pb-3 border-b border-slate-200/80 dark:border-white/10">
                         <div>
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="font-mono text-sm font-extrabold text-[#0E7490] dark:text-cyan-300">
+                            <span className="font-mono text-sm font-extrabold text-[#065F46] dark:text-[#E5C882]">
                               {item.ticket_id}
                             </span>
                             <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${st.lightBadge}`}>
                               {st.label}
                             </span>
                           </div>
-                          <h4 className="font-hero font-bold text-base text-[#061E2B] dark:text-white mt-1">
+                          <h4 className="font-hero font-bold text-base text-[#041E17] dark:text-white mt-1">
                             {cat.label}
                           </h4>
                           <p className="font-hero text-xs text-slate-600 dark:text-slate-300">
@@ -1314,9 +1314,9 @@ export function KunjunganTamuPortal({
                         <button
                           type="button"
                           onClick={() => printKunjunganReceipt(item, 'resi')}
-                          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white dark:bg-white/10 border border-slate-200 dark:border-white/15 font-hero text-xs font-bold text-[#061E2B] dark:text-white cursor-pointer"
+                          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white dark:bg-white/10 border border-slate-200 dark:border-white/15 font-hero text-xs font-bold text-[#041E17] dark:text-white cursor-pointer"
                         >
-                          <Printer className="h-3.5 w-3.5 text-[#0E7490] dark:text-cyan-300" />
+                          <Printer className="h-3.5 w-3.5 text-[#065F46] dark:text-[#E5C882]" />
                           <span>Cetak Resi</span>
                         </button>
                       </div>
@@ -1326,12 +1326,12 @@ export function KunjunganTamuPortal({
                         <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                           Timeline Riwayat Progres
                         </span>
-                        <div className="space-y-2.5 pl-3 border-l-2 border-[#0E7490]/40">
+                        <div className="space-y-2.5 pl-3 border-l-2 border-[#065F46]/40">
                           {(item.tracking_logs || []).map((log, i) => (
                             <div key={i} className="relative pl-3">
-                              <span className="absolute -left-[19px] top-1.5 h-2.5 w-2.5 rounded-full bg-[#0E7490] ring-4 ring-[#F3F7F9] dark:ring-[#0c1622]" />
+                              <span className="absolute -left-[19px] top-1.5 h-2.5 w-2.5 rounded-full bg-[#065F46] ring-4 ring-[#FAF8F5] dark:ring-[#0A1F1A]" />
                               <div className="flex flex-wrap items-center gap-2 text-[11px]">
-                                <span className="font-mono font-bold text-[#0E7490] dark:text-cyan-300">
+                                <span className="font-mono font-bold text-[#065F46] dark:text-[#E5C882]">
                                   {STATUS_META[log.status]?.label || log.status}
                                 </span>
                                 <span className="text-slate-400">•</span>
@@ -1344,7 +1344,7 @@ export function KunjunganTamuPortal({
                                   {log.actor}
                                 </span>
                               </div>
-                              <p className="font-hero text-xs text-[#061E2B] dark:text-slate-200 mt-0.5">
+                              <p className="font-hero text-xs text-[#041E17] dark:text-slate-200 mt-0.5">
                                 {log.note}
                               </p>
                             </div>

@@ -86,7 +86,7 @@ export function FullpageScrollController() {
         </button>
 
         <div className="text-[9.5px] font-mono font-semibold tracking-wider text-slate-500 dark:text-slate-400 bg-white/85 dark:bg-slate-900/85 backdrop-blur-md px-2 py-0.5 rounded-full border border-slate-200/80 dark:border-white/10 shadow-sm mb-0.5">
-          <span className="text-[#0E7490] dark:text-cyan-300 font-bold">{SLIDES[activeIndex]?.number}</span>
+          <span className="text-[#065F46] dark:text-[#E5C882] font-bold">{SLIDES[activeIndex]?.number}</span>
           <span className="text-slate-400 mx-0.5">/</span>
           <span>{SLIDES[SLIDES.length - 1]?.number}</span>
         </div>
@@ -110,9 +110,9 @@ export function FullpageScrollController() {
                       animate={{ opacity: 1, x: 0, scale: 1 }}
                       exit={{ opacity: 0, x: 8, scale: 0.95 }}
                       transition={{ duration: 0.18 }}
-                      className="absolute right-8 mr-1 flex items-center gap-2 whitespace-nowrap rounded-full px-3 py-1 shadow-md backdrop-blur-md text-[10px] font-hero uppercase tracking-wider font-bold bg-[#061E2B] text-white border border-cyan-300/25 pointer-events-none"
+                      className="absolute right-8 mr-1 flex items-center gap-2 whitespace-nowrap rounded-full px-3 py-1 shadow-md backdrop-blur-md text-[10px] font-hero uppercase tracking-wider font-bold bg-[#041E17] text-white border border-[#C8A253]/25 pointer-events-none"
                     >
-                      <span className="font-mono text-[9px] text-cyan-300">{slide.number}</span>
+                      <span className="font-mono text-[9px] text-[#E5C882]">{slide.number}</span>
                       <span>{slide.title}</span>
                     </motion.div>
                   )}
@@ -127,12 +127,12 @@ export function FullpageScrollController() {
                   <span
                     className={`flex items-center justify-center transition-all duration-300 rounded-full ${
                       isActive
-                        ? 'w-2.5 h-5 bg-[#0E7490] dark:bg-cyan-400 shadow-xs'
-                        : 'w-2 h-2 bg-slate-400/60 dark:bg-slate-600 group-hover:bg-[#061E2B] dark:group-hover:bg-cyan-200 group-hover:scale-125'
+                        ? 'w-2.5 h-5 bg-[#065F46] dark:bg-[#C8A253] shadow-xs'
+                        : 'w-2 h-2 bg-slate-400/60 dark:bg-slate-600 group-hover:bg-[#041E17] dark:group-hover:bg-[#E5C882] group-hover:scale-125'
                     }`}
                   >
                     {isActive && (
-                      <span className="w-1 h-1 rounded-full bg-white dark:bg-[#061E2B]" />
+                      <span className="w-1 h-1 rounded-full bg-white dark:bg-[#041E17]" />
                     )}
                   </span>
                 </button>
@@ -174,12 +174,12 @@ export function FullpageScrollController() {
             </button>
 
             <div className="flex items-center gap-1 px-2 py-0.5">
-              <span className="text-[10px] font-mono font-bold text-[#0E7490] dark:text-cyan-300">
+              <span className="text-[10px] font-mono font-bold text-[#065F46] dark:text-[#E5C882]">
                 {SLIDES[activeIndex]?.number}
               </span>
               <span className="text-[9px] text-slate-400">/</span>
               <span className="text-[9px] font-mono text-slate-500">{SLIDES[SLIDES.length - 1]?.number}</span>
-              <span className="text-[9.5px] font-hero font-bold text-[#061E2B] dark:text-slate-200 uppercase tracking-wider ml-1 max-w-[95px] truncate hidden sm:inline-block">
+              <span className="text-[9.5px] font-hero font-bold text-[#041E17] dark:text-slate-200 uppercase tracking-wider ml-1 max-w-[95px] truncate hidden sm:inline-block">
                 {SLIDES[activeIndex]?.title}
               </span>
             </div>

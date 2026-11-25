@@ -31,7 +31,7 @@ const SERVICE_CARDS = [
     href: '/Antrian/online/',
     icon: Ticket,
     priority: true,
-    accentBg: 'from-[#0E7490] to-[#061E2B]',
+    accentBg: 'from-[#065F46] to-[#041E17]',
   },
   {
     id: 'kunjungan-tamu',
@@ -42,7 +42,7 @@ const SERVICE_CARDS = [
     href: '/kunjungan-tamu/',
     icon: Users,
     priority: true,
-    accentBg: 'from-[#0a556a] to-[#08384a]',
+    accentBg: 'from-[#064E3B] to-[#064E3B]',
   },
   {
     id: 'agenda',
@@ -53,7 +53,7 @@ const SERVICE_CARDS = [
     href: '#agenda',
     icon: Calendar,
     priority: false,
-    accentBg: 'from-[#0284c7] to-[#0E7490]',
+    accentBg: 'from-[#047857] to-[#065F46]',
   },
   {
     id: 'kegiatan',
@@ -64,7 +64,7 @@ const SERVICE_CARDS = [
     href: '/input/',
     icon: Camera,
     priority: false,
-    accentBg: 'from-[#0e7490] to-[#155e75]',
+    accentBg: 'from-[#065F46] to-[#155e75]',
   },
   {
     id: 'solid',
@@ -76,7 +76,7 @@ const SERVICE_CARDS = [
     icon: Layers,
     priority: false,
     external: true,
-    accentBg: 'from-[#0f766e] to-[#061E2B]',
+    accentBg: 'from-[#0f766e] to-[#041E17]',
   },
   {
     id: 'website',
@@ -88,7 +88,7 @@ const SERVICE_CARDS = [
     icon: Globe,
     priority: false,
     external: true,
-    accentBg: 'from-[#061E2B] to-[#0E7490]',
+    accentBg: 'from-[#041E17] to-[#065F46]',
   },
 ];
 
@@ -106,13 +106,13 @@ export function ServicesSection() {
           <h2 className="font-hero font-bold text-2xl sm:text-3xl lg:text-[34px] tracking-tight text-white leading-tight">
             Layanan Digital Terpadu
           </h2>
-          <p className="mt-1 font-hero text-xs sm:text-sm text-cyan-100/85 max-w-2xl">
+          <p className="mt-1 font-hero text-xs sm:text-sm text-[#F5E9CC]/85 max-w-2xl">
             Akses cepat antrian online, layanan surat, agenda kedinasan, laporan kegiatan, dan data geospasial Kecamatan Gandrungmangu
           </p>
         </div>
         <Link
           href="/Antrian/online/"
-          className="inline-flex items-center gap-2 self-start sm:self-auto px-4 py-2 rounded-full bg-white/15 hover:bg-[#f4c430] text-white hover:text-[#061E2B] border border-white/25 font-hero text-xs font-semibold transition-all duration-200"
+          className="inline-flex items-center gap-2 self-start sm:self-auto px-4 py-2 rounded-full bg-white/15 hover:bg-[#C8A253] text-white hover:text-[#041E17] border border-white/25 font-hero text-xs font-semibold transition-all duration-200"
         >
           <span>Mulai Layanan</span>
           <ArrowRight className="h-3.5 w-3.5" />
@@ -129,18 +129,18 @@ export function ServicesSection() {
         {SERVICE_CARDS.map((item) => {
           const Icon = item.icon;
           const cardContent = (
-            <div className="group flex flex-col justify-between h-full rounded-[22px] bg-white dark:bg-[#0d1c2b] text-[#061E2B] dark:text-white p-4 sm:p-5 shadow-[0_14px_34px_rgba(3,20,30,0.28)] border border-white/80 dark:border-white/10 transition-all duration-300">
+            <div className="group flex flex-col justify-between h-full rounded-[22px] bg-white dark:bg-[#0d1c2b] text-[#041E17] dark:text-white p-4 sm:p-5 shadow-[0_14px_34px_rgba(3,20,30,0.28)] border border-white/80 dark:border-white/10 transition-all duration-300">
               {/* Header Kartu: Kategori, Judul & Tombol Panah */}
               <div className="flex items-center justify-between gap-2 pb-3 mb-3 border-b border-slate-100 dark:border-white/10">
                 <div className="min-w-0">
-                  <span className="font-mono text-[9.5px] font-bold uppercase tracking-[0.14em] text-[#0E7490] dark:text-cyan-400 block truncate">
+                  <span className="font-mono text-[9.5px] font-bold uppercase tracking-[0.14em] text-[#065F46] dark:text-[#E5C882] block truncate">
                     {item.category}
                   </span>
-                  <h3 className="font-hero font-bold text-sm sm:text-[15.5px] text-[#061E2B] dark:text-white group-hover:text-[#0E7490] dark:group-hover:text-cyan-300 transition-colors line-clamp-1 mt-0.5">
+                  <h3 className="font-hero font-bold text-sm sm:text-[15.5px] text-[#041E17] dark:text-white group-hover:text-[#065F46] dark:group-hover:text-[#E5C882] transition-colors line-clamp-1 mt-0.5">
                     {item.title}
                   </h3>
                 </div>
-                <span className="h-8 w-8 rounded-full bg-[#EBF5F8] group-hover:bg-[#0E7490] text-[#0E7490] group-hover:text-white dark:bg-white/10 dark:text-cyan-300 flex items-center justify-center shrink-0 transition-all duration-200">
+                <span className="h-8 w-8 rounded-full bg-[#F3EFE6] group-hover:bg-[#065F46] text-[#065F46] group-hover:text-white dark:bg-white/10 dark:text-[#E5C882] flex items-center justify-center shrink-0 transition-all duration-200">
                   {item.external ? (
                     <ExternalLink className="h-3.5 w-3.5" />
                   ) : (
@@ -161,9 +161,9 @@ export function ServicesSection() {
                   }}
                 />
                 <div className="relative z-10 h-12 w-12 rounded-2xl bg-white/15 backdrop-blur-md border border-white/25 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                  <Icon className="h-6 w-6 text-cyan-200" />
+                  <Icon className="h-6 w-6 text-[#E5C882]" />
                 </div>
-                <span className="relative z-10 font-mono text-[10px] uppercase tracking-[0.2em] text-cyan-100/80">
+                <span className="relative z-10 font-mono text-[10px] uppercase tracking-[0.2em] text-[#F5E9CC]/80">
                   SEMRINGAH
                 </span>
               </div>
@@ -177,13 +177,13 @@ export function ServicesSection() {
                   <span
                     className={`inline-flex items-center px-3 py-1 rounded-full font-hero text-[10px] font-bold uppercase tracking-wider ${
                       item.priority
-                        ? 'bg-[#061E2B] text-[#f4c430] dark:bg-[#f4c430] dark:text-[#061E2B]'
-                        : 'bg-[#EBF5F8] text-[#0E7490] dark:bg-cyan-950/60 dark:text-cyan-300'
+                        ? 'bg-[#041E17] text-[#C8A253] dark:bg-[#C8A253] dark:text-[#041E17]'
+                        : 'bg-[#F3EFE6] text-[#065F46] dark:bg-[#064E3B]/60 dark:text-[#E5C882]'
                     }`}
                   >
                     {item.badge}
                   </span>
-                  <span className="font-hero text-[11px] font-bold text-[#0E7490] dark:text-cyan-300 group-hover:underline">
+                  <span className="font-hero text-[11px] font-bold text-[#065F46] dark:text-[#E5C882] group-hover:underline">
                     Akses →
                   </span>
                 </div>

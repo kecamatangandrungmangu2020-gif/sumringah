@@ -218,7 +218,7 @@ export function AnamorphicTransitionWipe({
               x: [`${-6 * dir}%`, `${14 * dir}%`, `${32 * dir}%`],
             }}
             transition={{ duration: 0.82, ease: EASE_CINEMATIC }}
-            className="absolute top-[48%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-20 rounded-full bg-cyan-200/50 blur-2xl"
+            className="absolute top-[48%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-20 rounded-full bg-[#E5C882]/50 blur-2xl"
           />
         </motion.div>
       </AnimatePresence>
@@ -254,7 +254,7 @@ export function VerticalPhotoStrips({
           side === 'right' ? 'top-[2%] left-[2%]' : 'top-[2%] right-[2%] flex-row-reverse'
         }`}
       >
-        <span className="h-2 w-2 rounded-full border border-white/90 bg-cyan-300/40" />
+        <span className="h-2 w-2 rounded-full border border-white/90 bg-[#E5C882]/40" />
         <span className="h-[1px] w-7 bg-white/55" />
         <span className="font-mono text-[10.5px] font-medium text-white/90 tabular-nums drop-shadow-[0_1px_6px_rgba(0,0,0,0.6)]">
           {metricValue}
@@ -331,7 +331,7 @@ export function VerticalPhotoStrips({
                     animate={{ scaleY: 1, opacity: 1 }}
                     exit={{ scaleY: 0, opacity: 0 }}
                     transition={{ duration: 0.45, delay: strip.delay + 0.3, ease: EASE_CINEMATIC }}
-                    className={`pointer-events-none absolute z-30 w-[4px] sm:w-[5px] h-8 sm:h-10 bg-cyan-300 shadow-[0_0_14px_rgba(103,232,249,0.7)] origin-top ${
+                    className={`pointer-events-none absolute z-30 w-[4px] sm:w-[5px] h-8 sm:h-10 bg-[#E5C882] shadow-[0_0_14px_rgba(200,162,83,0.7)] origin-top ${
                       strip.hasAccentBar === 'left'
                         ? '-left-2 sm:-left-2.5 top-3'
                         : '-right-2 sm:-right-2.5 bottom-5'
@@ -364,7 +364,7 @@ export function VerticalPhotoStrips({
 
                   {strip.glassCap && (
                     <div
-                      className={`pointer-events-none absolute inset-x-0 h-[16%] bg-cyan-300/20 backdrop-blur-[1.5px] ${
+                      className={`pointer-events-none absolute inset-x-0 h-[16%] bg-[#E5C882]/20 backdrop-blur-[1.5px] ${
                         strip.glassCap === 'top'
                           ? 'top-0 border-b border-white/25'
                           : 'bottom-0 border-t border-white/25'
@@ -460,7 +460,7 @@ export function CenterColumnsReveal({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0, transition: { duration: 0.35 } }}
-              className="absolute inset-0 bg-gradient-to-b from-[#041520]/65 via-[#062230]/25 to-[#041520]/75"
+              className="absolute inset-0 bg-gradient-to-b from-[#041520]/65 via-[#04231B]/25 to-[#041520]/75"
             />
           </motion.div>
         )}
@@ -488,7 +488,7 @@ export function CinematicHudOverlay({
         initial={{ scale: 0.72, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 1.05, ease: EASE_CINEMATIC }}
-        className={`hidden md:block absolute -top-12 w-32 h-32 lg:w-40 lg:h-40 rounded-full border border-white/20 bg-cyan-200/12 backdrop-blur-[2px] ${
+        className={`hidden md:block absolute -top-12 w-32 h-32 lg:w-40 lg:h-40 rounded-full border border-white/20 bg-[#E5C882]/12 backdrop-blur-[2px] ${
           layoutMode === 'text-right' ? 'right-[20%]' : 'left-[16%]'
         }`}
       />
@@ -498,7 +498,7 @@ export function CinematicHudOverlay({
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 1.2, ease: EASE_CINEMATIC }}
-        className={`hidden lg:block absolute -bottom-24 w-[380px] h-[380px] rounded-full border-[24px] border-cyan-300/[0.06] ${
+        className={`hidden lg:block absolute -bottom-24 w-[380px] h-[380px] rounded-full border-[24px] border-[#C8A253]/[0.06] ${
           layoutMode === 'text-right' ? '-right-20' : '-left-20'
         }`}
       />
@@ -518,7 +518,7 @@ export function CinematicHudOverlay({
         <span className="font-mono text-[11px] font-semibold tracking-[0.2em] text-white/95">
           {slideNumStr}
         </span>
-        <span className="font-mono text-[10px] tracking-[0.18em] text-cyan-200/75">
+        <span className="font-mono text-[10px] tracking-[0.18em] text-[#E5C882]/75">
           / {totalNumStr}
         </span>
       </motion.div>
@@ -527,7 +527,7 @@ export function CinematicHudOverlay({
         <span className="font-mono text-[9px] tracking-[0.2em]">{slideNumStr}</span>
         <span className="w-[1px] h-10 bg-white/40" />
         <span
-          className="font-mono text-[8.5px] uppercase tracking-[0.26em] text-cyan-100/80"
+          className="font-mono text-[8.5px] uppercase tracking-[0.26em] text-[#F5E9CC]/80"
           style={{ writingMode: 'vertical-rl' }}
         >
           GANDRUNGMANGU
@@ -552,7 +552,7 @@ export function DottedMatrixBar({
         align === 'center' ? 'justify-center' : 'justify-start'
       }`}
     >
-      <span className="h-[3px] w-5 bg-cyan-300 rounded-full shadow-[0_0_10px_rgba(103,232,249,0.65)]" />
+      <span className="h-[3px] w-5 bg-[#E5C882] rounded-full shadow-[0_0_10px_rgba(200,162,83,0.65)]" />
       <div className="flex items-center gap-1">
         {Array.from({ length: 8 }).map((_, i) => {
           const isLit = i <= ((activeIndex + 1) * Math.floor(8 / Math.max(totalSlides, 1))) - 1;
@@ -588,7 +588,7 @@ export function BroadcastTimecode({ activeIndex }: { activeIndex: number }) {
   const timecode = `+ 00:00:${String(elapsedSec).padStart(2, '0')}:${String((activeIndex * 7 + elapsedSec * 3) % 30).padStart(2, '0')} +`;
 
   return (
-    <span className="inline-flex items-center font-mono text-[10px] tracking-[0.2em] text-cyan-100/85 tabular-nums">
+    <span className="inline-flex items-center font-mono text-[10px] tracking-[0.2em] text-[#F5E9CC]/85 tabular-nums">
       {timecode}
     </span>
   );

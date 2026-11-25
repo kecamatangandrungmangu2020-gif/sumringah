@@ -367,7 +367,7 @@ export default function AntrianOnline() {
       ctx.fillText(ticket.nomor_lengkap, width / 2, 310);
 
       // Keperluan & Loket
-      ctx.fillStyle = '#38bdf8';
+      ctx.fillStyle = '#E5C882';
       ctx.font = 'bold 22px system-ui, sans-serif';
       ctx.fillText(ticket.pelayanan_nama, width / 2, 360);
 
@@ -676,8 +676,8 @@ export default function AntrianOnline() {
                   {ticketResult.nomor_lengkap}
                 </div>
 
-                <div className="d-inline-block px-3.5 py-1.5 rounded-pill mb-2 shadow-sm" style={{ background: 'rgba(56, 189, 248, 0.15)', border: '1px solid #38bdf8' }}>
-                  <span className="fw-bold" style={{ color: '#38bdf8', fontSize: '0.98rem' }}>
+                <div className="d-inline-block px-3.5 py-1.5 rounded-pill mb-2 shadow-sm" style={{ background: 'rgba(200, 162, 83, 0.15)', border: '1px solid #E5C882' }}>
+                  <span className="fw-bold" style={{ color: '#E5C882', fontSize: '0.98rem' }}>
                     {ticketResult.pelayanan_nama}
                   </span>
                 </div>

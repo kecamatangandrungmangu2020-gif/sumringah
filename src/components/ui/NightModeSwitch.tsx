@@ -25,13 +25,13 @@ export function NightModeSwitch({ className, size = 'md' }: NightModeSwitchProps
       onClick={toggleTheme}
       title={isDark ? 'Mode Malam Aktif — Klik untuk Mode Siang' : 'Mode Siang Aktif — Klik untuk Mode Malam'}
       className={cn(
-        'group relative inline-flex items-center shrink-0 cursor-pointer select-none rounded-full transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0E7490] focus-visible:ring-offset-2',
+        'group relative inline-flex items-center shrink-0 cursor-pointer select-none rounded-full transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#065F46] focus-visible:ring-offset-2',
         isSmall
           ? 'h-[26px] w-[48px] p-[2px]'
           : 'h-[30px] w-[56px] p-[2.5px]',
         isDark
           ? 'bg-slate-800/95 border border-slate-700/80 shadow-[inset_0_2px_4px_rgba(0,0,0,0.5)]'
-          : 'bg-cyan-100/80 border border-cyan-300/60 shadow-[inset_0_1px_3px_rgba(14,116,144,0.18)]',
+          : 'bg-cyan-100/80 border border-[#C8A253]/60 shadow-[inset_0_1px_3px_rgba(6,95,70,0.18)]',
         'hover:scale-105 active:scale-95',
         className
       )}
@@ -68,7 +68,7 @@ export function NightModeSwitch({ className, size = 'md' }: NightModeSwitchProps
             : 'left-0',
           isDark
             ? 'bg-gradient-to-br from-slate-900 to-slate-800 text-sky-200 border border-slate-600/80 shadow-[0_2px_6px_rgba(0,0,0,0.6)]'
-            : 'bg-gradient-to-br from-white to-cyan-50 text-[#0E7490] border border-cyan-200/90 shadow-[0_2px_6px_rgba(14,116,144,0.25)]'
+            : 'bg-gradient-to-br from-white to-cyan-50 text-[#065F46] border border-[#E5C882]/90 shadow-[0_2px_6px_rgba(6,95,70,0.25)]'
         )}
       >
         <motion.div

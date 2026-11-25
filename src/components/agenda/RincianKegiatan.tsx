@@ -738,9 +738,9 @@ export function RincianKegiatan() {
 
               {/* FORM EDIT AGENDA LENGKAP (SINKRON OTOMATIS GOOGLE CALENDAR) */}
               {isEditingEvent && (
-                <div className="p-4 rounded-2xl bg-cyan-50/70 border border-cyan-200 space-y-3 animate-in fade-in slide-in-from-top-2">
+                <div className="p-4 rounded-2xl bg-[#F3EFE6]/70 border border-[#E5C882] space-y-3 animate-in fade-in slide-in-from-top-2">
                   <div className="flex items-center justify-between">
-                    <Label className="text-[11px] font-black uppercase text-[#0E7490] flex items-center gap-1.5">
+                    <Label className="text-[11px] font-black uppercase text-[#065F46] flex items-center gap-1.5">
                       <Pencil className="h-3.5 w-3.5" />
                       Edit Detail Agenda (Sinkron Google Calendar)
                     </Label>
@@ -808,7 +808,7 @@ export function RincianKegiatan() {
                             className={cn(
                               "h-9 rounded-xl text-xs font-bold border transition-all",
                               editForm.eventType === t
-                                ? "bg-[#0E7490] text-white border-[#0E7490]"
+                                ? "bg-[#065F46] text-white border-[#065F46]"
                                 : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
                             )}
                           >
@@ -833,7 +833,7 @@ export function RincianKegiatan() {
                         type="button"
                         onClick={handleSaveEditEvent}
                         disabled={isSavingEdit}
-                        className="flex-1 h-10 rounded-xl bg-[#0E7490] hover:bg-[#061E2B] text-white font-bold text-xs gap-2"
+                        className="flex-1 h-10 rounded-xl bg-[#065F46] hover:bg-[#041E17] text-white font-bold text-xs gap-2"
                       >
                         {isSavingEdit ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                         <span>{isSavingEdit ? "Menyimpan ke Kalender..." : "Simpan Perubahan ke Google Calendar"}</span>

@@ -12,94 +12,95 @@
     --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
 
     /* =========================================================
-       CORPORATE PRESENTATION DECK DESIGN SYSTEM (Ocean Teal & Marine Navy)
-       Canvas: #FFFFFF (Light) / #070b10 (Dark)
-       Primary Accent: #0E7490 (Ocean Teal)
-       Contrast Dark: #061E2B (Deep Marine Navy)
-       Soft Tinted Surface: #F3F7F9 & #EBF5F8 (Ice-Cyan)
+       SOVEREIGN LUXURY DESIGN SYSTEM (Deep Emerald + Warm Alabaster + Champagne Gold)
+       Canvas: #FAF8F5 (Warm Alabaster Light) / #05110E (Forest Obsidian Dark)
+       Primary Accent: #065F46 (Deep Sovereign Emerald)
+       Contrast Dark: #041E17 (Deep Forest Obsidian)
+       Soft Tinted Surface: #F3EFE6 (Warm Alabaster Cream)
+       Precious Accent: #C8A253 / #E5C882 (Champagne Gold)
        ========================================================= */
-    --background: 0 0% 100%;
-    --foreground: 201 76% 10%;
+    --background: 38 33% 97%;
+    --foreground: 164 76% 7%;
 
     --card: 0 0% 100%;
-    --card-foreground: 201 76% 10%;
+    --card-foreground: 164 76% 7%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 201 76% 10%;
+    --popover-foreground: 164 76% 7%;
 
-    --primary: 193 82% 31%;
+    --primary: 163 88% 20%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 201 76% 10%;
+    --secondary: 164 76% 7%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 197 37% 96%;
-    --muted-foreground: 215 19% 42%;
+    --muted: 40 35% 93%;
+    --muted-foreground: 164 14% 38%;
 
-    --accent: 194 46% 95%;
-    --accent-foreground: 193 82% 28%;
+    --accent: 41 52% 92%;
+    --accent-foreground: 163 88% 18%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 210 29% 89%;
-    --input: 210 29% 89%;
-    --ring: 193 82% 31%;
+    --border: 38 24% 87%;
+    --input: 38 24% 87%;
+    --ring: 163 88% 20%;
     --radius: 1.4rem;
 
-    --sidebar-background: 201 76% 10%;
-    --sidebar-foreground: 210 20% 98%;
-    --sidebar-primary: 192 91% 56%;
-    --sidebar-primary-foreground: 201 76% 10%;
-    --sidebar-accent: 200 65% 15%;
-    --sidebar-accent-foreground: 210 20% 98%;
-    --sidebar-border: 200 50% 18%;
-    --sidebar-ring: 192 91% 56%;
+    --sidebar-background: 164 76% 7%;
+    --sidebar-foreground: 40 33% 97%;
+    --sidebar-primary: 41 52% 55%;
+    --sidebar-primary-foreground: 164 76% 7%;
+    --sidebar-accent: 163 60% 13%;
+    --sidebar-accent-foreground: 40 33% 97%;
+    --sidebar-border: 163 45% 16%;
+    --sidebar-ring: 41 52% 55%;
 
-    --chart-1: 193 82% 31%;
-    --chart-2: 43 90% 57%;
-    --chart-3: 198 80% 40%;
-    --chart-4: 201 76% 18%;
-    --chart-5: 192 91% 56%;
+    --chart-1: 163 88% 20%;
+    --chart-2: 41 52% 55%;
+    --chart-3: 161 72% 28%;
+    --chart-4: 164 76% 14%;
+    --chart-5: 42 66% 70%;
   }
 
   .dark {
-    --background: 213 39% 5%;
-    --foreground: 210 20% 98%;
+    --background: 164 55% 4%;
+    --foreground: 40 33% 97%;
 
-    --card: 208 42% 8%;
-    --card-foreground: 210 20% 98%;
+    --card: 164 50% 8%;
+    --card-foreground: 40 33% 97%;
 
-    --popover: 208 42% 8%;
-    --popover-foreground: 210 20% 98%;
+    --popover: 164 50% 8%;
+    --popover-foreground: 40 33% 97%;
 
-    --primary: 192 91% 56%;
-    --primary-foreground: 201 76% 10%;
+    --primary: 41 58% 60%;
+    --primary-foreground: 164 76% 7%;
 
-    --secondary: 193 82% 31%;
+    --secondary: 163 88% 20%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 206 38% 13%;
-    --muted-foreground: 215 20% 65%;
+    --muted: 164 42% 12%;
+    --muted-foreground: 40 16% 68%;
 
-    --accent: 192 91% 56%;
-    --accent-foreground: 201 76% 10%;
+    --accent: 41 58% 60%;
+    --accent-foreground: 164 76% 7%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 208 32% 16%;
-    --input: 208 32% 16%;
-    --ring: 192 91% 56%;
+    --border: 164 35% 16%;
+    --input: 164 35% 16%;
+    --ring: 41 58% 60%;
 
-    --sidebar-background: 201 76% 8%;
-    --sidebar-foreground: 210 20% 98%;
-    --sidebar-primary: 192 91% 56%;
-    --sidebar-primary-foreground: 201 76% 10%;
-    --sidebar-accent: 201 55% 13%;
-    --sidebar-accent-foreground: 210 20% 98%;
-    --sidebar-border: 201 45% 15%;
-    --sidebar-ring: 192 91% 56%;
+    --sidebar-background: 164 60% 5%;
+    --sidebar-foreground: 40 33% 97%;
+    --sidebar-primary: 41 58% 60%;
+    --sidebar-primary-foreground: 164 76% 7%;
+    --sidebar-accent: 163 55% 12%;
+    --sidebar-accent-foreground: 40 33% 97%;
+    --sidebar-border: 163 45% 15%;
+    --sidebar-ring: 41 58% 60%;
   }
 }
 
@@ -126,8 +127,8 @@ html {
 }
 
 ::selection {
-  background: #0E7490;
-  color: #ffffff;
+  background: #065F46;
+  color: #FAF8F5;
 }
 
 /* Font utility aliases (compatibility + new system) */
@@ -151,114 +152,114 @@ html {
 }
 
 /* ========================================================
-   CORPORATE PRESENTATION DECK SURFACE UTILITIES
+   SOVEREIGN LUXURY SURFACE UTILITIES (Deep Emerald + Alabaster + Champagne Gold)
    ======================================================== */
 .teal-gradient {
-  background: linear-gradient(135deg, #0E7490 0%, #0284c7 100%);
+  background: linear-gradient(135deg, #065F46 0%, #047857 100%);
 }
 
 .navy-gradient {
-  background: linear-gradient(180deg, #061E2B 0%, #082738 50%, #04151F 100%);
+  background: linear-gradient(180deg, #041E17 0%, #063327 50%, #031510 100%);
 }
 
 .glass-card {
-  @apply rounded-2xl border border-slate-200/85 bg-white/95 backdrop-blur-xl shadow-sm;
+  @apply rounded-2xl border border-[#E6E0D3]/90 bg-white/95 backdrop-blur-xl shadow-sm;
 }
 
 .glass-card-dark {
-  @apply rounded-2xl border border-cyan-300/15 bg-[#061E2B]/90 backdrop-blur-xl text-white shadow-sm;
+  @apply rounded-2xl border border-[#C8A253]/25 bg-[#041E17]/90 backdrop-blur-xl text-white shadow-sm;
 }
 
 .neu-inset {
-  background: #EBF5F8;
+  background: #F3EFE6;
   box-shadow:
-    inset 0 2px 5px rgba(6, 30, 43, 0.045),
-    inset 0 1px 0 rgba(255, 255, 255, 0.75);
-  border: 1px solid rgba(186, 230, 253, 0.72);
+    inset 0 2px 5px rgba(4, 30, 23, 0.045),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(200, 162, 83, 0.35);
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .neu-btn {
   background: #FFFFFF;
   box-shadow:
-    0 4px 14px rgba(6, 30, 43, 0.05),
-    0 1px 2px rgba(6, 30, 43, 0.03);
-  border: 1px solid rgba(203, 213, 225, 0.9);
-  color: #061E2B;
+    0 4px 14px rgba(4, 30, 23, 0.05),
+    0 1px 2px rgba(4, 30, 23, 0.03);
+  border: 1px solid rgba(214, 206, 190, 0.9);
+  color: #041E17;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .neu-btn:hover {
   transform: translateY(-1.5px);
-  background: #EBF5F8;
-  border-color: rgba(14, 116, 144, 0.38);
-  color: #0E7490;
+  background: #F3EFE6;
+  border-color: rgba(200, 162, 83, 0.55);
+  color: #065F46;
   box-shadow:
-    0 8px 20px rgba(14, 116, 144, 0.12),
-    0 2px 6px rgba(6, 30, 43, 0.04);
+    0 8px 20px rgba(6, 95, 70, 0.12),
+    0 2px 6px rgba(4, 30, 23, 0.04);
 }
 
 .neu-btn-primary {
-  background: linear-gradient(135deg, #0E7490 0%, #095C73 100%);
+  background: linear-gradient(135deg, #065F46 0%, #044735 100%);
   box-shadow:
-    0 10px 24px -4px rgba(14, 116, 144, 0.35),
-    0 2px 6px rgba(6, 30, 43, 0.08);
-  border: 1px solid rgba(103, 232, 249, 0.28);
+    0 10px 24px -4px rgba(6, 95, 70, 0.36),
+    0 2px 6px rgba(4, 30, 23, 0.08);
+  border: 1px solid rgba(200, 162, 83, 0.38);
   color: #ffffff;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .neu-btn-primary:hover {
   transform: translateY(-2px);
-  background: linear-gradient(135deg, #0884A6 0%, #061E2B 100%);
+  background: linear-gradient(135deg, #047857 0%, #041E17 100%);
 }
 
 .neu-btn-dark {
-  background: linear-gradient(135deg, #061E2B 0%, #0A384D 100%);
+  background: linear-gradient(135deg, #041E17 0%, #064E3B 100%);
   box-shadow:
-    0 10px 24px -4px rgba(6, 30, 43, 0.28),
-    0 2px 6px rgba(6, 30, 43, 0.08);
-  border: 1px solid rgba(103, 232, 249, 0.2);
+    0 10px 24px -4px rgba(4, 30, 23, 0.32),
+    0 2px 6px rgba(4, 30, 23, 0.08);
+  border: 1px solid rgba(200, 162, 83, 0.32);
   color: #ffffff;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .dark .neu-inset {
-  background: #070b10 !important;
+  background: #05110E !important;
   box-shadow:
     inset 4px 4px 10px rgba(0, 0, 0, 0.8),
-    inset -3px -3px 8px rgba(255, 255, 255, 0.03) !important;
-  border-color: rgba(255, 255, 255, 0.06) !important;
-  color: #f1f5f9 !important;
+    inset -3px -3px 8px rgba(200, 162, 83, 0.04) !important;
+  border-color: rgba(200, 162, 83, 0.12) !important;
+  color: #FAF8F5 !important;
 }
 
 .dark .neu-btn {
-  background: linear-gradient(145deg, #1e2633, #111722) !important;
+  background: linear-gradient(145deg, #0f2922, #081914) !important;
   box-shadow:
     5px 5px 12px rgba(0, 0, 0, 0.6),
-    -3px -3px 8px rgba(255, 255, 255, 0.04) !important;
-  border-color: rgba(255, 255, 255, 0.1) !important;
-  color: #f1f5f9 !important;
+    -3px -3px 8px rgba(200, 162, 83, 0.05) !important;
+  border-color: rgba(200, 162, 83, 0.16) !important;
+  color: #FAF8F5 !important;
 }
 
 @layer components {
   .text-gradient-Kecamatan {
-    @apply bg-gradient-to-r from-[#061E2B] via-[#0E7490] to-cyan-700 dark:from-cyan-200 dark:via-sky-300 dark:to-amber-200 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-[#041E17] via-[#065F46] to-[#A67C2E] dark:from-[#E5C882] dark:via-[#FAF8F5] dark:to-[#C8A253] bg-clip-text text-transparent;
   }
   .text-gradient-amber {
-    @apply bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-600 dark:from-amber-400 dark:to-yellow-300 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-[#A67C2E] via-[#C8A253] to-[#E5C882] bg-clip-text text-transparent;
   }
   .card-Kecamatan {
-    @apply rounded-2xl md:rounded-3xl border border-slate-200/80 dark:border-white/10 bg-white/90 dark:bg-[#0c1622]/90 backdrop-blur-md text-card-foreground shadow-sm transition-all duration-300 hover:shadow-xl hover:border-[#0E7490]/35 hover:-translate-y-1;
+    @apply rounded-2xl md:rounded-3xl border border-[#E6E0D3]/90 dark:border-[#C8A253]/20 bg-white/95 dark:bg-[#0A1F1A]/95 backdrop-blur-md text-card-foreground shadow-sm transition-all duration-300 hover:shadow-xl hover:border-[#C8A253]/50 hover:-translate-y-1;
   }
   .card-Kecamatan-header {
-    @apply p-5 md:p-6 bg-gradient-to-r from-[#EBF5F8]/80 via-[#F3F7F9]/50 to-transparent dark:from-cyan-950/40 dark:via-cyan-950/10 dark:to-transparent border-b border-slate-200/80 dark:border-white/10;
+    @apply p-5 md:p-6 bg-gradient-to-r from-[#F3EFE6]/90 via-[#FAF8F5]/60 to-transparent dark:from-[#064E3B]/50 dark:via-[#064E3B]/15 dark:to-transparent border-b border-[#E6E0D3]/80 dark:border-[#C8A253]/15;
   }
   .badge-padi {
-    @apply inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-black uppercase bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/25 shadow-sm;
+    @apply inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-black uppercase bg-[#C8A253]/15 text-[#8A6520] dark:text-[#E5C882] border border-[#C8A253]/35 shadow-sm;
   }
   .badge-Kecamatan {
-    @apply inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-black uppercase bg-[#EBF5F8] text-[#0E7490] dark:bg-cyan-950/60 dark:text-cyan-300 border border-[#0E7490]/20 shadow-sm;
+    @apply inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-black uppercase bg-[#F3EFE6] text-[#065F46] dark:bg-[#064E3B]/70 dark:text-[#E5C882] border border-[#065F46]/20 shadow-sm;
   }
   .animate-fade-in-up {
     animation: fadeInUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -277,63 +278,62 @@ html {
 }
 
 /* ========================================================
-   SYSTEM-WIDE CORPORATE PRESENTATION DECK OVERRIDES
-   Menyelaraskan seluruh menu & sub-menu internal dengan tema Landing Page
-   (Ocean Teal #0E7490, Deep Marine Navy #061E2B, Ice-Cyan #F3F7F9, Dark #0c1622)
+   SYSTEM-WIDE SOVEREIGN LUXURY OVERRIDES
+   Deep Emerald #065F46, Forest Obsidian #041E17, Warm Alabaster #FAF8F5, Champagne Gold #C8A253
    ======================================================== */
 .system-shell input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
 .system-shell textarea,
 .system-shell select {
-  border-color: rgba(203, 213, 225, 0.85);
+  border-color: rgba(214, 206, 190, 0.9);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .system-shell input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):focus,
 .system-shell textarea:focus,
 .system-shell select:focus {
-  border-color: #0E7490 !important;
-  box-shadow: 0 0 0 3px rgba(14, 116, 144, 0.14) !important;
+  border-color: #065F46 !important;
+  box-shadow: 0 0 0 3px rgba(6, 95, 70, 0.14) !important;
 }
 
-/* Dark mode harmony for all inner menu & submenu pages that use utility bg-white/text-slate-* */
+/* Dark mode harmony for all inner menu & submenu pages */
 .dark .system-shell .bg-white,
 .dark .system-shell .bg-white\/80,
 .dark .system-shell .bg-white\/90 {
-  background-color: #0c1622 !important;
-  border-color: rgba(255, 255, 255, 0.1) !important;
+  background-color: #0A1F1A !important;
+  border-color: rgba(200, 162, 83, 0.15) !important;
 }
 
 .dark .system-shell .bg-slate-50,
 .dark .system-shell .bg-slate-50\/50,
 .dark .system-shell .bg-slate-100 {
   background-color: rgba(255, 255, 255, 0.04) !important;
-  border-color: rgba(255, 255, 255, 0.09) !important;
+  border-color: rgba(200, 162, 83, 0.12) !important;
 }
 
 .dark .system-shell .text-slate-900,
 .dark .system-shell .text-slate-800 {
-  color: #f1f5f9 !important;
+  color: #FAF8F5 !important;
 }
 
 .dark .system-shell .text-slate-700,
 .dark .system-shell .text-slate-600 {
-  color: #cbd5e1 !important;
+  color: #E2DDD2 !important;
 }
 
 .dark .system-shell .text-slate-500 {
-  color: #94a3b8 !important;
+  color: #A8B5AE !important;
 }
 
 .dark .system-shell .border-slate-100,
 .dark .system-shell .border-slate-200 {
-  border-color: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(200, 162, 83, 0.14) !important;
 }
 
 .dark .system-shell input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
 .dark .system-shell textarea,
 .dark .system-shell select {
-  background-color: #070f18 !important;
-  border-color: rgba(255, 255, 255, 0.14) !important;
-  color: #f8fafc !important;
+  background-color: #05110E !important;
+  border-color: rgba(200, 162, 83, 0.2) !important;
+  color: #FAF8F5 !important;
 }
 

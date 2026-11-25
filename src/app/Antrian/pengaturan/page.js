@@ -790,7 +790,7 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
   if (!isLogged) {
     return (
       <div style={{
-        background: 'linear-gradient(155deg, #f8fbfd 0%, #ebf5f8 52%, #dff0f6 100%)',
+        background: 'linear-gradient(155deg, #FAF8F5 0%, #F3EFE6 52%, #EFE9DC 100%)',
         minHeight: '100vh',
         display: 'flex',
         alignItems: 'center',
@@ -822,13 +822,13 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
             width: '100%',
             background: '#ffffff',
             borderRadius: '26px',
-            border: '1.5px solid rgba(14, 116, 144, 0.2)',
-            boxShadow: '0 22px 55px rgba(6, 30, 43, 0.14)',
-            color: '#061E2B',
+            border: '1.5px solid rgba(6, 95, 70, 0.2)',
+            boxShadow: '0 22px 55px rgba(4, 30, 23, 0.14)',
+            color: '#041E17',
             zIndex: 10
           }}
         >
-          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '6px', background: 'linear-gradient(90deg, #0E7490, #38bdf8, #061E2B)' }} />
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '6px', background: 'linear-gradient(90deg, #065F46, #E5C882, #041E17)' }} />
           <div className="text-center mb-4 pt-1">
             <div className="d-flex align-items-center justify-content-center mb-3">
               <img src={logoTambahan || "/img/logo-tambahan.png"} alt="Logo Instansi" style={{ height: '56px', objectFit: 'contain' }} />
@@ -838,18 +838,18 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
               <span
                 className="badge px-3 py-1.5 rounded-pill fw-bold font-mono"
                 style={{
-                  background: '#ebf5f8',
-                  color: '#0E7490',
+                  background: '#F3EFE6',
+                  color: '#065F46',
                   fontSize: '0.72rem',
                   letterSpacing: '0.06em',
-                  border: '1px solid rgba(14, 116, 144, 0.25)'
+                  border: '1px solid rgba(6, 95, 70, 0.25)'
                 }}
               >
                 <i className="bi bi-sliders me-1"></i> SEMRINGAH • PENGATURAN
               </span>
             </div>
 
-            <h3 className="fw-extrabold font-hero mb-1" style={{ fontSize: '1.7rem', letterSpacing: '-0.02em', color: '#061E2B' }}>
+            <h3 className="fw-extrabold font-hero mb-1" style={{ fontSize: '1.7rem', letterSpacing: '-0.02em', color: '#041E17' }}>
               Login Pengaturan Antrian
             </h3>
             <p className="small mb-0" style={{ color: '#64748b' }}>Sistem Pelayanan Kecamatan Gandrungmangu</p>
@@ -863,9 +863,9 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
 
           <form onSubmit={handleAdminLogin}>
             <div className="mb-3">
-              <label className="form-label small fw-bold mb-1.5 font-hero" style={{ color: '#061E2B' }}>Alamat Email / Username</label>
+              <label className="form-label small fw-bold mb-1.5 font-hero" style={{ color: '#041E17' }}>Alamat Email / Username</label>
               <div className="input-group">
-                <span className="input-group-text" style={{ background: '#ebf5f8', border: '1.5px solid rgba(14, 116, 144, 0.22)', borderRight: 'none', borderRadius: '12px 0 0 12px', color: '#0E7490' }}>
+                <span className="input-group-text" style={{ background: '#F3EFE6', border: '1.5px solid rgba(6, 95, 70, 0.22)', borderRight: 'none', borderRadius: '12px 0 0 12px', color: '#065F46' }}>
                   <i className="bi bi-envelope"></i>
                 </span>
                 <input
@@ -875,7 +875,7 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                   required
                   value={emailInput}
                   onChange={e => setEmailInput(e.target.value)}
-                  style={{ background: '#f8fbfd', border: '1.5px solid rgba(14, 116, 144, 0.22)', borderRadius: '0 12px 12px 0', color: '#061E2B' }}
+                  style={{ background: '#FAF8F5', border: '1.5px solid rgba(6, 95, 70, 0.22)', borderRadius: '0 12px 12px 0', color: '#041E17' }}
                 />
               </div>
               <small className="mt-1 d-block" style={{ fontSize: '11px', color: '#64748b' }}>
@@ -884,9 +884,9 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
             </div>
 
             <div className="mb-4">
-              <label className="form-label small fw-bold mb-1.5 font-hero" style={{ color: '#061E2B' }}>Password</label>
+              <label className="form-label small fw-bold mb-1.5 font-hero" style={{ color: '#041E17' }}>Password</label>
               <div className="input-group">
-                <span className="input-group-text" style={{ background: '#ebf5f8', border: '1.5px solid rgba(14, 116, 144, 0.22)', borderRight: 'none', borderRadius: '12px 0 0 12px', color: '#0E7490' }}>
+                <span className="input-group-text" style={{ background: '#F3EFE6', border: '1.5px solid rgba(6, 95, 70, 0.22)', borderRight: 'none', borderRadius: '12px 0 0 12px', color: '#065F46' }}>
                   <i className="bi bi-lock"></i>
                 </span>
                 <input
@@ -896,12 +896,12 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                   required
                   value={passwordInput}
                   onChange={e => setPasswordInput(e.target.value)}
-                  style={{ background: '#f8fbfd', border: '1.5px solid rgba(14, 116, 144, 0.22)', borderRadius: '0 12px 12px 0', color: '#061E2B' }}
+                  style={{ background: '#FAF8F5', border: '1.5px solid rgba(6, 95, 70, 0.22)', borderRadius: '0 12px 12px 0', color: '#041E17' }}
                 />
               </div>
             </div>
 
-            <button type="submit" className="btn w-100 py-3 fw-bold rounded-pill mb-3 text-white shadow font-hero" style={{ background: 'linear-gradient(135deg, #0E7490, #061E2B)', border: 'none', letterSpacing: '0.03em' }}>
+            <button type="submit" className="btn w-100 py-3 fw-bold rounded-pill mb-3 text-white shadow font-hero" style={{ background: 'linear-gradient(135deg, #065F46, #041E17)', border: 'none', letterSpacing: '0.03em' }}>
               <i className="bi bi-box-arrow-in-right me-1.5"></i> Masuk Pengaturan
             </button>
 
@@ -916,10 +916,10 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
 
   return (
     <div style={{
-      background: 'linear-gradient(155deg, #f8fbfd 0%, #ebf5f8 52%, #dff0f6 100%)',
+      background: 'linear-gradient(155deg, #FAF8F5 0%, #F3EFE6 52%, #EFE9DC 100%)',
       minHeight: '100vh',
       padding: '24px 20px 60px',
-      color: '#061E2B',
+      color: '#041E17',
       position: 'relative'
     }}>
       <div
@@ -941,18 +941,18 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
         <div className="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4 p-3.5 rounded-4" style={{
           background: 'rgba(255, 255, 255, 0.95)',
           backdropFilter: 'blur(20px)',
-          border: '1px solid rgba(14, 116, 144, 0.18)',
-          boxShadow: '0 10px 30px rgba(6, 30, 43, 0.08)'
+          border: '1px solid rgba(6, 95, 70, 0.18)',
+          boxShadow: '0 10px 30px rgba(4, 30, 23, 0.08)'
         }}>
           <div className="d-flex align-items-center gap-3">
             <img src={logoTambahan || "/img/logo-tambahan.png"} alt="Logo Instansi" style={{ height: '46px', objectFit: 'contain' }} />
             <div>
-              <h1 className="fw-extrabold m-0 font-hero" style={{ fontSize: '1.4rem', letterSpacing: '-0.02em', color: '#061E2B' }}>PENGATURAN SISTEM PELAYANAN</h1>
-              <p className="m-0 small font-mono" style={{ color: '#0E7490' }}>Kecamatan Gandrungmangu • Real-time Configurator</p>
+              <h1 className="fw-extrabold m-0 font-hero" style={{ fontSize: '1.4rem', letterSpacing: '-0.02em', color: '#041E17' }}>PENGATURAN SISTEM PELAYANAN</h1>
+              <p className="m-0 small font-mono" style={{ color: '#065F46' }}>Kecamatan Gandrungmangu • Real-time Configurator</p>
             </div>
           </div>
           <div className="d-flex gap-2">
-            <Link href="/Antrian/" className="btn btn-sm rounded-pill px-3.5 py-1.5 d-flex align-items-center gap-1.5 fw-bold text-decoration-none font-hero text-white" style={{ background: 'linear-gradient(135deg, #0E7490, #061E2B)', border: 'none' }}>
+            <Link href="/Antrian/" className="btn btn-sm rounded-pill px-3.5 py-1.5 d-flex align-items-center gap-1.5 fw-bold text-decoration-none font-hero text-white" style={{ background: 'linear-gradient(135deg, #065F46, #041E17)', border: 'none' }}>
               <i className="bi bi-arrow-left"></i> Kembali ke Portal
             </Link>
             <button onClick={handleLogout} className="btn btn-sm rounded-pill px-3.5 py-1.5 d-flex align-items-center gap-1.5 fw-bold font-hero" style={{ background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca' }}>
@@ -984,10 +984,10 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                 onClick={() => setActiveTab(tab.id)}
                 className="btn flex-grow-1 py-2.5 px-3 fw-bold rounded-pill transition font-hero text-nowrap"
                 style={{
-                  background: isActive ? 'linear-gradient(135deg, #0E7490, #061E2B)' : '#ffffff',
-                  color: isActive ? '#ffffff' : '#061E2B',
-                  border: isActive ? '1px solid #0E7490' : '1px solid rgba(14, 116, 144, 0.2)',
-                  boxShadow: isActive ? '0 8px 20px rgba(14, 116, 144, 0.25)' : '0 4px 12px rgba(6, 30, 43, 0.05)',
+                  background: isActive ? 'linear-gradient(135deg, #065F46, #041E17)' : '#ffffff',
+                  color: isActive ? '#ffffff' : '#041E17',
+                  border: isActive ? '1px solid #065F46' : '1px solid rgba(6, 95, 70, 0.2)',
+                  boxShadow: isActive ? '0 8px 20px rgba(6, 95, 70, 0.25)' : '0 4px 12px rgba(4, 30, 23, 0.05)',
                   fontSize: '0.84rem'
                 }}
               >
@@ -998,12 +998,12 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
         </div>
 
         {/* Main Content Area (Porcelain White Card) */}
-        <div className="card p-4 p-md-5 mb-4" style={{ background: '#ffffff', border: '1.5px solid rgba(14, 116, 144, 0.18)', borderRadius: '24px', boxShadow: '0 16px 40px rgba(6, 30, 43, 0.08)', color: '#061E2B' }}>
+        <div className="card p-4 p-md-5 mb-4" style={{ background: '#ffffff', border: '1.5px solid rgba(6, 95, 70, 0.18)', borderRadius: '24px', boxShadow: '0 16px 40px rgba(4, 30, 23, 0.08)', color: '#041E17' }}>
 
           {loading && (
             <div className="text-center py-5">
-              <div className="spinner-border" style={{ color: '#0E7490' }} role="status"></div>
-              <p className="mt-3 fw-semibold" style={{ color: '#0E7490' }}>Sinkronisasi data Firestore...</p>
+              <div className="spinner-border" style={{ color: '#065F46' }} role="status"></div>
+              <p className="mt-3 fw-semibold" style={{ color: '#065F46' }}>Sinkronisasi data Firestore...</p>
             </div>
           )}
 
@@ -1012,39 +1012,39 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
               {/* TAB 1: PENGATURAN UMUM */}
               {activeTab === 'umum' && (
                 <form onSubmit={handleSaveSettings}>
-                  <h4 className="fw-extrabold mb-4 pb-2 font-hero" style={{ color: '#0E7490', borderBottom: '2px solid #ebf5f8' }}>Informasi Instansi</h4>
+                  <h4 className="fw-extrabold mb-4 pb-2 font-hero" style={{ color: '#065F46', borderBottom: '2px solid #F3EFE6' }}>Informasi Instansi</h4>
                   <div className="row g-4">
                     <div className="col-md-6">
-                      <label className="form-label fw-bold small font-hero" style={{ color: '#061E2B' }}>Nama Instansi</label>
+                      <label className="form-label fw-bold small font-hero" style={{ color: '#041E17' }}>Nama Instansi</label>
                       <input
                         type="text"
                         className="form-control py-2"
-                        style={{ background: '#f8fbfd', border: '1.5px solid rgba(14, 116, 144, 0.22)', color: '#061E2B' }}
+                        style={{ background: '#FAF8F5', border: '1.5px solid rgba(6, 95, 70, 0.22)', color: '#041E17' }}
                         required
                         value={settings.instansi_nama || ''}
                         onChange={e => setSettings({ ...settings, instansi_nama: e.target.value })}
                       />
                     </div>
                     <div className="col-md-6">
-                      <label className="form-label fw-bold small font-hero" style={{ color: '#061E2B' }}>Alamat Instansi</label>
+                      <label className="form-label fw-bold small font-hero" style={{ color: '#041E17' }}>Alamat Instansi</label>
                       <input
                         type="text"
                         className="form-control py-2"
-                        style={{ background: '#f8fbfd', border: '1.5px solid rgba(14, 116, 144, 0.22)', color: '#061E2B' }}
+                        style={{ background: '#FAF8F5', border: '1.5px solid rgba(6, 95, 70, 0.22)', color: '#041E17' }}
                         required
                         value={settings.instansi_alamat || ''}
                         onChange={e => setSettings({ ...settings, instansi_alamat: e.target.value })}
                       />
                     </div>
 
-                    <h4 className="fw-extrabold mb-1 mt-5 pb-2 font-hero" style={{ color: '#0E7490', borderBottom: '2px solid #ebf5f8' }}>Pengaturan Display &amp; Media</h4>
+                    <h4 className="fw-extrabold mb-1 mt-5 pb-2 font-hero" style={{ color: '#065F46', borderBottom: '2px solid #F3EFE6' }}>Pengaturan Display &amp; Media</h4>
 
                     <div className="col-12">
-                      <label className="form-label fw-bold small font-hero" style={{ color: '#061E2B' }}>Teks Pengumuman Berjalan (Running Text)</label>
+                      <label className="form-label fw-bold small font-hero" style={{ color: '#041E17' }}>Teks Pengumuman Berjalan (Running Text)</label>
                       <textarea
                         rows="3"
                         className="form-control py-2"
-                        style={{ background: '#f8fbfd', border: '1.5px solid rgba(14, 116, 144, 0.22)', color: '#061E2B' }}
+                        style={{ background: '#FAF8F5', border: '1.5px solid rgba(6, 95, 70, 0.22)', color: '#041E17' }}
                         required
                         value={settings.running_text || ''}
                         onChange={e => setSettings({ ...settings, running_text: e.target.value })}
@@ -1052,11 +1052,11 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                     </div>
 
                     <div className="col-md-8">
-                      <label className="form-label fw-bold small font-hero" style={{ color: '#061E2B' }}>Display YouTube Video URL</label>
+                      <label className="form-label fw-bold small font-hero" style={{ color: '#041E17' }}>Display YouTube Video URL</label>
                       <input
                         type="text"
                         className="form-control py-2"
-                        style={{ background: '#f8fbfd', border: '1.5px solid rgba(14, 116, 144, 0.22)', color: '#061E2B' }}
+                        style={{ background: '#FAF8F5', border: '1.5px solid rgba(6, 95, 70, 0.22)', color: '#041E17' }}
                         placeholder="Contoh: https://www.youtube.com/watch?v=h-z_t11jvPU atau https://youtu.be/..."
                         value={settings.display_video_url || ''}
                         onChange={e => setSettings({ ...settings, display_video_url: e.target.value })}
@@ -1068,18 +1068,18 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                     <div className="col-12 mt-2">
                       <div
                         style={{
-                          border: `1.5px solid ${tvMode === 'tv' ? 'rgba(239,68,68,0.45)' : 'rgba(14,116,144,0.25)'}`,
+                          border: `1.5px solid ${tvMode === 'tv' ? 'rgba(239,68,68,0.45)' : 'rgba(6, 95, 70,0.25)'}`,
                           borderRadius: '18px',
                           padding: '18px 20px',
-                          background: tvMode === 'tv' ? '#fef2f2' : '#f8fbfd',
+                          background: tvMode === 'tv' ? '#fef2f2' : '#FAF8F5',
                           transition: 'all 0.3s ease'
                         }}
                       >
                         <div className="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
                           <div className="d-flex align-items-center gap-2">
-                            <i className="bi bi-tv-fill" style={{ fontSize: '1.3rem', color: tvMode === 'tv' ? '#dc2626' : '#0E7490' }} />
+                            <i className="bi bi-tv-fill" style={{ fontSize: '1.3rem', color: tvMode === 'tv' ? '#dc2626' : '#065F46' }} />
                             <div>
-                              <div className="fw-bold font-hero" style={{ fontSize: '1rem', color: '#061E2B' }}>Mode Siaran TV (IPTV)</div>
+                              <div className="fw-bold font-hero" style={{ fontSize: '1rem', color: '#041E17' }}>Mode Siaran TV (IPTV)</div>
                               <div style={{ fontSize: '0.8rem', color: '#64748b' }}>Sumber: dhasap/dhanytv — 920+ channel Indonesia gratis</div>
                             </div>
                           </div>
@@ -1087,9 +1087,9 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                             className="badge rounded-pill fw-bold px-3 py-2 font-mono"
                             style={{
                               fontSize: '0.76rem',
-                              background: tvMode === 'tv' ? '#dc2626' : '#ebf5f8',
-                              color: tvMode === 'tv' ? '#ffffff' : '#0E7490',
-                              border: tvMode === 'tv' ? 'none' : '1px solid rgba(14,116,144,0.25)'
+                              background: tvMode === 'tv' ? '#dc2626' : '#F3EFE6',
+                              color: tvMode === 'tv' ? '#ffffff' : '#065F46',
+                              border: tvMode === 'tv' ? 'none' : '1px solid rgba(6, 95, 70,0.25)'
                             }}
                           >
                             {tvMode === 'tv' ? '📺 Sedang Mode TV' : '🔢 Sedang Mode Antrian'}
@@ -1101,7 +1101,7 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                             <label className="form-label fw-semibold mb-1" style={{ fontSize: '0.82rem', color: '#475569' }}>Grup Channel</label>
                             <select
                               className="form-select form-select-sm"
-                              style={{ background: '#ffffff', border: '1.5px solid rgba(14, 116, 144, 0.22)', color: '#061E2B' }}
+                              style={{ background: '#ffffff', border: '1.5px solid rgba(6, 95, 70, 0.22)', color: '#041E17' }}
                               value={tvGroupFilter}
                               onChange={e => {
                                 setTvGroupFilter(e.target.value);
@@ -1118,7 +1118,7 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                             <label className="form-label fw-semibold mb-1" style={{ fontSize: '0.82rem', color: '#475569' }}>Pilih Channel</label>
                             <select
                               className="form-select form-select-sm"
-                              style={{ background: '#ffffff', border: '1.5px solid rgba(14, 116, 144, 0.22)', color: '#061E2B' }}
+                              style={{ background: '#ffffff', border: '1.5px solid rgba(6, 95, 70, 0.22)', color: '#041E17' }}
                               value={tvSelectedChannel?.url || ''}
                               onChange={e => {
                                 const ch = tvChannels.find(c => c.url === e.target.value);
@@ -1137,7 +1137,7 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                             <button
                               type="button"
                               className="btn btn-sm w-100"
-                              style={{ background: '#ebf5f8', color: '#0E7490', border: '1px solid rgba(14,116,144,0.25)' }}
+                              style={{ background: '#F3EFE6', color: '#065F46', border: '1px solid rgba(6, 95, 70,0.25)' }}
                               onClick={() => fetchTvChannels(tvGroupFilter)}
                               disabled={tvLoadingChannels}
                               title="Muat ulang daftar channel"
@@ -1152,7 +1152,7 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                         {tvSelectedChannel && (
                           <div
                             className="d-flex align-items-center gap-3 p-2.5 mb-3 rounded-3"
-                            style={{ background: '#ffffff', border: '1px solid rgba(14,116,144,0.2)' }}
+                            style={{ background: '#ffffff', border: '1px solid rgba(6, 95, 70,0.2)' }}
                           >
                             {tvSelectedChannel.logo && (
                               <img
@@ -1163,7 +1163,7 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                               />
                             )}
                             <div className="flex-grow-1">
-                              <div className="fw-bold" style={{ fontSize: '0.9rem', color: '#061E2B' }}>{tvSelectedChannel.name}</div>
+                              <div className="fw-bold" style={{ fontSize: '0.9rem', color: '#041E17' }}>{tvSelectedChannel.name}</div>
                               <div style={{ fontSize: '0.72rem', color: '#64748b', wordBreak: 'break-all' }}>{tvSelectedChannel.url.slice(0, 60)}...</div>
                             </div>
                             <span style={{ fontSize: '0.65rem', fontWeight: 700, color: '#dc2626', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '6px', padding: '2px 7px', letterSpacing: '1px' }}>
@@ -1193,7 +1193,7 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                             disabled={tvSwitching || tvMode === 'antrian'}
                             onClick={() => handleSwitchDisplayMode('antrian')}
                             style={{
-                              background: tvMode === 'tv' ? 'linear-gradient(135deg, #0E7490, #061E2B)' : '#cbd5e1',
+                              background: tvMode === 'tv' ? 'linear-gradient(135deg, #065F46, #041E17)' : '#cbd5e1',
                               border: 'none', opacity: tvMode === 'antrian' ? 0.6 : 1
                             }}
                           >
@@ -1206,7 +1206,7 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                     </div>
 
                     <div className="col-md-6">
-                      <label className="form-label fw-bold small font-hero" style={{ color: '#061E2B' }}>Volume Suara Panggilan (Bell Chime)</label>
+                      <label className="form-label fw-bold small font-hero" style={{ color: '#041E17' }}>Volume Suara Panggilan (Bell Chime)</label>
                       <div className="d-flex align-items-center gap-3">
                         <input
                           type="range"
@@ -1217,12 +1217,12 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                           value={settings.bell_sound_volume || '0.8'}
                           onChange={e => setSettings({ ...settings, bell_sound_volume: e.target.value })}
                         />
-                        <span className="badge font-mono px-2.5 py-2" style={{ background: '#ebf5f8', color: '#0E7490', border: '1px solid rgba(14,116,144,0.25)' }}>{Math.round((parseFloat(settings.bell_sound_volume) || 0) * 100)}%</span>
+                        <span className="badge font-mono px-2.5 py-2" style={{ background: '#F3EFE6', color: '#065F46', border: '1px solid rgba(6, 95, 70,0.25)' }}>{Math.round((parseFloat(settings.bell_sound_volume) || 0) * 100)}%</span>
                       </div>
                     </div>
 
                     <div className="col-md-6">
-                      <label className="form-label fw-bold small font-hero" style={{ color: '#061E2B' }}>Volume Tampilan TV / Video</label>
+                      <label className="form-label fw-bold small font-hero" style={{ color: '#041E17' }}>Volume Tampilan TV / Video</label>
                       <div className="d-flex align-items-center gap-3">
                         <input
                           type="range"
@@ -1233,14 +1233,14 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                           value={settings.display_video_volume || '0.8'}
                           onChange={e => setSettings({ ...settings, display_video_volume: e.target.value })}
                         />
-                        <span className="badge font-mono px-2.5 py-2" style={{ background: '#ebf5f8', color: '#0E7490', border: '1px solid rgba(14,116,144,0.25)' }}>{Math.round((parseFloat(settings.display_video_volume) || 0) * 100)}%</span>
+                        <span className="badge font-mono px-2.5 py-2" style={{ background: '#F3EFE6', color: '#065F46', border: '1px solid rgba(6, 95, 70,0.25)' }}>{Math.round((parseFloat(settings.display_video_volume) || 0) * 100)}%</span>
                       </div>
                       <small className="mt-1 d-block" style={{ color: '#64748b' }}>Mengatur volume siaran TV / video yang diputar di Display Antrian.</small>
                     </div>
                   </div>
 
                   <div className="text-end mt-5 pt-3" style={{ borderTop: '1px solid #e2e8f0' }}>
-                    <button type="submit" className="btn btn-lg px-5 fw-bold text-white rounded-pill shadow font-hero" style={{ background: 'linear-gradient(135deg, #0E7490, #061E2B)', border: 'none' }}>
+                    <button type="submit" className="btn btn-lg px-5 fw-bold text-white rounded-pill shadow font-hero" style={{ background: 'linear-gradient(135deg, #065F46, #041E17)', border: 'none' }}>
                       Simpan Semua Perubahan
                     </button>
                   </div>
@@ -1250,16 +1250,16 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
               {/* TAB 2: KATEGORI LAYANAN */}
               {activeTab === 'layanan' && (
                 <div>
-                  <h4 className="fw-extrabold mb-4 pb-2 font-hero" style={{ color: '#0E7490', borderBottom: '2px solid #ebf5f8' }}>
+                  <h4 className="fw-extrabold mb-4 pb-2 font-hero" style={{ color: '#065F46', borderBottom: '2px solid #F3EFE6' }}>
                     {isEditingLayanan ? 'Edit Layanan' : 'Tambah Kategori Layanan Baru'}
                   </h4>
-                  <form onSubmit={handleSaveLayanan} className="row g-3 mb-5 align-items-end p-3.5 rounded-4" style={{ background: '#f8fbfd', border: '1px solid rgba(14,116,144,0.16)' }}>
+                  <form onSubmit={handleSaveLayanan} className="row g-3 mb-5 align-items-end p-3.5 rounded-4" style={{ background: '#FAF8F5', border: '1px solid rgba(6, 95, 70,0.16)' }}>
                     <div className="col-md-1">
-                      <label className="form-label fw-bold small font-hero" style={{ color: '#061E2B' }}>Kode</label>
+                      <label className="form-label fw-bold small font-hero" style={{ color: '#041E17' }}>Kode</label>
                       <input
                         type="text"
                         className="form-control"
-                        style={{ background: '#ffffff', border: '1.5px solid rgba(14,116,144,0.22)', color: '#061E2B' }}
+                        style={{ background: '#ffffff', border: '1.5px solid rgba(6, 95, 70,0.22)', color: '#041E17' }}
                         placeholder="A"
                         maxLength="2"
                         required
@@ -1269,11 +1269,11 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                       />
                     </div>
                     <div className="col-md-4">
-                      <label className="form-label fw-bold small font-hero" style={{ color: '#061E2B' }}>Nama Layanan</label>
+                      <label className="form-label fw-bold small font-hero" style={{ color: '#041E17' }}>Nama Layanan</label>
                       <input
                         type="text"
                         className="form-control"
-                        style={{ background: '#ffffff', border: '1.5px solid rgba(14,116,144,0.22)', color: '#061E2B' }}
+                        style={{ background: '#ffffff', border: '1.5px solid rgba(6, 95, 70,0.22)', color: '#041E17' }}
                         placeholder="Contoh: Pelayanan Kependudukan"
                         required
                         value={layananForm.nama}
@@ -1281,10 +1281,10 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                       />
                     </div>
                     <div className="col-md-3">
-                      <label className="form-label fw-bold small font-hero" style={{ color: '#061E2B' }}>Loket Pelayanan</label>
+                      <label className="form-label fw-bold small font-hero" style={{ color: '#041E17' }}>Loket Pelayanan</label>
                       <select
                         className="form-select"
-                        style={{ background: '#ffffff', border: '1.5px solid rgba(14,116,144,0.22)', color: '#061E2B' }}
+                        style={{ background: '#ffffff', border: '1.5px solid rgba(6, 95, 70,0.22)', color: '#041E17' }}
                         required
                         value={layananForm.loket_id || ''}
                         onChange={e => {
@@ -1303,11 +1303,11 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                       </select>
                     </div>
                     <div className="col-md-2">
-                      <label className="form-label fw-bold small font-hero" style={{ color: '#061E2B' }}>Estimasi (Mnt)</label>
+                      <label className="form-label fw-bold small font-hero" style={{ color: '#041E17' }}>Estimasi (Mnt)</label>
                       <input
                         type="number"
                         className="form-control"
-                        style={{ background: '#ffffff', border: '1.5px solid rgba(14,116,144,0.22)', color: '#061E2B' }}
+                        style={{ background: '#ffffff', border: '1.5px solid rgba(6, 95, 70,0.22)', color: '#041E17' }}
                         placeholder="15"
                         required
                         value={layananForm.estimasi_waktu}
@@ -1315,7 +1315,7 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                       />
                     </div>
                     <div className="col-md-2 d-flex gap-2">
-                      <button type="submit" className="btn fw-bold w-100 py-2 text-white rounded-3 font-hero" style={{ background: 'linear-gradient(135deg, #0E7490, #061E2B)', border: 'none' }}>
+                      <button type="submit" className="btn fw-bold w-100 py-2 text-white rounded-3 font-hero" style={{ background: 'linear-gradient(135deg, #065F46, #041E17)', border: 'none' }}>
                         {isEditingLayanan ? 'Update' : 'Simpan'}
                       </button>
                       {isEditingLayanan && (
@@ -1333,11 +1333,11 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                     </div>
                   </form>
 
-                  <h4 className="fw-extrabold mb-3 font-hero" style={{ color: '#061E2B' }}>Daftar Layanan Saat Ini</h4>
+                  <h4 className="fw-extrabold mb-3 font-hero" style={{ color: '#041E17' }}>Daftar Layanan Saat Ini</h4>
                   <div className="table-responsive rounded-3 overflow-hidden" style={{ border: '1px solid #e2e8f0' }}>
                     <table className="table table-hover align-middle m-0">
                       <thead>
-                        <tr style={{ background: '#ebf5f8', color: '#061E2B' }}>
+                        <tr style={{ background: '#F3EFE6', color: '#041E17' }}>
                           <th style={{ width: '10%' }} className="text-center font-hero">Kode</th>
                           <th style={{ width: '35%' }} className="font-hero">Nama Layanan</th>
                           <th style={{ width: '20%' }} className="text-center font-hero">Loket Pelayanan</th>
@@ -1348,13 +1348,13 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                       <tbody>
                         {layananList.map((layanan) => (
                           <tr key={layanan.id}>
-                            <td className="text-center fw-black fs-5 font-mono" style={{ color: '#0E7490' }}>{layanan.kode}</td>
-                            <td className="fw-bold" style={{ color: '#061E2B' }}>{layanan.nama}</td>
-                            <td className="text-center fw-semibold" style={{ color: '#0369a1' }}>{layanan.loket_nama || '-'}</td>
+                            <td className="text-center fw-black fs-5 font-mono" style={{ color: '#065F46' }}>{layanan.kode}</td>
+                            <td className="fw-bold" style={{ color: '#041E17' }}>{layanan.nama}</td>
+                            <td className="text-center fw-semibold" style={{ color: '#047857' }}>{layanan.loket_nama || '-'}</td>
                             <td className="text-center">{layanan.estimasi_waktu} Menit</td>
                             <td className="text-center">
                               <div className="d-flex justify-content-center gap-2">
-                                <button className="btn btn-sm rounded-pill px-3 fw-bold" style={{ background: '#ebf5f8', color: '#0E7490', border: '1px solid rgba(14,116,144,0.25)' }} onClick={() => handleEditLayanan(layanan)}>
+                                <button className="btn btn-sm rounded-pill px-3 fw-bold" style={{ background: '#F3EFE6', color: '#065F46', border: '1px solid rgba(6, 95, 70,0.25)' }} onClick={() => handleEditLayanan(layanan)}>
                                   <i className="bi bi-pencil-square"></i> Edit
                                 </button>
                                 <button className="btn btn-sm rounded-pill px-3 fw-bold" style={{ background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca' }} onClick={() => handleDeleteLayanan(layanan.id)}>
@@ -1378,16 +1378,16 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
               {/* TAB 3: PENGATURAN LOKET */}
               {activeTab === 'loket' && (
                 <div>
-                  <h4 className="fw-extrabold mb-4 pb-2 font-hero" style={{ color: '#0E7490', borderBottom: '2px solid #ebf5f8' }}>
+                  <h4 className="fw-extrabold mb-4 pb-2 font-hero" style={{ color: '#065F46', borderBottom: '2px solid #F3EFE6' }}>
                     Tambah Loket Pelayanan Baru
                   </h4>
-                  <form onSubmit={handleSaveLoket} className="row g-3 mb-5 align-items-end p-3.5 rounded-4" style={{ background: '#f8fbfd', border: '1px solid rgba(14,116,144,0.16)' }}>
+                  <form onSubmit={handleSaveLoket} className="row g-3 mb-5 align-items-end p-3.5 rounded-4" style={{ background: '#FAF8F5', border: '1px solid rgba(6, 95, 70,0.16)' }}>
                     <div className="col-md-9">
-                      <label className="form-label fw-bold small font-hero" style={{ color: '#061E2B' }}>Nama Loket</label>
+                      <label className="form-label fw-bold small font-hero" style={{ color: '#041E17' }}>Nama Loket</label>
                       <input
                         type="text"
                         className="form-control py-2"
-                        style={{ background: '#ffffff', border: '1.5px solid rgba(14,116,144,0.22)', color: '#061E2B' }}
+                        style={{ background: '#ffffff', border: '1.5px solid rgba(6, 95, 70,0.22)', color: '#041E17' }}
                         placeholder="Contoh: Loket 5, Loket Customer Service, dll."
                         required
                         value={loketForm.nama}
@@ -1395,17 +1395,17 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                       />
                     </div>
                     <div className="col-md-3">
-                      <button type="submit" className="btn fw-bold w-100 py-2 text-white rounded-3 font-hero" style={{ background: 'linear-gradient(135deg, #0E7490, #061E2B)', border: 'none' }}>
+                      <button type="submit" className="btn fw-bold w-100 py-2 text-white rounded-3 font-hero" style={{ background: 'linear-gradient(135deg, #065F46, #041E17)', border: 'none' }}>
                         Tambah Loket
                       </button>
                     </div>
                   </form>
 
-                  <h4 className="fw-extrabold mb-3 font-hero" style={{ color: '#061E2B' }}>Daftar Loket Terdaftar</h4>
+                  <h4 className="fw-extrabold mb-3 font-hero" style={{ color: '#041E17' }}>Daftar Loket Terdaftar</h4>
                   <div className="table-responsive rounded-3 overflow-hidden" style={{ border: '1px solid #e2e8f0' }}>
                     <table className="table table-hover align-middle m-0">
                       <thead>
-                        <tr style={{ background: '#ebf5f8', color: '#061E2B' }}>
+                        <tr style={{ background: '#F3EFE6', color: '#041E17' }}>
                           <th style={{ width: '80%' }} className="font-hero">Nama Loket</th>
                           <th style={{ width: '20%' }} className="text-center font-hero">Aksi</th>
                         </tr>
@@ -1413,7 +1413,7 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                       <tbody>
                         {loketList.map((loket) => (
                           <tr key={loket.id}>
-                            <td className="fw-bold fs-5 ps-4 font-hero" style={{ color: '#0E7490' }}>{loket.nama}</td>
+                            <td className="fw-bold fs-5 ps-4 font-hero" style={{ color: '#065F46' }}>{loket.nama}</td>
                             <td className="text-center">
                               <button className="btn btn-sm rounded-pill px-3 fw-bold" style={{ background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca' }} onClick={() => handleDeleteLoket(loket.id)}>
                                 <i className="bi bi-trash"></i> Hapus
@@ -1435,12 +1435,12 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
               {/* TAB 4: DAFTAR PELAYANAN (HISTORI) */}
               {activeTab === 'daftar_pelayanan' && (
                 <div>
-                  <h4 className="fw-extrabold mb-4 pb-2 font-hero" style={{ color: '#0E7490', borderBottom: '2px solid #ebf5f8' }}>Histori Daftar Pelayanan</h4>
+                  <h4 className="fw-extrabold mb-4 pb-2 font-hero" style={{ color: '#065F46', borderBottom: '2px solid #F3EFE6' }}>Histori Daftar Pelayanan</h4>
 
-                  <div className="row g-3 mb-4 p-3.5 rounded-4" style={{ background: '#f8fbfd', border: '1px solid rgba(14,116,144,0.16)' }}>
+                  <div className="row g-3 mb-4 p-3.5 rounded-4" style={{ background: '#FAF8F5', border: '1px solid rgba(6, 95, 70,0.16)' }}>
                     <div className="col-md-2">
-                      <label className="form-label fw-bold small font-hero" style={{ color: '#061E2B' }}>Filter Waktu</label>
-                      <select className="form-select" style={{ background: '#ffffff', border: '1.5px solid rgba(14,116,144,0.22)', color: '#061E2B' }} value={filterMode} onChange={e => setFilterMode(e.target.value)}>
+                      <label className="form-label fw-bold small font-hero" style={{ color: '#041E17' }}>Filter Waktu</label>
+                      <select className="form-select" style={{ background: '#ffffff', border: '1.5px solid rgba(6, 95, 70,0.22)', color: '#041E17' }} value={filterMode} onChange={e => setFilterMode(e.target.value)}>
                         <option value="hari">Per Hari (Tanggal)</option>
                         <option value="bulan">Per Bulan</option>
                       </select>
@@ -1448,22 +1448,22 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
 
                     {filterMode === 'hari' ? (
                       <div className="col-md-3">
-                        <label className="form-label fw-bold small font-hero" style={{ color: '#061E2B' }}>Pilih Hari</label>
+                        <label className="form-label fw-bold small font-hero" style={{ color: '#041E17' }}>Pilih Hari</label>
                         <input
                           type="date"
                           className="form-control"
-                          style={{ background: '#ffffff', border: '1.5px solid rgba(14,116,144,0.22)', color: '#061E2B' }}
+                          style={{ background: '#ffffff', border: '1.5px solid rgba(6, 95, 70,0.22)', color: '#041E17' }}
                           value={filterDate}
                           onChange={e => setFilterDate(e.target.value)}
                         />
                       </div>
                     ) : (
                       <div className="col-md-3">
-                        <label className="form-label fw-bold small font-hero" style={{ color: '#061E2B' }}>Pilih Bulan</label>
+                        <label className="form-label fw-bold small font-hero" style={{ color: '#041E17' }}>Pilih Bulan</label>
                         <input
                           type="month"
                           className="form-control"
-                          style={{ background: '#ffffff', border: '1.5px solid rgba(14,116,144,0.22)', color: '#061E2B' }}
+                          style={{ background: '#ffffff', border: '1.5px solid rgba(6, 95, 70,0.22)', color: '#041E17' }}
                           value={filterMonth}
                           onChange={e => setFilterMonth(e.target.value)}
                         />
@@ -1471,8 +1471,8 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                     )}
 
                     <div className="col-md-3">
-                      <label className="form-label fw-bold small font-hero" style={{ color: '#061E2B' }}>Jenis Pelayanan</label>
-                      <select className="form-select" style={{ background: '#ffffff', border: '1.5px solid rgba(14,116,144,0.22)', color: '#061E2B' }} value={filterLayanan} onChange={e => setFilterLayanan(e.target.value)}>
+                      <label className="form-label fw-bold small font-hero" style={{ color: '#041E17' }}>Jenis Pelayanan</label>
+                      <select className="form-select" style={{ background: '#ffffff', border: '1.5px solid rgba(6, 95, 70,0.22)', color: '#041E17' }} value={filterLayanan} onChange={e => setFilterLayanan(e.target.value)}>
                         <option value="semua">-- Semua Pelayanan --</option>
                         {layananList.map(l => (
                           <option key={l.id} value={l.id}>{l.nama} ({l.kode})</option>
@@ -1484,7 +1484,7 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                       <button
                         type="button"
                         className="btn w-100 py-2 fw-bold rounded-3 font-hero text-white"
-                        style={{ background: 'linear-gradient(135deg, #0E7490, #061E2B)', border: 'none' }}
+                        style={{ background: 'linear-gradient(135deg, #065F46, #041E17)', border: 'none' }}
                         onClick={() => window.print()}
                       >
                         <i className="bi bi-printer"></i> Cetak
@@ -1505,8 +1505,8 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
 
                   {historyLoading ? (
                     <div className="text-center py-5">
-                      <div className="spinner-border" style={{ color: '#0E7490' }} role="status"></div>
-                      <p className="mt-2 small fw-semibold" style={{ color: '#0E7490' }}>Memuat data histori...</p>
+                      <div className="spinner-border" style={{ color: '#065F46' }} role="status"></div>
+                      <p className="mt-2 small fw-semibold" style={{ color: '#065F46' }}>Memuat data histori...</p>
                     </div>
                   ) : (
                     <div id="report-print-wrapper">
@@ -1523,7 +1523,7 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                       <div className="table-responsive rounded-3 overflow-hidden" style={{ border: '1px solid #e2e8f0' }}>
                         <table className="table table-hover align-middle m-0" id="report-table">
                           <thead>
-                            <tr style={{ background: '#ebf5f8', color: '#061E2B' }}>
+                            <tr style={{ background: '#F3EFE6', color: '#041E17' }}>
                               <th style={{ width: '4%' }} className="text-center font-hero">No</th>
                               <th style={{ width: '11%' }} className="text-center font-hero">Waktu</th>
                               <th style={{ width: '10%' }} className="text-center font-hero">No. Antrian</th>
@@ -1542,8 +1542,8 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                                 <td className="text-center small">
                                   {item.created_at ? new Date(item.created_at.toMillis()).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }) : '-'}
                                 </td>
-                                <td className="text-center fw-bold font-mono" style={{ color: '#0E7490' }}>{item.nomor_lengkap}</td>
-                                <td className="fw-semibold" style={{ color: '#061E2B' }}>{item.pelayanan_nama}</td>
+                                <td className="text-center fw-bold font-mono" style={{ color: '#065F46' }}>{item.nomor_lengkap}</td>
+                                <td className="fw-semibold" style={{ color: '#041E17' }}>{item.pelayanan_nama}</td>
                                 <td>{item.warga_nama || <em className="text-muted small">-</em>}</td>
                                 <td>{item.warga_alamat || <em className="text-muted small">-</em>}</td>
                                 <td>{item.warga_hp || <em className="text-muted small">-</em>}</td>
@@ -1552,7 +1552,7 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                                     const opName = resolveOperatorName(item);
                                     if (opName && opName !== '-') {
                                       return (
-                                        <span className="badge px-2 py-1 fw-semibold" style={{ background: '#ebf5f8', color: '#0E7490', border: '1px solid rgba(14,116,144,0.22)' }}>
+                                        <span className="badge px-2 py-1 fw-semibold" style={{ background: '#F3EFE6', color: '#065F46', border: '1px solid rgba(6, 95, 70,0.22)' }}>
                                           <i className="bi bi-person-badge me-1"></i>
                                           {opName}
                                         </span>
@@ -1658,16 +1658,16 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
               {/* TAB 5: MANAJEMEN OPERATOR */}
               {activeTab === 'operator_config' && (
                 <div>
-                  <h4 className="fw-extrabold mb-4 pb-2 font-hero" style={{ color: '#0E7490', borderBottom: '2px solid #ebf5f8' }}>
+                  <h4 className="fw-extrabold mb-4 pb-2 font-hero" style={{ color: '#065F46', borderBottom: '2px solid #F3EFE6' }}>
                     {isEditingOperator ? 'Edit Operator' : 'Tambah Operator Baru'}
                   </h4>
-                  <form onSubmit={handleSaveOperator} className="row g-3 mb-5 align-items-end p-3.5 rounded-4" style={{ background: '#f8fbfd', border: '1px solid rgba(14,116,144,0.16)' }}>
+                  <form onSubmit={handleSaveOperator} className="row g-3 mb-5 align-items-end p-3.5 rounded-4" style={{ background: '#FAF8F5', border: '1px solid rgba(6, 95, 70,0.16)' }}>
                     <div className="col-md-3">
-                      <label className="form-label fw-bold small font-hero" style={{ color: '#061E2B' }}>Nama Lengkap</label>
+                      <label className="form-label fw-bold small font-hero" style={{ color: '#041E17' }}>Nama Lengkap</label>
                       <input
                         type="text"
                         className="form-control"
-                        style={{ background: '#ffffff', border: '1.5px solid rgba(14,116,144,0.22)', color: '#061E2B' }}
+                        style={{ background: '#ffffff', border: '1.5px solid rgba(6, 95, 70,0.22)', color: '#041E17' }}
                         placeholder="Contoh: Budi Santoso"
                         required
                         value={operatorForm.nama}
@@ -1675,11 +1675,11 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                       />
                     </div>
                     <div className="col-md-3">
-                      <label className="form-label fw-bold small font-hero" style={{ color: '#061E2B' }}>Username</label>
+                      <label className="form-label fw-bold small font-hero" style={{ color: '#041E17' }}>Username</label>
                       <input
                         type="text"
                         className="form-control"
-                        style={{ background: '#ffffff', border: '1.5px solid rgba(14,116,144,0.22)', color: '#061E2B' }}
+                        style={{ background: '#ffffff', border: '1.5px solid rgba(6, 95, 70,0.22)', color: '#041E17' }}
                         placeholder="Contoh: budi"
                         required
                         value={operatorForm.username}
@@ -1687,11 +1687,11 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                       />
                     </div>
                     <div className="col-md-3">
-                      <label className="form-label fw-bold small font-hero" style={{ color: '#061E2B' }}>Password</label>
+                      <label className="form-label fw-bold small font-hero" style={{ color: '#041E17' }}>Password</label>
                       <input
                         type="password"
                         className="form-control"
-                        style={{ background: '#ffffff', border: '1.5px solid rgba(14,116,144,0.22)', color: '#061E2B' }}
+                        style={{ background: '#ffffff', border: '1.5px solid rgba(6, 95, 70,0.22)', color: '#041E17' }}
                         placeholder="Password login"
                         required
                         value={operatorForm.password}
@@ -1699,7 +1699,7 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                       />
                     </div>
                     <div className="col-md-3 d-flex gap-2">
-                      <button type="submit" className="btn fw-bold w-100 py-2 text-white rounded-3 font-hero" style={{ background: 'linear-gradient(135deg, #0E7490, #061E2B)', border: 'none' }}>
+                      <button type="submit" className="btn fw-bold w-100 py-2 text-white rounded-3 font-hero" style={{ background: 'linear-gradient(135deg, #065F46, #041E17)', border: 'none' }}>
                         {isEditingOperator ? 'Perbarui' : 'Tambah'}
                       </button>
                       {isEditingOperator && (
@@ -1717,11 +1717,11 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                     </div>
                   </form>
 
-                  <h4 className="fw-extrabold mb-3 font-hero" style={{ color: '#061E2B' }}>Daftar Operator Terdaftar</h4>
+                  <h4 className="fw-extrabold mb-3 font-hero" style={{ color: '#041E17' }}>Daftar Operator Terdaftar</h4>
                   <div className="table-responsive rounded-3 overflow-hidden" style={{ border: '1px solid #e2e8f0' }}>
                     <table className="table table-hover align-middle m-0">
                       <thead>
-                        <tr style={{ background: '#ebf5f8', color: '#061E2B' }}>
+                        <tr style={{ background: '#F3EFE6', color: '#041E17' }}>
                           <th style={{ width: '40%' }} className="font-hero">Nama Operator</th>
                           <th style={{ width: '30%' }} className="font-hero">Username</th>
                           <th style={{ width: '30%' }} className="text-center font-hero">Aksi</th>
@@ -1730,10 +1730,10 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                       <tbody>
                         {operatorList.map((op) => (
                           <tr key={op.id}>
-                            <td className="fw-bold fs-6 ps-4 font-hero" style={{ color: '#0E7490' }}>{op.nama}</td>
-                            <td><code style={{ color: '#061E2B', background: '#f1f5f9', padding: '2px 8px', borderRadius: '6px' }}>{op.username}</code></td>
+                            <td className="fw-bold fs-6 ps-4 font-hero" style={{ color: '#065F46' }}>{op.nama}</td>
+                            <td><code style={{ color: '#041E17', background: '#f1f5f9', padding: '2px 8px', borderRadius: '6px' }}>{op.username}</code></td>
                             <td className="text-center">
-                              <button className="btn btn-sm rounded-pill px-3 fw-bold me-2" style={{ background: '#ebf5f8', color: '#0E7490', border: '1px solid rgba(14,116,144,0.25)' }} onClick={() => handleEditOperator(op)}>
+                              <button className="btn btn-sm rounded-pill px-3 fw-bold me-2" style={{ background: '#F3EFE6', color: '#065F46', border: '1px solid rgba(6, 95, 70,0.25)' }} onClick={() => handleEditOperator(op)}>
                                 <i className="bi bi-pencil"></i> Edit
                               </button>
                               <button className="btn btn-sm rounded-pill px-3 fw-bold" style={{ background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca' }} onClick={() => handleDeleteOperator(op.id)}>

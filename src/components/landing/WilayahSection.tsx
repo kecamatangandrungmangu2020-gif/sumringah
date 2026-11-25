@@ -61,7 +61,7 @@ export function WilayahSection({ wilayahData, desaList, onSelectDesa }: WilayahS
         {/* KIRI (6 cols): Deskripsi Wilayah + Statistik + CTA SOLID */}
         <div className="lg:col-span-6 space-y-5">
           {wilayahData.subtitle && (
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 border border-white/20 text-[#f4c430] font-mono text-[10px] font-bold tracking-[0.16em] uppercase">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 border border-white/20 text-[#C8A253] font-mono text-[10px] font-bold tracking-[0.16em] uppercase">
               <Compass className="w-3.5 h-3.5" />
               <span>{wilayahData.subtitle}</span>
             </div>
@@ -71,7 +71,7 @@ export function WilayahSection({ wilayahData, desaList, onSelectDesa }: WilayahS
             {wilayahData.title || 'Wilayah Gandrungmangu'}
           </h2>
 
-          <div className="space-y-3 font-hero text-xs sm:text-sm text-cyan-50/90 leading-relaxed whitespace-pre-line">
+          <div className="space-y-3 font-hero text-xs sm:text-sm text-[#FAF8F5]/90 leading-relaxed whitespace-pre-line">
             <p>{wilayahData.description}</p>
             {wilayahData.secondaryDescription && <p>{wilayahData.secondaryDescription}</p>}
           </div>
@@ -83,7 +83,7 @@ export function WilayahSection({ wilayahData, desaList, onSelectDesa }: WilayahS
                 key={st.label}
                 className="rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 p-3"
               >
-                <span className="font-mono text-[9.5px] uppercase tracking-wider text-cyan-200/80 block">
+                <span className="font-mono text-[9.5px] uppercase tracking-wider text-[#E5C882]/80 block">
                   {st.label}
                 </span>
                 <span className="font-hero text-xs sm:text-sm font-bold text-white mt-0.5 block truncate">
@@ -99,7 +99,7 @@ export function WilayahSection({ wilayahData, desaList, onSelectDesa }: WilayahS
                 href={wilayahData.mapLinkUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#f4c430] hover:bg-white text-[#061E2B] font-hero font-bold text-xs uppercase tracking-wider transition-all duration-200 shadow-lg hover:scale-[1.02]"
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#C8A253] hover:bg-white text-[#041E17] font-hero font-bold text-xs uppercase tracking-wider transition-all duration-200 shadow-lg hover:scale-[1.02]"
               >
                 <MapPin className="w-4 h-4" />
                 <span>{wilayahData.mapButtonText || 'Jelajahi Data Wilayah'}</span>
@@ -127,42 +127,42 @@ export function WilayahSection({ wilayahData, desaList, onSelectDesa }: WilayahS
                 <svg viewBox="0 0 300 340" className="w-full h-full drop-shadow-md">
                   <path
                     d="M120,20 L210,35 L260,95 L280,180 L230,270 L170,320 L90,300 L40,240 L30,150 L65,80 Z"
-                    fill="#0E7490"
-                    stroke="#061E2B"
+                    fill="#065F46"
+                    stroke="#041E17"
                     strokeWidth="2.5"
                   />
-                  <path d="M65,80 Q150,160 230,270" stroke="#f4c430" strokeWidth="2" strokeDasharray="4 4" fill="none" />
-                  <path d="M120,20 Q160,170 170,320" stroke="#f4c430" strokeWidth="2" strokeDasharray="4 4" fill="none" />
-                  <circle cx="150" cy="165" r="7" fill="#f4c430" stroke="#061E2B" strokeWidth="2.5" />
-                  <circle cx="100" cy="95" r="4.5" fill="#67e8f9" />
-                  <circle cx="205" cy="115" r="4.5" fill="#67e8f9" />
-                  <circle cx="185" cy="230" r="4.5" fill="#67e8f9" />
-                  <circle cx="95" cy="245" r="4.5" fill="#67e8f9" />
+                  <path d="M65,80 Q150,160 230,270" stroke="#C8A253" strokeWidth="2" strokeDasharray="4 4" fill="none" />
+                  <path d="M120,20 Q160,170 170,320" stroke="#C8A253" strokeWidth="2" strokeDasharray="4 4" fill="none" />
+                  <circle cx="150" cy="165" r="7" fill="#C8A253" stroke="#041E17" strokeWidth="2.5" />
+                  <circle cx="100" cy="95" r="4.5" fill="#E5C882" />
+                  <circle cx="205" cy="115" r="4.5" fill="#E5C882" />
+                  <circle cx="185" cy="230" r="4.5" fill="#E5C882" />
+                  <circle cx="95" cy="245" r="4.5" fill="#E5C882" />
                 </svg>
               </div>
             )}
 
             <div className="grid grid-cols-2 gap-2 text-[11px]">
-              <div className="rounded-xl bg-[#061E2B]/60 border border-white/10 p-2.5">
-                <span className="font-mono text-[9px] uppercase text-cyan-300 block">Utara</span>
+              <div className="rounded-xl bg-[#041E17]/60 border border-white/10 p-2.5">
+                <span className="font-mono text-[9px] uppercase text-[#E5C882] block">Utara</span>
                 <span className="font-hero font-semibold text-white line-clamp-1">
                   {wilayahData.batasUtara || 'Karangpucung & Sidareja'}
                 </span>
               </div>
-              <div className="rounded-xl bg-[#061E2B]/60 border border-white/10 p-2.5">
-                <span className="font-mono text-[9px] uppercase text-cyan-300 block">Selatan</span>
+              <div className="rounded-xl bg-[#041E17]/60 border border-white/10 p-2.5">
+                <span className="font-mono text-[9px] uppercase text-[#E5C882] block">Selatan</span>
                 <span className="font-hero font-semibold text-white line-clamp-1">
                   {wilayahData.batasSelatan || 'Bantarsari & Kawunganten'}
                 </span>
               </div>
-              <div className="rounded-xl bg-[#061E2B]/60 border border-white/10 p-2.5">
-                <span className="font-mono text-[9px] uppercase text-cyan-300 block">Barat</span>
+              <div className="rounded-xl bg-[#041E17]/60 border border-white/10 p-2.5">
+                <span className="font-mono text-[9px] uppercase text-[#E5C882] block">Barat</span>
                 <span className="font-hero font-semibold text-white line-clamp-1">
                   {wilayahData.batasBarat || 'Cipari & Sidareja'}
                 </span>
               </div>
-              <div className="rounded-xl bg-[#061E2B]/60 border border-white/10 p-2.5">
-                <span className="font-mono text-[9px] uppercase text-cyan-300 block">Timur</span>
+              <div className="rounded-xl bg-[#041E17]/60 border border-white/10 p-2.5">
+                <span className="font-mono text-[9px] uppercase text-[#E5C882] block">Timur</span>
                 <span className="font-hero font-semibold text-white line-clamp-1">
                   {wilayahData.batasTimur || 'Kecamatan Bantarsari'}
                 </span>
@@ -183,12 +183,12 @@ export function WilayahSection({ wilayahData, desaList, onSelectDesa }: WilayahS
         >
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <Landmark className="h-4 w-4 text-[#f4c430]" />
+              <Landmark className="h-4 w-4 text-[#C8A253]" />
               <h3 className="font-hero text-sm sm:text-base font-bold text-white">
                 Direktori 14 Desa Wilayah Gandrungmangu
               </h3>
             </div>
-            <span className="font-mono text-[10px] uppercase tracking-wider text-cyan-200/80 hidden sm:inline">
+            <span className="font-mono text-[10px] uppercase tracking-wider text-[#E5C882]/80 hidden sm:inline">
               Klik desa untuk melihat profil
             </span>
           </div>
@@ -200,10 +200,10 @@ export function WilayahSection({ wilayahData, desaList, onSelectDesa }: WilayahS
                 type="button"
                 variants={cardFadeUp}
                 onClick={() => onSelectDesa(desa)}
-                className="group flex items-center justify-between gap-1.5 px-3 py-2.5 rounded-xl bg-white/10 hover:bg-white text-white hover:text-[#061E2B] border border-white/15 transition-all duration-200 text-left cursor-pointer"
+                className="group flex items-center justify-between gap-1.5 px-3 py-2.5 rounded-xl bg-white/10 hover:bg-white text-white hover:text-[#041E17] border border-white/15 transition-all duration-200 text-left cursor-pointer"
               >
                 <div className="flex items-center gap-1.5 min-w-0">
-                  <span className="font-mono text-[9.5px] font-bold text-[#f4c430] group-hover:text-[#0E7490] shrink-0">
+                  <span className="font-mono text-[9.5px] font-bold text-[#C8A253] group-hover:text-[#065F46] shrink-0">
                     {String(idx + 1).padStart(2, '0')}
                   </span>
                   <span className="font-hero text-xs font-semibold truncate">{desa.name}</span>

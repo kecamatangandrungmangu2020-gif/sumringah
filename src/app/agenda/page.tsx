@@ -12,14 +12,14 @@ export default function AgendaPage() {
   return (
     <div className="flex flex-col gap-6 p-4 md:p-8 max-w-6xl mx-auto">
       <header className="flex items-center gap-4 pb-4 border-b border-slate-200/80 dark:border-white/10">
-        <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-[#0E7490] to-[#061E2B] flex items-center justify-center shadow-md">
-          <Calendar className="h-6 w-6 text-cyan-200" />
+        <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-[#065F46] to-[#041E17] flex items-center justify-center shadow-md">
+          <Calendar className="h-6 w-6 text-[#E5C882]" />
         </div>
         <div>
-          <span className="font-mono text-[9.5px] font-bold uppercase tracking-[0.16em] text-[#0E7490] dark:text-cyan-300">
+          <span className="font-mono text-[9.5px] font-bold uppercase tracking-[0.16em] text-[#065F46] dark:text-[#E5C882]">
             Kecamatan Gandrungmangu • Google Calendar
           </span>
-          <h1 className="font-hero text-2xl font-extrabold text-[#061E2B] dark:text-white tracking-tight leading-tight">
+          <h1 className="font-hero text-2xl font-extrabold text-[#041E17] dark:text-white tracking-tight leading-tight">
             Agenda Kegiatan
           </h1>
           <p className="font-hero text-xs text-slate-500 dark:text-slate-400 font-medium">
