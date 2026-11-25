@@ -3,10 +3,11 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
 import { doc, onSnapshot } from 'firebase/firestore';
 import {
-  LogIn,
+  Briefcase,
   ExternalLink,
   Menu,
   FileText,
@@ -15,6 +16,8 @@ import {
   Building2,
   ChevronRight,
   Star,
+  Loader2,
+  Sparkles,
 } from 'lucide-react';
 import { useUser, useFirestore } from '@/firebase';
 import { Button } from '@/components/ui/button';
@@ -35,9 +38,11 @@ const MASCOT_VIDEO_URL =
 export default function AdminLandingPage() {
   const { user } = useUser();
   const db = useFirestore();
+  const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileSheetOpen, setMobileSheetOpen] = useState(false);
+  const [launchingCard, setLaunchingCard] = useState<'kantor' | 'pelayanan' | null>(null);
   const [currentTime, setCurrentTime] = useState<{ time: string; date: string } | null>(null);
 
   const [configData, setConfigData] = useState<any>(() => {
@@ -125,9 +130,17 @@ export default function AdminLandingPage() {
   const logoImage = getFormattedLogo(configData);
   const systemHref = user ? '/dashboard/' : '/login/';
 
+  const handleMascotLaunch = (target: 'kantor' | 'pelayanan', href: string) => {
+    if (launchingCard) return;
+    setLaunchingCard(target);
+    setTimeout(() => {
+      router.push(href);
+    }, 320);
+  };
+
   const navLinks = [
     { href: '/', label: 'Portal Warga' },
-    { href: '/Antrian/', label: 'Sistem Antrian' },
+    { href: '/Antrian/', label: 'Sistem Pelayanan' },
     { href: '/kunjungan-tamu/?channel=front_office', label: 'Kunjungan Tamu' },
     { href: '/agenda/', label: 'Agenda' },
   ];
@@ -201,8 +214,8 @@ export default function AdminLandingPage() {
           <div className="pt-3.5 border-t border-slate-200/80 dark:border-white/10 flex flex-col gap-2">
             <Link href={systemHref} onClick={() => setMobileSheetOpen(false)}>
               <Button className="neu-btn-primary text-white w-full h-11 rounded-2xl font-hero font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 border-0">
-                <LogIn className="h-4 w-4" />
-                <span>Masuk Sistem</span>
+                <Briefcase className="h-4 w-4" />
+                <span>Manajemen Kantor</span>
               </Button>
             </Link>
           </div>
@@ -273,8 +286,8 @@ export default function AdminLandingPage() {
                     href={systemHref}
                     className="ml-1 inline-flex items-center gap-1.5 h-9 xl:h-10 px-4 xl:px-5 rounded-full bg-[#061E2B] hover:bg-[#0E7490] dark:bg-[#0E7490] dark:hover:bg-cyan-400 text-white dark:hover:text-[#061E2B] font-hero font-semibold text-xs tracking-[0.02em] shadow-sm transition-all whitespace-nowrap"
                   >
-                    <LogIn className="h-3.5 w-3.5" />
-                    <span>Masuk Sistem</span>
+                    <Briefcase className="h-3.5 w-3.5" />
+                    <span>Manajemen Kantor</span>
                   </Link>
                 </div>
                 {mobileControls}
@@ -311,8 +324,8 @@ export default function AdminLandingPage() {
                 href={systemHref}
                 className="inline-flex items-center gap-1.5 h-9 px-4 rounded-full bg-[#061E2B] hover:bg-[#0E7490] dark:bg-[#0E7490] text-white font-hero font-semibold text-xs transition-all whitespace-nowrap"
               >
-                <LogIn className="h-3.5 w-3.5" />
-                <span>Masuk Sistem</span>
+                <Briefcase className="h-3.5 w-3.5" />
+                <span>Manajemen Kantor</span>
               </Link>
             </div>
             {mobileControls}
@@ -379,30 +392,172 @@ export default function AdminLandingPage() {
                     'Platform terintegrasi pengelolaan administrasi pemerintahan, sistem antrian loket, kunjungan tamu front office, dan dokumentasi kegiatan Kecamatan.'}
                 </p>
 
-                {/* 3 Tombol Aksi Utama (Selaras Pill Style Landing Page) */}
-                <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-                  <Link
-                    href={systemHref}
-                    className="group inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#0E7490] hover:bg-white text-white hover:text-[#061E2B] border border-cyan-300/40 font-hero font-bold text-xs uppercase tracking-[0.15em] shadow-[0_12px_30px_rgba(14,116,144,0.45)] transition-all duration-300 active:scale-95"
+                {/* 2 Tombol Maskot Utama Diperbesar dengan Motion & Animasi Klik */}
+                <div className="mt-7 sm:mt-8 w-full max-w-3xl grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+                  {/* Maskot 1: Manajemen Kantor */}
+                  <motion.button
+                    type="button"
+                    onClick={() => handleMascotLaunch('kantor', systemHref)}
+                    initial={{ opacity: 0, y: 26, scale: 0.95 }}
+                    animate={
+                      launchingCard === 'kantor'
+                        ? { opacity: 1, y: -4, scale: 1.04 }
+                        : launchingCard === 'pelayanan'
+                        ? { opacity: 0.45, y: 0, scale: 0.97 }
+                        : { opacity: 1, y: 0, scale: 1 }
+                    }
+                    whileHover={launchingCard ? undefined : { y: -7, scale: 1.025 }}
+                    whileTap={{ scale: 0.96 }}
+                    transition={{ type: 'spring', stiffness: 320, damping: 22 }}
+                    className="group relative overflow-hidden rounded-[24px] p-5 sm:p-6 text-left cursor-pointer border border-cyan-300/40 bg-gradient-to-br from-[#0E7490]/95 via-[#0B5C73]/95 to-[#061E2B]/95 backdrop-blur-xl shadow-[0_18px_45px_rgba(6,30,43,0.45)] hover:shadow-[0_24px_60px_rgba(14,116,144,0.6)] hover:border-cyan-200/80 transition-colors"
                   >
-                    <LogIn className="h-4 w-4" />
-                    <span>Masuk Sistem</span>
-                    <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                  </Link>
+                    {/* Subtle Semringah Watermark */}
+                    <div
+                      aria-hidden="true"
+                      className="pointer-events-none absolute -right-4 -bottom-4 w-36 h-36 opacity-[0.14] group-hover:opacity-[0.24] group-hover:scale-110 transition-all duration-500 bg-no-repeat bg-contain bg-right-bottom"
+                      style={{ backgroundImage: "url('/images/gandrungmangu-semringah-silhouette.webp')" }}
+                    />
+                    {/* Shimmer Sweep on Hover */}
+                    <div className="pointer-events-none absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/15 to-transparent" />
 
-                  <Link
-                    href="/Antrian/"
-                    className="group inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#f4c430] hover:bg-white text-[#061E2B] font-hero font-bold text-xs uppercase tracking-[0.15em] shadow-lg transition-all duration-300 active:scale-95"
+                    {/* Click Ripple Pulse */}
+                    <AnimatePresence>
+                      {launchingCard === 'kantor' && (
+                        <motion.span
+                          initial={{ scale: 0.2, opacity: 0.65 }}
+                          animate={{ scale: 3.2, opacity: 0 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.5, ease: 'easeOut' }}
+                          className="pointer-events-none absolute inset-0 m-auto h-28 w-28 rounded-full bg-cyan-300/50"
+                        />
+                      )}
+                    </AnimatePresence>
+
+                    <div className="relative z-10 flex items-start justify-between gap-3">
+                      <motion.div
+                        animate={{ y: [0, -4, 0] }}
+                        transition={{ duration: 3.4, repeat: Infinity, ease: 'easeInOut' }}
+                        className="h-14 w-14 sm:h-16 sm:w-16 rounded-2xl bg-white/15 border border-cyan-200/35 flex items-center justify-center shadow-lg group-hover:bg-white group-hover:text-[#061E2B] text-cyan-100 transition-all duration-300 group-hover:rotate-[-4deg] group-hover:scale-105"
+                      >
+                        {launchingCard === 'kantor' ? (
+                          <Loader2 className="h-7 w-7 sm:h-8 sm:w-8 animate-spin" />
+                        ) : (
+                          <Briefcase className="h-7 w-7 sm:h-8 sm:w-8" />
+                        )}
+                      </motion.div>
+
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/12 border border-cyan-200/25 font-mono text-[9.5px] font-bold uppercase tracking-[0.14em] text-cyan-100">
+                        <span className="h-1.5 w-1.5 rounded-full bg-cyan-300 animate-pulse" />
+                        Internal
+                      </span>
+                    </div>
+
+                    <div className="relative z-10 mt-4">
+                      <h2 className="font-hero text-xl sm:text-2xl font-black text-white tracking-tight leading-tight">
+                        {launchingCard === 'kantor' ? 'Membuka Sistem...' : 'Manajemen Kantor'}
+                      </h2>
+                      <p className="mt-1.5 font-hero text-xs text-cyan-100/85 leading-relaxed">
+                        Dashboard, Agenda Kegiatan, SPPD, Arsip Surat &amp; Laporan Kecamatan
+                      </p>
+                    </div>
+
+                    <div className="relative z-10 mt-4 pt-3 border-t border-white/15 flex items-center justify-between">
+                      <span className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-cyan-200">
+                        Database Terpadu
+                      </span>
+                      <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white text-[#061E2B] font-hero text-[10.5px] font-extrabold uppercase tracking-wider shadow-sm group-hover:bg-[#f4c430] transition-colors">
+                        <span>Masuk</span>
+                        <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                      </span>
+                    </div>
+                  </motion.button>
+
+                  {/* Maskot 2: Sistem Pelayanan */}
+                  <motion.button
+                    type="button"
+                    onClick={() => handleMascotLaunch('pelayanan', '/Antrian/')}
+                    initial={{ opacity: 0, y: 26, scale: 0.95 }}
+                    animate={
+                      launchingCard === 'pelayanan'
+                        ? { opacity: 1, y: -4, scale: 1.04 }
+                        : launchingCard === 'kantor'
+                        ? { opacity: 0.45, y: 0, scale: 0.97 }
+                        : { opacity: 1, y: 0, scale: 1 }
+                    }
+                    whileHover={launchingCard ? undefined : { y: -7, scale: 1.025 }}
+                    whileTap={{ scale: 0.96 }}
+                    transition={{ type: 'spring', stiffness: 320, damping: 22, delay: 0.06 }}
+                    className="group relative overflow-hidden rounded-[24px] p-5 sm:p-6 text-left cursor-pointer border border-amber-200/70 bg-gradient-to-br from-[#f4c430] via-[#eab308] to-[#ca8a04] text-[#061E2B] shadow-[0_18px_45px_rgba(244,196,48,0.32)] hover:shadow-[0_24px_60px_rgba(244,196,48,0.52)] hover:border-white transition-colors"
                   >
-                    <Ticket className="h-4 w-4" />
-                    <span>Sistem Antrian</span>
-                  </Link>
+                    {/* Subtle Semringah Watermark */}
+                    <div
+                      aria-hidden="true"
+                      className="pointer-events-none absolute -right-4 -bottom-4 w-36 h-36 opacity-[0.12] group-hover:opacity-[0.22] group-hover:scale-110 transition-all duration-500 bg-no-repeat bg-contain bg-right-bottom"
+                      style={{ backgroundImage: "url('/images/gandrungmangu-semringah-silhouette.webp')" }}
+                    />
+                    {/* Shimmer Sweep on Hover */}
+                    <div className="pointer-events-none absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/35 to-transparent" />
 
+                    {/* Click Ripple Pulse */}
+                    <AnimatePresence>
+                      {launchingCard === 'pelayanan' && (
+                        <motion.span
+                          initial={{ scale: 0.2, opacity: 0.7 }}
+                          animate={{ scale: 3.2, opacity: 0 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.5, ease: 'easeOut' }}
+                          className="pointer-events-none absolute inset-0 m-auto h-28 w-28 rounded-full bg-white/70"
+                        />
+                      )}
+                    </AnimatePresence>
+
+                    <div className="relative z-10 flex items-start justify-between gap-3">
+                      <motion.div
+                        animate={{ y: [0, -4, 0] }}
+                        transition={{ duration: 3.4, delay: 0.5, repeat: Infinity, ease: 'easeInOut' }}
+                        className="h-14 w-14 sm:h-16 sm:w-16 rounded-2xl bg-[#061E2B] text-[#f4c430] border border-[#061E2B]/20 flex items-center justify-center shadow-lg group-hover:bg-white group-hover:text-[#0E7490] transition-all duration-300 group-hover:rotate-[4deg] group-hover:scale-105"
+                      >
+                        {launchingCard === 'pelayanan' ? (
+                          <Loader2 className="h-7 w-7 sm:h-8 sm:w-8 animate-spin" />
+                        ) : (
+                          <Ticket className="h-7 w-7 sm:h-8 sm:w-8" />
+                        )}
+                      </motion.div>
+
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#061E2B]/12 border border-[#061E2B]/20 font-mono text-[9.5px] font-bold uppercase tracking-[0.14em] text-[#061E2B]">
+                        <Sparkles className="h-3 w-3" />
+                        Front Office
+                      </span>
+                    </div>
+
+                    <div className="relative z-10 mt-4">
+                      <h2 className="font-hero text-xl sm:text-2xl font-black text-[#061E2B] tracking-tight leading-tight">
+                        {launchingCard === 'pelayanan' ? 'Membuka Pelayanan...' : 'Sistem Pelayanan'}
+                      </h2>
+                      <p className="mt-1.5 font-hero text-xs text-[#061E2B]/80 font-medium leading-relaxed">
+                        Kiosk Antrian, Layar Display TV, Konsol Loket &amp; Kunjungan Tamu
+                      </p>
+                    </div>
+
+                    <div className="relative z-10 mt-4 pt-3 border-t border-[#061E2B]/15 flex items-center justify-between">
+                      <span className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-[#061E2B]/75">
+                        Loket &amp; Tamu Real-time
+                      </span>
+                      <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#061E2B] text-white font-hero text-[10.5px] font-extrabold uppercase tracking-wider shadow-sm group-hover:bg-[#0E7490] transition-colors">
+                        <span>Buka</span>
+                        <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                      </span>
+                    </div>
+                  </motion.button>
+                </div>
+
+                {/* Akses Sekunder: Portal Warga */}
+                <div className="mt-5">
                   <Link
                     href="/"
-                    className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-[#061E2B]/70 hover:bg-[#0E7490] text-white border border-white/25 backdrop-blur-md font-hero font-bold text-xs uppercase tracking-[0.14em] transition-all duration-300"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#061E2B]/70 hover:bg-[#0E7490] text-white border border-white/25 backdrop-blur-md font-hero font-bold text-[11px] uppercase tracking-[0.14em] transition-all duration-300"
                   >
-                    <FileText className="h-4 w-4 text-cyan-300" />
+                    <FileText className="h-3.5 w-3.5 text-cyan-300" />
                     <span>Portal Warga</span>
                   </Link>
                 </div>

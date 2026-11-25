@@ -36,7 +36,7 @@ const SERVICE_CARDS = [
   {
     id: 'kunjungan-tamu',
     category: 'FRONT OFFICE • NON-PATEN',
-    title: 'Kunjungan Tamu',
+    title: 'Register Kunjungan',
     subtitle: 'Tamu Dinas, Proposal, SPJ, Pengiriman Barang & Pengaduan dalam satu pintu Front Office.',
     badge: 'SATU PINTU',
     href: '/kunjungan-tamu/',

@@ -380,9 +380,9 @@ export function Header({ logoImage, desaList, isAuthenticated }: HeaderProps) {
               <div className="hidden lg:flex items-center gap-1.5 xl:gap-2">
                 <Link
                   href="/kunjungan-tamu/"
-                  aria-label="Kunjungan Tamu Front Office"
+                  aria-label="Register Kunjungan Front Office"
                   className="h-8 w-8 flex items-center justify-center rounded-full text-slate-600 hover:text-[#0E7490] hover:bg-[#EBF5F8] dark:text-slate-300 dark:hover:text-cyan-300 dark:hover:bg-white/10 transition-all"
-                  title="Kunjungan Tamu (Proposal, SPJ, Barang & Pengaduan)"
+                  title="Register Kunjungan (Proposal, SPJ, Barang & Pengaduan)"
                 >
                   <Users className="h-3.5 w-3.5" />
                 </Link>
@@ -457,9 +457,9 @@ export function Header({ logoImage, desaList, isAuthenticated }: HeaderProps) {
         <div className="hidden lg:flex items-center gap-1.5 xl:gap-2 shrink-0 ml-2 xl:ml-4">
           <Link
             href="/kunjungan-tamu/"
-            aria-label="Kunjungan Tamu"
+            aria-label="Register Kunjungan"
             className="h-8 w-8 flex items-center justify-center rounded-full bg-[#F3F7F9] hover:bg-[#EBF5F8] dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 hover:text-[#0E7490] dark:text-slate-200 dark:hover:text-cyan-300 transition-all hover:scale-105 active:scale-95"
-            title="Kunjungan Tamu"
+            title="Register Kunjungan"
           >
             <Users className="h-3.5 w-3.5" />
           </Link>

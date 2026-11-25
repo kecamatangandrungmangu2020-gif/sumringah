@@ -179,7 +179,7 @@ export function Footer({ logoImage, configData, heroImage, wilayahBgImage }: Foo
                 </h4>
                 <ul className="space-y-2 text-cyan-100/80">
                   <li><Link href="/Antrian/online/" className="hover:text-[#f4c430] transition-colors">Antrian Online</Link></li>
-                  <li><Link href="/kunjungan-tamu/" className="hover:text-[#f4c430] transition-colors">Kunjungan Tamu</Link></li>
+                  <li><Link href="/kunjungan-tamu/" className="hover:text-[#f4c430] transition-colors">Register Kunjungan</Link></li>
                   <li><Link href="/input/" className="hover:text-[#f4c430] transition-colors">Laporan Kegiatan</Link></li>
                   <li><Link href="#pengaduan" className="hover:text-[#f4c430] transition-colors">Pengaduan Warga</Link></li>
                   <li>

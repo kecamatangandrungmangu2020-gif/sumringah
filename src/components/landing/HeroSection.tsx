@@ -54,7 +54,7 @@ const QUICK_DOCK_ITEMS = [
     accent: 'text-cyan-300 group-hover:text-white',
   },
   {
-    label: 'Kunjungan Tamu',
+    label: 'Register Kunjungan',
     href: '/kunjungan-tamu/',
     icon: Users,
     accent: 'text-sky-300 group-hover:text-white',
@@ -165,22 +165,22 @@ export function HeroSection({
       {
         id: 'slide-pelayanan-digital',
         tag: 'Front Office • Non-PATEN',
-        title: 'Kunjungan Tamu',
+        title: 'Register Kunjungan',
         subtitle: 'Tamu Dinas, Proposal, SPJ, Barang & Pengaduan',
         description:
           'Satu pintu Front Office Kecamatan Gandrungmangu untuk penerimaan tamu dinas, penyerahan proposal, SPJ desa, paket logistik, dan aspirasi warga.',
         imageUrl: primaryImg,
-        actionText: 'Isi Kunjungan Tamu',
+        actionText: 'Isi Register Kunjungan',
         actionUrl: '/kunjungan-tamu/',
         colorTone: 'from-[#0a3d50]/78 via-[#166e85]/62 to-[#072636]/86',
       },
       {
         id: 'slide-wilayah-solid',
         tag: 'Geospasial & 14 Desa',
-        title: 'Wilayah & SOLID',
-        subtitle: '64,37 km² • 14 Desa Terintegrasi',
+        title: 'Portal SOLID',
+        subtitle: 'Sistem Olah Laporan Informasi & Data Desa',
         description:
-          'Eksplorasi data geospasial kewilayahan, profil 14 desa, dan potensi agraris Kecamatan Gandrungmangu secara transparan melalui portal SOLID.',
+          'Eksplorasi data geospasial kewilayahan seluas 64,37 km², profil 14 desa terintegrasi, dan potensi agraris Kecamatan Gandrungmangu secara transparan.',
         imageUrl: territoryImg,
         actionText: 'Jelajahi Data Wilayah',
         actionUrl: '#wilayah',
@@ -295,11 +295,10 @@ export function HeroSection({
                 priority
                 unoptimized
                 sizes="100vw"
-                className={`object-cover object-center transition-all duration-700 ${
-                  layoutMode === 'center-banner'
+                className={`object-cover object-center transition-all duration-700 ${layoutMode === 'center-banner'
                     ? 'brightness-[0.6] contrast-[1.05] scale-[1.02]'
                     : 'brightness-[0.72] saturate-[0.8] contrast-[1.04] blur-[4px] scale-[1.06]'
-                }`}
+                  }`}
               />
             </motion.div>
           </AnimatePresence>
@@ -458,9 +457,8 @@ export function HeroSection({
               >
                 <div className="grid grid-cols-1 lg:grid-cols-12 items-center gap-5 sm:gap-7 lg:gap-9">
                   <div
-                    className={`lg:col-span-5 flex flex-col items-start text-left z-20 min-w-0 ${
-                      layoutMode === 'text-right' ? 'order-2 lg:order-2 lg:pl-3' : 'order-2 lg:order-1 lg:pr-3'
-                    }`}
+                    className={`lg:col-span-5 flex flex-col items-start text-left z-20 min-w-0 ${layoutMode === 'text-right' ? 'order-2 lg:order-2 lg:pl-3' : 'order-2 lg:order-1 lg:pr-3'
+                      }`}
                   >
                     <motion.div
                       initial={{ opacity: 0, x: -14 }}
@@ -555,9 +553,8 @@ export function HeroSection({
                   </div>
 
                   <div
-                    className={`lg:col-span-7 relative z-10 ${
-                      layoutMode === 'text-right' ? 'order-1 lg:order-1' : 'order-1 lg:order-2'
-                    }`}
+                    className={`lg:col-span-7 relative z-10 ${layoutMode === 'text-right' ? 'order-1 lg:order-1' : 'order-1 lg:order-2'
+                      }`}
                   >
                     <VerticalPhotoStrips
                       imageUrl={activeSlide.imageUrl}
@@ -652,9 +649,8 @@ export function HeroSection({
                       className="relative flex h-6 w-7 sm:w-8 items-center justify-center cursor-pointer focus:outline-none group"
                     >
                       <span
-                        className={`relative h-1.5 w-full rounded-full overflow-hidden transition-opacity duration-300 ${
-                          isActive ? 'bg-white/35' : 'bg-white/25 group-hover:bg-white/55'
-                        }`}
+                        className={`relative h-1.5 w-full rounded-full overflow-hidden transition-opacity duration-300 ${isActive ? 'bg-white/35' : 'bg-white/25 group-hover:bg-white/55'
+                          }`}
                       >
                         {isActive && (
                           <motion.span

@@ -55,7 +55,15 @@ function formatRupiahInput(raw: string): string {
   return 'Rp ' + digits.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 }
 
-export function KunjunganTamuPortal({ initialChannel = 'mandiri_hp' }: { initialChannel?: InputChannel }) {
+export function KunjunganTamuPortal({
+  initialChannel = 'mandiri_hp',
+  embedded = false,
+  onClose,
+}: {
+  initialChannel?: InputChannel;
+  embedded?: boolean;
+  onClose?: () => void;
+}) {
   const [activeMode, setActiveMode] = useState<'form' | 'track'>('form');
   const [inputChannel, setInputChannel] = useState<InputChannel>(initialChannel);
   const [step, setStep] = useState<1 | 2 | 3>(1);
@@ -341,21 +349,32 @@ export function KunjunganTamuPortal({ initialChannel = 'mandiri_hp' }: { initial
   };
 
   return (
-    <div className="min-h-screen bg-[#F3F7F9] dark:bg-[#070b10] text-[#061E2B] dark:text-slate-100 pb-16">
+    <div className={`${embedded ? 'min-h-0 pb-8' : 'min-h-screen pb-16'} bg-[#F3F7F9] dark:bg-[#070b10] text-[#061E2B] dark:text-slate-100`}>
       {/* Top Bar */}
-      <header className="sticky top-0 z-40 bg-white/90 dark:bg-[#0c1622]/90 backdrop-blur-xl border-b border-slate-200/80 dark:border-white/10">
+      <header className="sticky top-0 z-40 bg-white/95 dark:bg-[#0c1622]/95 backdrop-blur-xl border-b border-slate-200/80 dark:border-white/10">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <Link
-              href="/"
-              className="h-9 w-9 rounded-full bg-[#EBF5F8] hover:bg-[#0E7490] text-[#0E7490] hover:text-white dark:bg-white/10 dark:text-cyan-300 flex items-center justify-center transition-colors"
-              title="Kembali ke Beranda"
-            >
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
+            {embedded && onClose ? (
+              <button
+                type="button"
+                onClick={onClose}
+                className="h-9 w-9 rounded-full bg-[#EBF5F8] hover:bg-[#0E7490] text-[#0E7490] hover:text-white dark:bg-white/10 dark:text-cyan-300 flex items-center justify-center transition-colors cursor-pointer"
+                title="Kembali ke Kiosk"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </button>
+            ) : (
+              <Link
+                href="/"
+                className="h-9 w-9 rounded-full bg-[#EBF5F8] hover:bg-[#0E7490] text-[#0E7490] hover:text-white dark:bg-white/10 dark:text-cyan-300 flex items-center justify-center transition-colors"
+                title="Kembali ke Beranda"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </Link>
+            )}
             <div>
               <h1 className="font-hero font-extrabold text-sm sm:text-base text-[#061E2B] dark:text-white leading-none">
-                Kunjungan Tamu &amp; Front Office
+                {embedded ? 'Register Kunjungan' : 'Kunjungan Tamu & Front Office'}
               </h1>
               <p className="font-mono text-[10px] uppercase tracking-wider text-[#0E7490] dark:text-cyan-300 mt-0.5">
                 Kecamatan Gandrungmangu • Non-PATEN
@@ -364,13 +383,24 @@ export function KunjunganTamuPortal({ initialChannel = 'mandiri_hp' }: { initial
           </div>
 
           <div className="flex items-center gap-2">
-            <Link
-              href="/Antrian/"
-              className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#F3F7F9] hover:bg-[#EBF5F8] dark:bg-white/5 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 font-hero text-xs font-semibold text-slate-700 dark:text-slate-200 transition-colors"
-            >
-              <Building2 className="h-3.5 w-3.5 text-[#0E7490] dark:text-cyan-300" />
-              <span>Rekap di /Antrian</span>
-            </Link>
+            {embedded && onClose ? (
+              <button
+                type="button"
+                onClick={onClose}
+                className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#061E2B] hover:bg-[#0E7490] text-white font-hero text-xs font-bold transition-colors cursor-pointer"
+              >
+                <ArrowLeft className="h-3.5 w-3.5" />
+                <span>Kembali ke Kiosk</span>
+              </button>
+            ) : (
+              <Link
+                href="/Antrian/"
+                className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#F3F7F9] hover:bg-[#EBF5F8] dark:bg-white/5 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 font-hero text-xs font-semibold text-slate-700 dark:text-slate-200 transition-colors"
+              >
+                <Building2 className="h-3.5 w-3.5 text-[#0E7490] dark:text-cyan-300" />
+                <span>Rekap di /Antrian</span>
+              </Link>
+            )}
           </div>
         </div>
       </header>

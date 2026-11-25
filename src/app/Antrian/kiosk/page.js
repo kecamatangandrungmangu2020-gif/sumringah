@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { db } from '../../lib/firebase';
 import { collection, getDocs, query, where, addDoc, Timestamp, doc, onSnapshot } from 'firebase/firestore';
 import Link from 'next/link';
+import { KunjunganTamuPortal } from '@/components/kunjungan-tamu/KunjunganTamuPortal';
 
 const DEFAULT_PELAYANAN = [
   { id: 'layanan-a', kode: 'A', nama: 'Legalisasi', estimasi_waktu: 15, loket_nama: 'Loket 1' },
@@ -27,7 +29,9 @@ export default function Kiosk() {
   const [successMessage, setSuccessMessage] = useState('');
   const [ticketToPrint, setTicketToPrint] = useState(null);
   const [selectedLayananForForm, setSelectedLayananForForm] = useState(null);
+  const [showRegisterKunjungan, setShowRegisterKunjungan] = useState(false);
   const [wargaForm, setWargaForm] = useState({ nama: '', alamat: '', hp: '' });
+  const [currentTime, setCurrentTime] = useState(null);
   const [heroBg, setHeroBg] = useState(() => {
     if (typeof window !== 'undefined') {
       try {
@@ -120,10 +124,17 @@ export default function Kiosk() {
     fetchData();
   }, []);
 
-  // Keyboard shortcut listener (A, B, C)
+  // Live clock
+  useEffect(() => {
+    setCurrentTime(new Date());
+    const t = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(t);
+  }, []);
+
+  // Keyboard shortcut listener (A, B, C, dan R untuk Register Kunjungan)
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (selectedLayananForForm) return;
+      if (selectedLayananForForm || showRegisterKunjungan) return;
       if (
         e.target.tagName === 'INPUT' ||
         e.target.tagName === 'TEXTAREA' ||
@@ -133,6 +144,10 @@ export default function Kiosk() {
       }
 
       const key = e.key.toLowerCase();
+      if (key === 'r') {
+        setShowRegisterKunjungan(true);
+        return;
+      }
       const p = pelayanan.find(item => item.kode.toLowerCase() === key);
       if (p) {
         setSelectedLayananForForm(p);
@@ -140,7 +155,7 @@ export default function Kiosk() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [pelayanan, selectedLayananForForm]);
+  }, [pelayanan, selectedLayananForForm, showRegisterKunjungan]);
 
   const handleAmbilAntrian = async (layanan, dataWarga) => {
     setLoading(true);
@@ -231,264 +246,553 @@ export default function Kiosk() {
 
   return (
     <>
-      <div id="kiosk-main-container" style={{
-        backgroundImage: `linear-gradient(rgba(10, 15, 29, 0.82), rgba(10, 15, 29, 0.94)), url("${heroBg}")`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        backgroundAttachment: 'fixed',
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '24px 20px',
-        color: '#ffffff',
-        transition: 'background-image 0.5s ease-in-out'
-      }}>
-        <div className="container" style={{ maxWidth: '1150px' }}>
+      <div
+        id="kiosk-main-container"
+        className="kiosk-screen-root"
+        style={{
+          background: 'linear-gradient(155deg, #f8fbfd 0%, #ebf5f8 52%, #dff0f6 100%)',
+          height: '100vh',
+          maxHeight: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          padding: '14px 20px',
+          boxSizing: 'border-box',
+          color: '#061E2B',
+          overflow: 'hidden',
+          position: 'relative'
+        }}
+      >
+        {/* Ambient Blue-White Glow + Subtle Light Pendopo Silhouette */}
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            pointerEvents: 'none',
+            zIndex: 0,
+            backgroundImage: 'radial-gradient(circle at 12% 14%, rgba(14, 116, 144, 0.12), transparent 45%), radial-gradient(circle at 88% 86%, rgba(56, 189, 248, 0.14), transparent 45%)'
+          }}
+        />
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            pointerEvents: 'none',
+            zIndex: 0,
+            opacity: 0.13,
+            backgroundImage: "url('/images/gandrungmangu-pendopo-silhouette-light.webp')",
+            backgroundRepeat: 'no-repeat',
+            backgroundPosition: 'center bottom',
+            backgroundSize: 'cover'
+          }}
+        />
 
-          {/* Top Glass Header Card */}
-          <div className="text-center mb-4 position-relative p-4 p-md-5 rounded-4 shadow-2xl antrian-glass" style={{
-            border: '2px solid rgba(251, 191, 36, 0.35)',
-            boxShadow: '0 20px 50px rgba(0,0,0,0.6)'
-          }}>
-            {/* Top Right Keluar Kiosk Button */}
-            <Link
-              href="/Antrian"
-              className="btn btn-sm position-absolute top-0 end-0 m-3 rounded-pill px-3.5 py-1.5 fw-bold shadow-sm d-inline-flex align-items-center gap-1.5 text-white"
-              style={{
-                backdropFilter: 'blur(10px)',
-                background: 'rgba(255, 255, 255, 0.08)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                fontSize: '0.85rem'
-              }}
-            >
-              <i className="bi bi-box-arrow-right text-warning"></i>
-              <span>Kembali ke Portal</span>
-            </Link>
+        <div
+          className="mx-auto w-100 d-flex flex-column"
+          style={{
+            maxWidth: '1220px',
+            flex: '1 1 0%',
+            minHeight: 0,
+            gap: '12px',
+            position: 'relative',
+            zIndex: 10
+          }}
+        >
+          {/* ── 1. COMPACT EXECUTIVE HEADER BAR (PORCELAIN WHITE + OCEAN BLUE) ── */}
+          <motion.div
+            initial={{ opacity: 0, y: -14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+            className="d-flex justify-content-between align-items-center gap-3 flex-wrap"
+            style={{
+              flexShrink: 0,
+              padding: '12px 20px',
+              borderRadius: '20px',
+              background: 'rgba(255, 255, 255, 0.95)',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid rgba(14, 116, 144, 0.16)',
+              boxShadow: '0 10px 30px rgba(6, 30, 43, 0.07)'
+            }}
+          >
+            {/* Kiri: Tombol Portal + Logo + Judul */}
+            <div className="d-flex align-items-center gap-3 min-w-0">
+              <Link
+                href="/Antrian/"
+                className="btn btn-sm rounded-pill px-3 py-1.5 text-white d-inline-flex align-items-center gap-1.5 text-decoration-none font-hero shrink-0"
+                style={{
+                  background: 'linear-gradient(135deg, #0E7490, #061E2B)',
+                  border: 'none',
+                  boxShadow: '0 4px 12px rgba(14, 116, 144, 0.22)',
+                  fontSize: '0.8rem',
+                  fontWeight: 700
+                }}
+              >
+                <i className="bi bi-arrow-left"></i>
+                <span className="d-none d-sm-inline">Portal</span>
+              </Link>
 
-            {/* Logos */}
-            <div className="d-flex align-items-center justify-content-center mb-3">
               {logoTambahan ? (
                 <img
                   src={logoTambahan}
                   alt="Logo Sistem Antrian"
                   style={{
-                    maxWidth: '560px',
-                    width: '100%',
-                    height: 'auto',
-                    maxHeight: '95px',
-                    aspectRatio: '13 / 2',
+                    height: '44px',
+                    maxWidth: '210px',
                     objectFit: 'contain',
-                    filter: 'drop-shadow(0 6px 16px rgba(0,0,0,0.6))'
+                    filter: 'drop-shadow(0 2px 6px rgba(6, 30, 43, 0.14))'
                   }}
                 />
               ) : (
-                <div className="d-flex align-items-center justify-content-center gap-3 flex-wrap">
-                  <img
-                    src="/img/Logo.png"
-                    alt="Logo Cilacap"
-                    style={{ height: '78px', objectFit: 'contain', filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.4))' }}
-                  />
-                  <img
-                    src="/img/cilacap-bercahaya.png"
-                    alt="Logo Cilacap Bercahaya"
-                    style={{ height: '55px', objectFit: 'contain', filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.4))' }}
-                  />
-                  <img
-                    src="/img/logo-semringah.png"
-                    alt="Logo Gandrung Mangu Semringah"
-                    style={{ height: '78px', objectFit: 'contain', filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.4))' }}
-                  />
-                </div>
+                <img
+                  src="/img/Logo.png"
+                  alt="Logo Cilacap"
+                  style={{ height: '42px', objectFit: 'contain' }}
+                />
               )}
-            </div>
 
-            {/* Slogan Badge */}
-            <div className="mb-3">
-              <span
-                className="badge px-3.5 py-1.5 rounded-pill fw-bold shadow-sm"
-                style={{
-                  background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
-                  color: '#0f172a',
-                  fontSize: '0.8rem',
-                  letterSpacing: '0.3px',
-                  border: '1px solid #fef08a'
-                }}
-              >
-                <i className="bi bi-stars me-1"></i> "SEMAngat memberIkan pelayanan NGgawe bungAH"
-              </span>
-            </div>
-
-            {/* Title & Subtitles */}
-            <h1 className="fw-extrabold mb-1 text-white" style={{
-              fontSize: 'clamp(1.75rem, 3.5vw, 2.5rem)',
-              letterSpacing: '0.5px',
-              textShadow: '0 4px 16px rgba(0,0,0,0.6)'
-            }}>
-              AMBIL NOMOR ANTRIAN
-            </h1>
-            <h3 className="text-info fw-bold mb-1" style={{ fontSize: '1.25rem' }}>
-              {instansiNama}
-            </h3>
-            <p className="text-white-50 small mb-0">
-              {instansiAlamat}
-            </p>
-          </div>
-
-          {/* Success Notification */}
-          {successMessage && (
-            <div className="alert alert-success border-0 text-white p-3 mb-4 text-center rounded-4 shadow-lg fs-5 fw-bold d-flex align-items-center justify-content-center gap-2" style={{ background: 'linear-gradient(135deg, #059669, #10b981)', border: '1px solid #6ee7b7' }}>
-              <i className="bi bi-check-circle-fill"></i> {successMessage}
-            </div>
-          )}
-
-          {/* 3 Service Cards */}
-          <div className="row g-4 justify-content-center">
-            {pelayanan.map((p, idx) => {
-              const accentColor = p.kode === 'A' ? '#38bdf8' : p.kode === 'B' ? '#34d399' : p.kode === 'C' ? '#fbbf24' : '#818cf8';
-              const glowClass = p.kode === 'A' ? 'glow-cyan' : p.kode === 'B' ? 'glow-emerald' : p.kode === 'C' ? 'glow-amber' : 'glow-indigo';
-              return (
-                <div className="col-12 col-md-4" key={p.id || p.kode}>
-                  <div
-                    onClick={() => setSelectedLayananForForm(p)}
-                    className={`card text-decoration-none h-100 shadow-xl text-white antrian-glass antrian-glass-hover ${glowClass}`}
+              <div className="min-w-0">
+                <div className="d-flex align-items-center gap-2 flex-wrap">
+                  <h1
+                    className="fw-extrabold m-0 font-hero text-truncate"
                     style={{
-                      padding: '30px 24px',
-                      cursor: 'pointer',
-                      border: `1.5px solid rgba(255, 255, 255, 0.16)`
+                      fontSize: 'clamp(1.25rem, 2vw, 1.9rem)',
+                      fontWeight: 900,
+                      letterSpacing: '-0.02em',
+                      color: '#061E2B',
+                      lineHeight: 1.15
                     }}
                   >
-                    <div className="d-flex justify-content-between align-items-center mb-3">
-                      <span style={{
-                        fontSize: '6.5rem',
-                        fontWeight: 900,
-                        color: accentColor,
-                        lineHeight: 1,
-                        letterSpacing: '-2px',
-                        textShadow: `0 0 30px ${accentColor}40`,
-                        userSelect: 'none'
-                      }}>
-                        {p.kode}
-                      </span>
-                      <span className="badge px-3 py-2 rounded-pill fs-6 shadow fw-bold" style={{ backgroundColor: `${accentColor}25`, color: accentColor, border: `1px solid ${accentColor}50` }}>
-                        Estimasi: {p.estimasi_waktu || 15} mnt
-                      </span>
-                    </div>
-                    <div>
-                      <h2 className="fw-bold mb-2 text-white" style={{ fontSize: '1.6rem', lineHeight: 1.25 }}>
-                        {p.nama}
-                      </h2>
-                      <p className="m-0 small fw-semibold" style={{ color: accentColor }}>
-                        Tekan kartu ({p.kode}) atau sentuh layar.
-                      </p>
-                    </div>
-                  </div>
+                    AMBIL NOMOR ANTRIAN &amp; REGISTER
+                  </h1>
+                  <span
+                    className="d-none d-lg-inline-flex align-items-center gap-1 px-2.5 py-0.5 rounded-pill font-mono"
+                    style={{
+                      fontSize: '11px',
+                      fontWeight: 700,
+                      letterSpacing: '0.1em',
+                      background: '#ebf5f8',
+                      border: '1px solid rgba(14, 116, 144, 0.24)',
+                      color: '#0E7490'
+                    }}
+                  >
+                    SEMRINGAH
+                  </span>
                 </div>
+                <p className="m-0 text-truncate font-hero" style={{ fontSize: '0.9rem', color: '#475569', fontWeight: 600 }}>
+                  {instansiNama} • {instansiAlamat}
+                </p>
+              </div>
+            </div>
+
+            {/* Kanan: Jam Digital Ringkas */}
+            <div
+              className="text-end px-3 py-1.5 rounded-4 shrink-0 d-none d-md-block"
+              style={{
+                background: 'linear-gradient(135deg, #0E7490, #061E2B)',
+                color: '#ffffff',
+                boxShadow: '0 6px 16px rgba(14, 116, 144, 0.22)'
+              }}
+            >
+              <div className="font-mono fw-black" style={{ fontSize: '1.2rem', lineHeight: 1.05, fontVariantNumeric: 'tabular-nums' }}>
+                {currentTime ? currentTime.toLocaleTimeString('id-ID', { hour12: false }) : '--.--.--'}{' '}
+                <span style={{ fontSize: '0.68rem', color: '#bae6fd' }}>WIB</span>
+              </div>
+              <div className="font-mono text-uppercase" style={{ fontSize: '0.65rem', color: 'rgba(224,242,254,0.88)', letterSpacing: '0.06em' }}>
+                {currentTime ? currentTime.toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }) : ''}
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Success Notification */}
+          <AnimatePresence>
+            {successMessage && (
+              <motion.div
+                initial={{ opacity: 0, y: -10, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="text-white px-4 py-2.5 text-center rounded-4 shadow-lg fw-bold d-flex align-items-center justify-content-center gap-2 font-hero"
+                style={{
+                  flexShrink: 0,
+                  background: 'linear-gradient(135deg, #0E7490, #059669)',
+                  border: '1px solid rgba(255,255,255,0.4)',
+                  fontSize: '0.95rem'
+                }}
+              >
+                <i className="bi bi-check-circle-fill"></i> {successMessage}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* ── 2. 3 KARTU LAYANAN ANTRIAN PATEN (PUTIH + AKSEN BIRU OCEAN) ── */}
+          <div
+            className="kiosk-cards-grid"
+            style={{
+              flex: '1 1 56%',
+              minHeight: 0,
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+              gap: '14px'
+            }}
+          >
+            {pelayanan.map((p, idx) => {
+              const badgeBg = idx === 0 ? '#0E7490' : idx === 1 ? '#0369a1' : '#061E2B';
+              return (
+                <motion.button
+                  key={p.id || p.kode}
+                  type="button"
+                  onClick={() => setSelectedLayananForForm(p)}
+                  initial={{ opacity: 0, y: 18, scale: 0.96 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  whileHover={{ y: -6, scale: 1.015 }}
+                  whileTap={{ scale: 0.97 }}
+                  transition={{ type: 'spring', stiffness: 320, damping: 24, delay: idx * 0.06 }}
+                  className="text-start position-relative overflow-hidden d-flex flex-column justify-content-between h-100"
+                  style={{
+                    padding: '22px 22px 18px',
+                    borderRadius: '22px',
+                    cursor: 'pointer',
+                    background: '#ffffff',
+                    border: '1.5px solid rgba(14, 116, 144, 0.18)',
+                    boxShadow: '0 12px 30px rgba(6, 30, 43, 0.08)',
+                    color: '#061E2B'
+                  }}
+                >
+                  {/* Top Blue Accent Strip */}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      height: '6px',
+                      background: `linear-gradient(90deg, ${badgeBg}, #38bdf8)`
+                    }}
+                  />
+
+                  <div className="d-flex justify-content-between align-items-start gap-2 w-100">
+                    <span
+                      className="font-hero fw-black"
+                      style={{
+                        fontSize: 'clamp(5.2rem, 8vw, 7.6rem)',
+                        fontWeight: 900,
+                        color: badgeBg,
+                        lineHeight: 0.88,
+                        letterSpacing: '-0.04em',
+                        userSelect: 'none'
+                      }}
+                    >
+                      {p.kode}
+                    </span>
+                    <span
+                      className="badge rounded-pill font-mono fw-bold px-3.5 py-2"
+                      style={{
+                        background: '#ebf5f8',
+                        color: '#0E7490',
+                        border: '1.5px solid rgba(14, 116, 144, 0.25)',
+                        fontSize: '0.88rem'
+                      }}
+                    >
+                      Estimasi {p.estimasi_waktu || 15} mnt
+                    </span>
+                  </div>
+
+                  <div className="my-auto pt-3">
+                    <div className="font-mono text-uppercase fw-bold" style={{ fontSize: '0.85rem', letterSpacing: '0.14em', color: '#0E7490' }}>
+                      Layanan Antrian • {p.loket_nama || `Loket ${idx + 1}`}
+                    </div>
+                    <h2
+                      className="font-hero fw-black m-0 mt-1.5"
+                      style={{
+                        fontSize: 'clamp(1.85rem, 2.75vw, 2.65rem)',
+                        fontWeight: 900,
+                        lineHeight: 1.12,
+                        letterSpacing: '-0.02em',
+                        color: '#061E2B'
+                      }}
+                    >
+                      {p.nama}
+                    </h2>
+                  </div>
+
+                  <div
+                    className="d-flex align-items-center justify-content-between pt-3 mt-2 w-100"
+                    style={{ borderTop: '1.5px solid rgba(14, 116, 144, 0.14)' }}
+                  >
+                    <span className="font-hero fw-bold" style={{ fontSize: '0.95rem', color: '#334155' }}>
+                      Tekan ({p.kode}) atau sentuh
+                    </span>
+                    <span
+                      className="d-inline-flex align-items-center gap-1.5 px-3.5 py-1.5 rounded-pill font-hero fw-bold text-white"
+                      style={{
+                        background: badgeBg,
+                        fontSize: '0.9rem'
+                      }}
+                    >
+                      Ambil <i className="bi bi-arrow-up-right"></i>
+                    </span>
+                  </div>
+                </motion.button>
               );
             })}
           </div>
 
-          {/* Bottom Center Button: Kembali ke Portal Utama */}
-          <div className="text-center mt-4">
-            <Link
-              href="/Antrian"
-              className="btn btn-sm rounded-pill px-4 py-2 fw-bold shadow-lg d-inline-flex align-items-center gap-2 text-white"
+          {/* ── 3. KARTU PALING BAWAH: REGISTER KUNJUNGAN (FUNGSI /kunjungan-tamu/) ── */}
+          <motion.button
+            type="button"
+            onClick={() => setShowRegisterKunjungan(true)}
+            initial={{ opacity: 0, y: 20, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            whileHover={{ y: -4, scale: 1.008 }}
+            whileTap={{ scale: 0.985 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 24, delay: 0.2 }}
+            className="w-100 text-start position-relative overflow-hidden d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3"
+            style={{
+              flex: '0 0 auto',
+              minHeight: '118px',
+              padding: '18px 26px',
+              borderRadius: '22px',
+              cursor: 'pointer',
+              background: 'linear-gradient(135deg, #0E7490 0%, #095972 52%, #061E2B 100%)',
+              border: '2px solid rgba(255, 255, 255, 0.85)',
+              boxShadow: '0 16px 38px rgba(14, 116, 144, 0.28)',
+              color: '#ffffff'
+            }}
+          >
+            {/* Subtle Semringah Watermark */}
+            <div
+              aria-hidden="true"
               style={{
-                backdropFilter: 'blur(10px)',
-                background: 'rgba(255, 255, 255, 0.08)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
-                fontSize: '0.9rem'
+                position: 'absolute',
+                right: '14px',
+                bottom: '-8px',
+                width: '160px',
+                height: '130px',
+                opacity: 0.13,
+                pointerEvents: 'none',
+                backgroundImage: "url('/images/gandrungmangu-semringah-silhouette.webp')",
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'right bottom',
+                backgroundSize: 'contain'
               }}
-            >
-              <i className="bi bi-arrow-left text-warning"></i> Kembali ke Portal Antrian
-            </Link>
-          </div>
+            />
 
+            <div className="d-flex align-items-center gap-3.5 position-relative" style={{ zIndex: 2 }}>
+              <div
+                className="d-flex align-items-center justify-content-center shrink-0"
+                style={{
+                  width: '60px',
+                  height: '60px',
+                  borderRadius: '18px',
+                  background: 'rgba(255, 255, 255, 0.16)',
+                  border: '1.5px solid rgba(255, 255, 255, 0.35)',
+                  boxShadow: '0 8px 20px rgba(6, 30, 43, 0.25)'
+                }}
+              >
+                <i className="bi bi-journal-check text-white" style={{ fontSize: '1.85rem' }}></i>
+              </div>
+
+              <div>
+                <div className="d-flex align-items-center gap-2 flex-wrap mb-1">
+                  <span
+                    className="badge rounded-pill font-mono fw-bold px-3 py-1"
+                    style={{
+                      background: '#ffffff',
+                      color: '#0E7490',
+                      fontSize: '0.78rem',
+                      letterSpacing: '0.1em'
+                    }}
+                  >
+                    FRONT OFFICE • NON-PATEN
+                  </span>
+                  <span className="font-mono d-none d-sm-inline fw-semibold" style={{ fontSize: '0.8rem', color: '#bae6fd' }}>
+                    Pintasan Keyboard: (R)
+                  </span>
+                </div>
+                <h2
+                  className="font-hero fw-black m-0 text-white"
+                  style={{ fontSize: 'clamp(1.65rem, 2.5vw, 2.3rem)', fontWeight: 900, letterSpacing: '-0.02em', lineHeight: 1.12 }}
+                >
+                  Register Kunjungan
+                </h2>
+                <p className="m-0 mt-1 font-hero fw-medium" style={{ fontSize: '0.96rem', color: 'rgba(224, 242, 254, 0.94)' }}>
+                  Tamu Dinas, Pengajuan Proposal, Penyerahan SPJ/Berkas, Pengiriman Barang &amp; Pengaduan + Cetak Tanda Terima
+                </p>
+              </div>
+            </div>
+
+            <div className="position-relative shrink-0" style={{ zIndex: 2 }}>
+              <span
+                className="d-inline-flex align-items-center gap-2 px-4 py-3 rounded-pill font-hero fw-black shadow"
+                style={{
+                  background: '#ffffff',
+                  color: '#061E2B',
+                  fontSize: '0.98rem',
+                  fontWeight: 800,
+                  letterSpacing: '0.03em'
+                }}
+              >
+                <span>Buka Formulir</span>
+                <i className="bi bi-arrow-right-circle-fill" style={{ color: '#0E7490', fontSize: '1.2rem' }}></i>
+              </span>
+            </div>
+          </motion.button>
         </div>
       </div>
 
-      {/* Form Dialog for Citizen Info (Dark Frosted Glassmorphic Modal) */}
-      {selectedLayananForForm && (
-        <div className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center px-3" style={{ background: 'rgba(10, 15, 29, 0.75)', backdropFilter: 'blur(10px)', zIndex: 1050 }}>
-          <div className="card text-white p-4 p-md-5 border-0 w-100 shadow-2xl" style={{ maxWidth: '560px', background: 'rgba(15, 23, 42, 0.94)', border: '1.5px solid rgba(255, 255, 255, 0.2)', borderRadius: '28px', boxShadow: '0 25px 60px rgba(0,0,0,0.7)' }}>
-            <div className="text-center mb-4">
-              <span className="badge px-3.5 py-1.5 rounded-pill mb-3 fs-6 fw-bold" style={{ background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', border: '1px solid rgba(56, 189, 248, 0.35)' }}>
-                Kategori Layanan {selectedLayananForForm.kode}
-              </span>
-              <h2 className="fw-extrabold text-white">{selectedLayananForForm.nama}</h2>
-              <p className="text-white-50 m-0 small">Silakan lengkapi data diri Anda sebelum mencetak tiket antrian.</p>
-            </div>
-
-            <form onSubmit={handleSubmitForm}>
-              <div className="mb-3">
-                <label className="form-label text-white-50 fw-semibold small">Nama Lengkap</label>
-                <input
-                  type="text"
-                  className="form-control text-white py-2.5 rounded-3"
-                  style={{ background: 'rgba(255, 255, 255, 0.08)', border: '1px solid rgba(255, 255, 255, 0.2)', color: '#ffffff' }}
-                  placeholder="Masukkan nama lengkap"
-                  required
-                  value={wargaForm.nama}
-                  onChange={e => setWargaForm({ ...wargaForm, nama: e.target.value })}
+      {/* Modal Register Kunjungan (Langsung Memuat Fitur Lengkap /kunjungan-tamu/) */}
+      <AnimatePresence>
+        {showRegisterKunjungan && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center p-2 p-md-3"
+            style={{
+              background: 'rgba(6, 30, 43, 0.72)',
+              backdropFilter: 'blur(10px)',
+              zIndex: 1060
+            }}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96, y: 18 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.96, y: 14 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 26 }}
+              className="w-100 shadow-2xl overflow-hidden"
+              style={{
+                maxWidth: '1080px',
+                maxHeight: '94vh',
+                borderRadius: '26px',
+                background: '#F3F7F9',
+                border: '2px solid rgba(255, 255, 255, 0.85)',
+                display: 'flex',
+                flexDirection: 'column'
+              }}
+            >
+              <div style={{ overflowY: 'auto', flex: '1 1 auto' }}>
+                <KunjunganTamuPortal
+                  initialChannel="kiosk"
+                  embedded
+                  onClose={() => setShowRegisterKunjungan(false)}
                 />
               </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-              <div className="mb-3">
-                <label className="form-label text-white-50 fw-semibold small">Alamat Rumah</label>
-                <input
-                  type="text"
-                  className="form-control text-white py-2.5 rounded-3"
-                  style={{ background: 'rgba(255, 255, 255, 0.08)', border: '1px solid rgba(255, 255, 255, 0.2)', color: '#ffffff' }}
-                  placeholder="Masukkan alamat lengkap (Desa / RT / RW)"
-                  required
-                  value={wargaForm.alamat}
-                  onChange={e => setWargaForm({ ...wargaForm, alamat: e.target.value })}
-                />
+      {/* Form Dialog for Citizen Info (Clean Blue & White Modal) */}
+      <AnimatePresence>
+        {selectedLayananForForm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center px-3"
+            style={{ background: 'rgba(6, 30, 43, 0.65)', backdropFilter: 'blur(10px)', zIndex: 1050 }}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.94, y: 16 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.94, y: 12 }}
+              transition={{ type: 'spring', stiffness: 320, damping: 24 }}
+              className="card p-4 p-md-5 border-0 w-100 shadow-2xl"
+              style={{
+                maxWidth: '540px',
+                background: '#ffffff',
+                border: '1.5px solid rgba(14, 116, 144, 0.22)',
+                borderRadius: '26px',
+                boxShadow: '0 25px 60px rgba(6, 30, 43, 0.28)',
+                color: '#061E2B'
+              }}
+            >
+              <div className="text-center mb-4">
+                <span
+                  className="badge px-3.5 py-1.5 rounded-pill mb-2.5 fw-bold font-mono"
+                  style={{
+                    background: '#ebf5f8',
+                    color: '#0E7490',
+                    border: '1px solid rgba(14, 116, 144, 0.25)',
+                    fontSize: '0.78rem'
+                  }}
+                >
+                  KATEGORI LAYANAN {selectedLayananForForm.kode}
+                </span>
+                <h2 className="fw-extrabold font-hero m-0" style={{ color: '#061E2B' }}>{selectedLayananForForm.nama}</h2>
+                <p className="m-0 mt-1 small" style={{ color: '#64748b' }}>Silakan lengkapi data diri Anda sebelum mencetak tiket antrian.</p>
               </div>
 
-              <div className="mb-4">
-                <label className="form-label text-white-50 fw-semibold small">Nomor HP / WhatsApp</label>
-                <input
-                  type="tel"
-                  className="form-control text-white py-2.5 rounded-3"
-                  style={{ background: 'rgba(255, 255, 255, 0.08)', border: '1px solid rgba(255, 255, 255, 0.2)', color: '#ffffff' }}
-                  placeholder="Contoh: 0812xxxxxxxx"
-                  required
-                  value={wargaForm.hp}
-                  onChange={e => setWargaForm({ ...wargaForm, hp: e.target.value })}
-                />
-              </div>
-
-              <div className="row g-3">
-                <div className="col-6">
-                  <button
-                    type="button"
-                    className="btn btn-outline-light w-100 py-2.5 rounded-pill fw-bold text-white-50"
-                    style={{ border: '1px solid rgba(255, 255, 255, 0.25)' }}
-                    onClick={() => {
-                      setSelectedLayananForForm(null);
-                      setWargaForm({ nama: '', alamat: '', hp: '' });
-                    }}
-                  >
-                    Batal
-                  </button>
+              <form onSubmit={handleSubmitForm}>
+                <div className="mb-3">
+                  <label className="form-label fw-bold small font-hero" style={{ color: '#061E2B' }}>Nama Lengkap</label>
+                  <input
+                    type="text"
+                    className="form-control py-2.5 rounded-3"
+                    style={{ background: '#f8fbfd', border: '1.5px solid rgba(14, 116, 144, 0.22)', color: '#061E2B' }}
+                    placeholder="Masukkan nama lengkap"
+                    required
+                    value={wargaForm.nama}
+                    onChange={e => setWargaForm({ ...wargaForm, nama: e.target.value })}
+                  />
                 </div>
-                <div className="col-6">
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="btn w-100 py-2.5 rounded-pill fw-bold text-dark shadow-lg"
-                    style={{ background: 'linear-gradient(135deg, #fbbf24, #f59e0b)', border: 'none' }}
-                  >
-                    {loading ? 'Memproses...' : 'Ambil & Cetak'}
-                  </button>
+
+                <div className="mb-3">
+                  <label className="form-label fw-bold small font-hero" style={{ color: '#061E2B' }}>Alamat Rumah</label>
+                  <input
+                    type="text"
+                    className="form-control py-2.5 rounded-3"
+                    style={{ background: '#f8fbfd', border: '1.5px solid rgba(14, 116, 144, 0.22)', color: '#061E2B' }}
+                    placeholder="Masukkan alamat lengkap (Desa / RT / RW)"
+                    required
+                    value={wargaForm.alamat}
+                    onChange={e => setWargaForm({ ...wargaForm, alamat: e.target.value })}
+                  />
                 </div>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+
+                <div className="mb-4">
+                  <label className="form-label fw-bold small font-hero" style={{ color: '#061E2B' }}>Nomor HP / WhatsApp</label>
+                  <input
+                    type="tel"
+                    className="form-control py-2.5 rounded-3"
+                    style={{ background: '#f8fbfd', border: '1.5px solid rgba(14, 116, 144, 0.22)', color: '#061E2B' }}
+                    placeholder="Contoh: 0812xxxxxxxx"
+                    required
+                    value={wargaForm.hp}
+                    onChange={e => setWargaForm({ ...wargaForm, hp: e.target.value })}
+                  />
+                </div>
+
+                <div className="row g-3">
+                  <div className="col-6">
+                    <button
+                      type="button"
+                      className="btn w-100 py-2.5 rounded-pill fw-bold font-hero"
+                      style={{ background: '#f1f5f9', color: '#475569', border: '1px solid #cbd5e1' }}
+                      onClick={() => {
+                        setSelectedLayananForForm(null);
+                        setWargaForm({ nama: '', alamat: '', hp: '' });
+                      }}
+                    >
+                      Batal
+                    </button>
+                  </div>
+                  <div className="col-6">
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="btn w-100 py-2.5 rounded-pill fw-bold text-white shadow font-hero"
+                      style={{ background: 'linear-gradient(135deg, #0E7490, #061E2B)', border: 'none' }}
+                    >
+                      {loading ? 'Memproses...' : 'Ambil & Cetak'}
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Hidden print-only ticket */}
       {ticketToPrint && (
@@ -517,9 +821,22 @@ export default function Kiosk() {
         </div>
       )}
 
-      {/* CSS Styles for 80mm POS Thermal Printer */}
+      {/* CSS Styles for Responsive Single-Screen Kiosk & 80mm POS Thermal Printer */}
       <style dangerouslySetInnerHTML={{
         __html: `
+        @media (max-width: 991px) {
+          .kiosk-screen-root {
+            height: auto !important;
+            max-height: none !important;
+            min-height: 100vh !important;
+            overflow-y: auto !important;
+          }
+          .kiosk-cards-grid {
+            grid-template-columns: 1fr !important;
+            flex: none !important;
+          }
+        }
+
         @media print {
           @page {
             size: 80mm auto;

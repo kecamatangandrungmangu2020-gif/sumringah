@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { db, auth } from '../../lib/firebase';
 import { collection, query, where, orderBy, onSnapshot, doc, updateDoc, Timestamp, getDocs } from 'firebase/firestore';
 import { signInWithEmailAndPassword } from 'firebase/auth';
@@ -607,58 +608,73 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
   if (!isLogged) {
     return (
       <div style={{
-        backgroundImage: `linear-gradient(rgba(10, 15, 29, 0.84), rgba(10, 15, 29, 0.94)), url("${heroBg}")`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        backgroundAttachment: 'fixed',
+        background: 'linear-gradient(155deg, #f8fbfd 0%, #ebf5f8 52%, #dff0f6 100%)',
         minHeight: '100vh',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '20px',
-        fontFamily: 'var(--font-outfit), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-        transition: 'background-image 0.5s ease-in-out'
+        padding: '24px 20px',
+        position: 'relative',
+        overflow: 'hidden'
       }}>
-        <div className="card text-white p-4 p-md-5 shadow-lg antrian-glass" style={{
-          maxWidth: '520px',
-          width: '100%',
-          background: 'rgba(255, 255, 255, 0.06)',
-          backdropFilter: 'blur(16px)',
-          WebkitBackdropFilter: 'blur(16px)',
-          borderRadius: '24px',
-          border: '1px solid rgba(255, 255, 255, 0.16)',
-          boxShadow: '0 25px 60px rgba(0, 0, 0, 0.6)'
-        }}>
-          <div className="text-center mb-4">
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            pointerEvents: 'none',
+            opacity: 0.13,
+            backgroundImage: "url('/images/gandrungmangu-pendopo-silhouette-light.webp')",
+            backgroundRepeat: 'no-repeat',
+            backgroundPosition: 'center bottom',
+            backgroundSize: 'cover'
+          }}
+        />
+        <motion.div
+          initial={{ opacity: 0, y: 20, scale: 0.97 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+          className="card p-4 p-md-5 shadow-lg position-relative overflow-hidden"
+          style={{
+            maxWidth: '520px',
+            width: '100%',
+            background: '#ffffff',
+            borderRadius: '26px',
+            border: '1.5px solid rgba(14, 116, 144, 0.2)',
+            boxShadow: '0 22px 55px rgba(6, 30, 43, 0.14)',
+            color: '#061E2B',
+            zIndex: 10
+          }}
+        >
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '6px', background: 'linear-gradient(90deg, #0E7490, #38bdf8, #061E2B)' }} />
+          <div className="text-center mb-4 pt-1">
             <div className="d-flex align-items-center justify-content-center mb-3">
-              <img src={logoTambahan || "/img/logo-tambahan.png"} alt="Logo Gandrungmangu" style={{ height: '60px', objectFit: 'contain', filter: 'drop-shadow(0 4px 10px rgba(0,0,0,0.6))' }} />
+              <img src={logoTambahan || "/img/logo-tambahan.png"} alt="Logo Gandrungmangu" style={{ height: '56px', objectFit: 'contain' }} />
             </div>
 
-            {/* Slogan Badge */}
             <div className="mb-2">
               <span
-                className="badge px-3 py-1.5 rounded-pill fw-bold shadow-sm"
+                className="badge px-3 py-1.5 rounded-pill fw-bold font-mono"
                 style={{
-                  background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
-                  color: '#0f172a',
-                  fontSize: '0.78rem',
-                  letterSpacing: '0.3px',
-                  border: '1px solid #fef08a'
+                  background: '#ebf5f8',
+                  color: '#0E7490',
+                  fontSize: '0.72rem',
+                  letterSpacing: '0.06em',
+                  border: '1px solid rgba(14, 116, 144, 0.25)'
                 }}
               >
-                <i className="bi bi-stars me-1"></i> "SEMAngat memberIkan pelayanan NGgawe bungAH"
+                <i className="bi bi-stars me-1"></i> SEMRINGAH • KONSOL LOKET
               </span>
             </div>
 
-            <h3 className="fw-bold text-white mb-1" style={{ fontSize: '1.75rem', letterSpacing: '-0.02em', textShadow: '0 2px 8px rgba(0,0,0,0.7)' }}>
+            <h3 className="fw-extrabold font-hero mb-1" style={{ fontSize: '1.7rem', letterSpacing: '-0.02em', color: '#061E2B' }}>
               Konsol Petugas Loket
             </h3>
-            <p className="text-white-50 small mb-0">Sistem Antrian Kecamatan Gandrungmangu</p>
+            <p className="small mb-0" style={{ color: '#64748b' }}>Sistem Pelayanan Kecamatan Gandrungmangu</p>
           </div>
 
           {loginError && (
-            <div className="alert border-0 text-white p-3 mb-3 text-center rounded-3 small fw-semibold shadow-sm" style={{ background: 'rgba(239, 68, 68, 0.85)', backdropFilter: 'blur(8px)', border: '1px solid rgba(239, 68, 68, 0.5)' }}>
+            <div className="alert border-0 text-white p-3 mb-3 text-center rounded-3 small fw-semibold shadow-sm" style={{ background: '#dc2626' }}>
               <i className="bi bi-exclamation-triangle-fill me-1"></i> {loginError}
             </div>
           )}
@@ -666,11 +682,11 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
           <form onSubmit={handleLogin}>
             {operatorList.length > 0 && (
               <div className="mb-3">
-                <label className="form-label text-white-50 small fw-bold mb-1.5">
-                  <i className="bi bi-person-badge text-warning me-1"></i> Pilih Petugas / Operator Terdaftar
+                <label className="form-label small fw-bold mb-1.5 font-hero" style={{ color: '#061E2B' }}>
+                  <i className="bi bi-person-badge me-1" style={{ color: '#0E7490' }}></i> Pilih Petugas / Operator Terdaftar
                 </label>
                 <select
-                  className="form-select text-white fw-medium mb-1"
+                  className="form-select fw-medium mb-1"
                   value={selectedOpId}
                   onChange={(e) => {
                     const opId = e.target.value;
@@ -683,11 +699,11 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                       }
                     }
                   }}
-                  style={{ background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(255, 255, 255, 0.2)', borderRadius: '12px' }}
+                  style={{ background: '#f8fbfd', border: '1.5px solid rgba(14, 116, 144, 0.22)', borderRadius: '12px', color: '#061E2B' }}
                 >
-                  <option value="" className="bg-dark text-white">-- Pilih Dari Daftar Operator Terdaftar --</option>
+                  <option value="">-- Pilih Dari Daftar Operator Terdaftar --</option>
                   {operatorList.map(op => (
-                    <option key={op.id} value={op.id} className="bg-dark text-white">
+                    <option key={op.id} value={op.id}>
                       {op.nama} ({op.username})
                     </option>
                   ))}
@@ -696,128 +712,138 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
             )}
 
             <div className="mb-3">
-              <label className="form-label text-white-50 small fw-bold mb-1.5">Username / Email Masuk Sistem</label>
+              <label className="form-label small fw-bold mb-1.5 font-hero" style={{ color: '#061E2B' }}>Username / Email Masuk Sistem</label>
               <div className="input-group">
-                <span className="input-group-text text-info" style={{ background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(255, 255, 255, 0.2)', borderRight: 'none', borderRadius: '12px 0 0 12px' }}>
+                <span className="input-group-text" style={{ background: '#ebf5f8', border: '1.5px solid rgba(14, 116, 144, 0.22)', borderRight: 'none', borderRadius: '12px 0 0 12px', color: '#0E7490' }}>
                   <i className="bi bi-person"></i>
                 </span>
                 <input
                   type="text"
-                  className="form-control text-white fw-medium"
+                  className="form-control fw-medium"
                   placeholder="Username / Email akun Masuk Sistem"
                   required
                   value={username}
                   onChange={e => setUsername(e.target.value)}
-                  style={{ background: 'rgba(15, 23, 42, 0.75)', border: '1px solid rgba(255, 255, 255, 0.2)', borderRadius: '0 12px 12px 0' }}
+                  style={{ background: '#f8fbfd', border: '1.5px solid rgba(14, 116, 144, 0.22)', borderRadius: '0 12px 12px 0', color: '#061E2B' }}
                 />
               </div>
             </div>
 
             <div className="mb-3">
-              <label className="form-label text-white-50 small fw-bold mb-1.5">Kata Sandi</label>
+              <label className="form-label small fw-bold mb-1.5 font-hero" style={{ color: '#061E2B' }}>Kata Sandi</label>
               <div className="input-group">
-                <span className="input-group-text text-info" style={{ background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(255, 255, 255, 0.2)', borderRight: 'none', borderRadius: '12px 0 0 12px' }}>
+                <span className="input-group-text" style={{ background: '#ebf5f8', border: '1.5px solid rgba(14, 116, 144, 0.22)', borderRight: 'none', borderRadius: '12px 0 0 12px', color: '#0E7490' }}>
                   <i className="bi bi-lock"></i>
                 </span>
                 <input
                   type="password"
-                  className="form-control text-white fw-medium"
+                  className="form-control fw-medium"
                   placeholder="Password"
                   required
                   value={password}
                   onChange={e => setPassword(e.target.value)}
-                  style={{ background: 'rgba(15, 23, 42, 0.75)', border: '1px solid rgba(255, 255, 255, 0.2)', borderRadius: '0 12px 12px 0' }}
+                  style={{ background: '#f8fbfd', border: '1.5px solid rgba(14, 116, 144, 0.22)', borderRadius: '0 12px 12px 0', color: '#061E2B' }}
                 />
               </div>
             </div>
 
             <div className="row g-2 mb-4">
               <div className="col-md-6">
-                <label className="form-label text-white-50 small fw-bold mb-1.5">Pilih Loket</label>
+                <label className="form-label small fw-bold mb-1.5 font-hero" style={{ color: '#061E2B' }}>Pilih Loket</label>
                 <select
-                  className="form-select text-white fw-medium"
+                  className="form-select fw-medium"
                   required
                   value={selectedLoket}
                   onChange={e => setSelectedLoket(e.target.value)}
-                  style={{ background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(255, 255, 255, 0.2)', borderRadius: '12px' }}
+                  style={{ background: '#f8fbfd', border: '1.5px solid rgba(14, 116, 144, 0.22)', borderRadius: '12px', color: '#061E2B' }}
                 >
-                  <option value="" className="bg-dark text-white">-- Pilih Loket --</option>
-                  {loketList.map(l => <option key={l} value={l} className="bg-dark text-white">{l}</option>)}
+                  <option value="">-- Pilih Loket --</option>
+                  {loketList.map(l => <option key={l} value={l}>{l}</option>)}
                 </select>
               </div>
               <div className="col-md-6">
-                <label className="form-label text-white-50 small fw-bold mb-1.5">Pilih Layanan</label>
+                <label className="form-label small fw-bold mb-1.5 font-hero" style={{ color: '#061E2B' }}>Pilih Layanan</label>
                 <select
-                  className="form-select text-white fw-medium"
+                  className="form-select fw-medium"
                   value={selectedLayanan}
                   onChange={e => setSelectedLayanan(e.target.value)}
-                  style={{ background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(255, 255, 255, 0.2)', borderRadius: '12px' }}
+                  style={{ background: '#f8fbfd', border: '1.5px solid rgba(14, 116, 144, 0.22)', borderRadius: '12px', color: '#061E2B' }}
                 >
-                  <option value="semua" className="bg-dark text-white">Semua Layanan (Multi-Layanan)</option>
+                  <option value="semua">Semua Layanan (Multi-Layanan)</option>
                   {pelayananList.map(p => (
-                    <option key={p.id} value={p.id} className="bg-dark text-white">{p.nama} ({p.kode})</option>
+                    <option key={p.id} value={p.id}>{p.nama} ({p.kode})</option>
                   ))}
                 </select>
               </div>
             </div>
 
-            <button type="submit" className="btn w-100 py-3 fw-bold rounded-pill mb-3 text-white shadow-lg" style={{ background: 'linear-gradient(135deg, #0284c7, #2563eb)', border: '1px solid rgba(56, 189, 248, 0.5)', boxShadow: '0 8px 25px rgba(2, 132, 199, 0.35)', letterSpacing: '0.3px' }}>
+            <button type="submit" className="btn w-100 py-3 fw-bold rounded-pill mb-3 text-white shadow font-hero" style={{ background: 'linear-gradient(135deg, #0E7490, #061E2B)', border: 'none', letterSpacing: '0.03em' }}>
               <i className="bi bi-box-arrow-in-right me-1.5"></i> Masuk Konsol Petugas
             </button>
 
-            <Link href="/Antrian" className="btn w-100 py-2.5 rounded-pill text-white-50 small text-decoration-none text-center d-block fw-semibold shadow-sm" style={{ backdropFilter: 'blur(8px)', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.15)', transition: 'all 0.2s ease' }}>
-              <i className="bi bi-arrow-left me-1"></i> Kembali ke Portal Antrian
+            <Link href="/Antrian/" className="btn w-100 py-2.5 rounded-pill small text-decoration-none text-center d-block fw-bold font-hero" style={{ background: '#f1f5f9', color: '#475569', border: '1px solid #cbd5e1' }}>
+              <i className="bi bi-arrow-left me-1"></i> Kembali ke Portal Pelayanan
             </Link>
           </form>
-        </div>
+        </motion.div>
       </div>
     );
   }
 
   return (
     <div style={{
-      backgroundImage: `linear-gradient(rgba(10, 15, 29, 0.88), rgba(10, 15, 29, 0.96)), url("${heroBg}")`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat',
-      backgroundAttachment: 'fixed',
+      background: 'linear-gradient(155deg, #f8fbfd 0%, #ebf5f8 52%, #dff0f6 100%)',
       minHeight: '100vh',
       maxHeight: '100vh',
       display: 'flex',
       flexDirection: 'column',
-      padding: '16px 24px',
+      padding: '14px 20px',
       boxSizing: 'border-box',
       overflow: 'hidden',
-      fontFamily: 'var(--font-outfit), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-      transition: 'background-image 0.5s ease-in-out'
+      color: '#061E2B',
+      position: 'relative'
     }}>
-      {/* Header Bar */}
-      <div className="d-flex justify-content-between align-items-center mb-3 px-4 py-2.5 rounded-4 shadow-lg antrian-glass" style={{
-        background: 'rgba(255, 255, 255, 0.06)',
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)',
-        border: '1px solid rgba(255, 255, 255, 0.15)',
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)'
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'fixed',
+          inset: 0,
+          pointerEvents: 'none',
+          opacity: 0.11,
+          backgroundImage: "url('/images/gandrungmangu-pendopo-silhouette-light.webp')",
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'center bottom',
+          backgroundSize: 'cover'
+        }}
+      />
+
+      {/* Header Bar (Porcelain White + Ocean Blue) */}
+      <div className="d-flex justify-content-between align-items-center mb-3 px-4 py-2.5 rounded-4 position-relative" style={{
+        zIndex: 10,
+        background: 'rgba(255, 255, 255, 0.95)',
+        backdropFilter: 'blur(20px)',
+        border: '1px solid rgba(14, 116, 144, 0.18)',
+        boxShadow: '0 8px 26px rgba(6, 30, 43, 0.08)'
       }}>
         <div className="d-flex align-items-center gap-3">
-          <img src={logoTambahan || "/img/logo-tambahan.png"} alt="Logo Gandrungmangu" style={{ height: '42px', objectFit: 'contain', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.6))' }} />
+          <img src={logoTambahan || "/img/logo-tambahan.png"} alt="Logo Gandrungmangu" style={{ height: '42px', objectFit: 'contain' }} />
           <div>
-            <div className="d-flex align-items-center gap-2">
-              <h4 className="fw-bold m-0 text-white" style={{ fontSize: '1.35rem', letterSpacing: '-0.01em' }}>
-                Konsol Loket: <span style={{ color: '#38bdf8' }}>{selectedLoket}</span>
+            <div className="d-flex align-items-center gap-2 flex-wrap">
+              <h4 className="fw-extrabold m-0 font-hero" style={{ fontSize: '1.3rem', letterSpacing: '-0.02em', color: '#061E2B' }}>
+                Konsol Loket: <span style={{ color: '#0E7490' }}>{selectedLoket}</span>
               </h4>
               <button
                 onClick={handleOpenSwitchModal}
-                className="btn btn-sm fw-bold rounded-pill px-3 py-1 shadow-sm d-flex align-items-center gap-1.5"
-                style={{ fontSize: '0.8rem', background: 'linear-gradient(135deg, #fbbf24, #f59e0b)', color: '#0f172a', border: '1px solid #fef08a' }}
+                className="btn btn-sm fw-bold rounded-pill px-3 py-1 shadow-sm d-flex align-items-center gap-1.5 font-hero text-white"
+                style={{ fontSize: '0.78rem', background: 'linear-gradient(135deg, #0E7490, #061E2B)', border: 'none' }}
                 title="Ganti Loket / Petugas Tanpa Logout"
               >
                 <i className="bi bi-arrow-repeat"></i> Ganti Loket / Petugas
               </button>
             </div>
-            <div className="d-flex align-items-center gap-2 mt-1">
-              <span className="text-white-50 small">Petugas: <strong className="text-white">{operatorNama || (operatorList.length > 0 ? operatorList[0].nama : 'Operator')}</strong></span>
-              <span className="badge rounded-pill px-2.5 py-1 small fw-semibold font-monospace" style={{ background: 'rgba(56, 189, 248, 0.15)', border: '1px solid rgba(56, 189, 248, 0.35)', color: '#38bdf8' }}>
+            <div className="d-flex align-items-center gap-2 mt-1 flex-wrap">
+              <span className="small" style={{ color: '#475569' }}>Petugas: <strong style={{ color: '#061E2B' }}>{operatorNama || (operatorList.length > 0 ? operatorList[0].nama : 'Operator')}</strong></span>
+              <span className="badge rounded-pill px-2.5 py-1 small fw-bold font-mono" style={{ background: '#ebf5f8', border: '1px solid rgba(14, 116, 144, 0.25)', color: '#0E7490' }}>
                 {selectedLayanan === 'semua' || !selectedLayanan
                   ? 'Semua Layanan (Multi-Layanan)'
                   : (pelayananList.find(p => p.id === selectedLayanan)?.nama || selectedLayanan)}
@@ -826,96 +852,125 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
           </div>
         </div>
 
-        <div className="d-flex align-items-center gap-3">
-          <span
-            className="badge px-3 py-1.5 rounded-pill fw-bold d-none d-md-inline-block shadow-sm"
-            style={{
-              background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
-              color: '#0f172a',
-              fontSize: '0.75rem',
-              border: '1px solid #fef08a'
-            }}
+        <div className="d-flex align-items-center gap-2">
+          <Link
+            href="/Antrian/"
+            className="btn btn-sm px-3 py-1.5 rounded-pill fw-bold d-none d-md-inline-flex align-items-center gap-1.5 text-decoration-none font-hero"
+            style={{ background: '#ebf5f8', color: '#0E7490', border: '1px solid rgba(14, 116, 144, 0.25)' }}
           >
-            "SEMAngat memberIkan pelayanan NGgawe bungAH"
-          </span>
-          <button className="btn btn-outline-danger btn-sm px-3.5 py-1.5 rounded-pill fw-bold shadow-sm d-flex align-items-center gap-1.5" onClick={handleLogout} style={{ border: '1px solid rgba(239, 68, 68, 0.5)' }}>
+            <i className="bi bi-arrow-left"></i> Portal
+          </Link>
+          <button className="btn btn-sm px-3.5 py-1.5 rounded-pill fw-bold d-flex align-items-center gap-1.5 font-hero" onClick={handleLogout} style={{ background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca' }}>
             <i className="bi bi-box-arrow-right"></i> Keluar
           </button>
         </div>
       </div>
 
       {/* Main Single-Viewport Layout */}
-      <div className="row g-3 flex-grow-1 overflow-hidden" style={{ minHeight: 0 }}>
+      <div className="row g-3 flex-grow-1 overflow-hidden position-relative" style={{ minHeight: 0, zIndex: 10 }}>
 
         {/* Left Column (Calling Control Center) */}
         <div className="col-lg-6 d-flex flex-column h-100">
-          <div className="w-100 h-100 rounded-4 p-4 d-flex flex-column justify-content-between text-center shadow-lg antrian-glass" style={{
-            background: 'rgba(255, 255, 255, 0.05)',
-            backdropFilter: 'blur(16px)',
-            WebkitBackdropFilter: 'blur(16px)',
-            border: '1px solid rgba(255, 255, 255, 0.15)',
-            boxShadow: '0 12px 40px rgba(0, 0, 0, 0.4)'
+          <div className="w-100 h-100 rounded-4 p-4 d-flex flex-column justify-content-between text-center" style={{
+            background: '#ffffff',
+            border: '1.5px solid rgba(14, 116, 144, 0.18)',
+            boxShadow: '0 14px 36px rgba(6, 30, 43, 0.08)'
           }}>
             {/* Header Service Info */}
-            <div className="d-flex justify-content-between align-items-center border-bottom border-white border-opacity-15 pb-2.5">
+            <div className="d-flex justify-content-between align-items-center pb-2.5" style={{ borderBottom: '1px solid rgba(14, 116, 144, 0.14)' }}>
               <div className="text-start">
-                <h5 className="fw-bold m-0 text-white" style={{ fontSize: '1.2rem', letterSpacing: '-0.01em' }}>
+                <h5 className="fw-extrabold m-0 font-hero" style={{ fontSize: '1.15rem', letterSpacing: '-0.01em', color: '#061E2B' }}>
                   {selectedLayanan === 'semua' || !selectedLayanan
                     ? 'Akses Semua Layanan Antrian'
                     : pelayananList.find(p => p.id === selectedLayanan)?.nama}
                 </h5>
-                <small className="fw-semibold" style={{ color: '#38bdf8' }}>Aktif di: {selectedLoket}</small>
+                <small className="fw-bold font-mono" style={{ color: '#0E7490' }}>Aktif di: {selectedLoket}</small>
               </div>
-              <span className="badge rounded-pill py-1.5 px-3 fs-7 shadow-sm fw-bold" style={{ background: 'rgba(52, 211, 153, 0.18)', border: '1px solid rgba(52, 211, 153, 0.4)', color: '#34d399' }}>
+              <span className="badge rounded-pill py-1.5 px-3 fw-bold font-mono" style={{ background: '#ecfdf5', border: '1px solid #a7f3d0', color: '#059669', fontSize: '0.72rem' }}>
                 <i className="bi bi-check-circle-fill me-1"></i> Tersinkronisasi
               </span>
             </div>
 
-            {/* Radiant Called Number Display (Harmonized with Display screen) */}
+            {/* Radiant Called Number Display (Ocean Blue Centerpiece Card) */}
             <div className="my-auto py-2">
-              <span className="small text-uppercase fw-bold tracking-wider" style={{ color: 'rgba(255, 255, 255, 0.65)', fontSize: '0.95rem', letterSpacing: '2px' }}>
-                Nomor Antrian Dipanggil
-              </span>
+              <div
+                className="rounded-4 p-3 p-md-4 position-relative overflow-hidden mx-auto"
+                style={{
+                  background: 'linear-gradient(135deg, #0E7490 0%, #095972 52%, #061E2B 100%)',
+                  boxShadow: '0 16px 36px rgba(14, 116, 144, 0.28)',
+                  color: '#ffffff'
+                }}
+              >
+                <div
+                  aria-hidden="true"
+                  style={{
+                    position: 'absolute',
+                    right: '-8px',
+                    bottom: '-8px',
+                    width: '140px',
+                    height: '140px',
+                    opacity: 0.13,
+                    pointerEvents: 'none',
+                    backgroundImage: "url('/images/gandrungmangu-semringah-silhouette.webp')",
+                    backgroundRepeat: 'no-repeat',
+                    backgroundPosition: 'right bottom',
+                    backgroundSize: 'contain'
+                  }}
+                />
+                <span className="badge rounded-pill px-3 py-1 font-mono fw-bold text-uppercase" style={{ background: '#ffffff', color: '#0E7490', fontSize: '0.72rem', letterSpacing: '0.12em' }}>
+                  Nomor Antrian Dipanggil
+                </span>
 
-              <h1 className="fw-black my-2" style={{
-                fontSize: '7.5rem',
-                lineHeight: 0.9,
-                fontWeight: 900,
-                color: currentQueue ? '#fbbf24' : 'rgba(255, 255, 255, 0.25)',
-                textShadow: currentQueue ? '0 0 40px rgba(251, 191, 36, 0.45), 0 4px 15px rgba(0, 0, 0, 0.9)' : 'none',
-                letterSpacing: '-2px'
-              }}>
-                {currentQueue ? currentQueue.nomor_lengkap : '---'}
-              </h1>
+                <AnimatePresence mode="wait">
+                  <motion.h1
+                    key={currentQueue ? `${currentQueue.id}-${currentQueue.panggil_ulang}` : 'none'}
+                    initial={{ opacity: 0, scale: 0.85, y: 10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 1.05, y: -8 }}
+                    transition={{ type: 'spring', stiffness: 300, damping: 22 }}
+                    className="fw-black my-2 font-hero"
+                    style={{
+                      fontSize: 'clamp(4.4rem, 6.2vw, 6.8rem)',
+                      lineHeight: 0.92,
+                      fontWeight: 900,
+                      color: currentQueue ? '#ffffff' : 'rgba(255, 255, 255, 0.35)',
+                      textShadow: currentQueue ? '0 0 32px rgba(186, 230, 253, 0.5), 0 4px 14px rgba(6, 30, 43, 0.45)' : 'none',
+                      letterSpacing: '-0.03em'
+                    }}
+                  >
+                    {currentQueue ? currentQueue.nomor_lengkap : '---'}
+                  </motion.h1>
+                </AnimatePresence>
 
-              <p className="text-white-50 fw-medium mb-2 small">
-                {currentQueue ? `Diulang: ${currentQueue.panggil_ulang}x` : 'Tidak ada antrian aktif saat ini.'}
-              </p>
+                <p className="fw-medium mb-0 small" style={{ color: '#bae6fd' }}>
+                  {currentQueue ? `Diulang: ${currentQueue.panggil_ulang}x` : 'Tidak ada antrian aktif saat ini.'}
+                </p>
+              </div>
 
               {currentQueue && currentQueue.warga_nama && (
-                <div className="p-3 rounded-4 text-start d-inline-block shadow-lg antrian-glass" style={{ background: 'rgba(15, 23, 42, 0.75)', border: '1px solid rgba(255, 255, 255, 0.18)', backdropFilter: 'blur(12px)', minWidth: '300px' }}>
-                  <div className="fw-bold border-bottom border-white border-opacity-15 pb-1.5 mb-1.5 small d-flex justify-content-between align-items-center" style={{ color: '#38bdf8' }}>
+                <div className="p-3 rounded-4 text-start mt-3 shadow-sm" style={{ background: '#f8fbfd', border: '1.5px solid rgba(14, 116, 144, 0.2)' }}>
+                  <div className="fw-bold pb-1.5 mb-1.5 small d-flex justify-content-between align-items-center font-hero" style={{ color: '#0E7490', borderBottom: '1px solid rgba(14, 116, 144, 0.14)' }}>
                     <span><i className="bi bi-person-fill me-1"></i> Data Warga</span>
-                    {currentQueue.tipe === 'online' && <span className="badge rounded-pill small" style={{ background: 'rgba(251, 191, 36, 0.2)', border: '1px solid rgba(251, 191, 36, 0.5)', color: '#fbbf24' }}>ONLINE</span>}
+                    {currentQueue.tipe === 'online' && <span className="badge rounded-pill small" style={{ background: '#0E7490', color: '#ffffff' }}>ONLINE</span>}
                   </div>
-                  <div className="text-white small">Nama: <strong className="text-white">{currentQueue.warga_nama}</strong></div>
-                  <div className="text-white-50 small">Alamat: <span>{currentQueue.warga_alamat}</span> | HP: <span>{currentQueue.warga_hp}</span></div>
+                  <div className="small" style={{ color: '#061E2B' }}>Nama: <strong>{currentQueue.warga_nama}</strong></div>
+                  <div className="small" style={{ color: '#475569' }}>Alamat: <span>{currentQueue.warga_alamat}</span> | HP: <strong style={{ color: '#0E7490' }}>{currentQueue.warga_hp}</strong></div>
                   <div className="d-flex gap-2 mt-2">
                     {currentQueue.warga_hp && currentQueue.warga_hp.trim() !== '' && currentQueue.warga_hp !== '-' && (
                       <button
                         onClick={() => handleSendWaEvaluasi(currentQueue)}
-                        className={`btn btn-sm flex-fill fw-bold py-1.5 px-3 rounded-pill d-inline-flex align-items-center justify-content-center gap-1.5 shadow-sm ${currentQueue.wa_evaluasi_sent ? 'border' : ''}`}
+                        className="btn btn-sm flex-fill fw-bold py-1.5 px-3 rounded-pill d-inline-flex align-items-center justify-content-center gap-1.5 shadow-sm"
                         style={{
                           fontSize: '0.78rem',
-                          background: currentQueue.wa_evaluasi_sent ? '#0d6838' : '#25D366',
-                          borderColor: currentQueue.wa_evaluasi_sent ? '#198754' : '#22bf5b',
+                          background: currentQueue.wa_evaluasi_sent ? '#059669' : '#25D366',
+                          border: 'none',
                           color: '#ffffff'
                         }}
                         title={currentQueue.wa_evaluasi_sent ? "Sudah terkirim. Klik jika ingin kirim ulang." : "Kirim WA Evaluasi"}
                       >
                         {currentQueue.wa_evaluasi_sent ? (
                           <>
-                            <i className="bi bi-check-circle-fill" style={{ color: '#4ddb86' }}></i>
+                            <i className="bi bi-check-circle-fill"></i>
                             <span>Terkirim</span>
                             <i className="bi bi-whatsapp opacity-75 ms-1" style={{ fontSize: '10px' }}></i>
                           </>
@@ -931,7 +986,7 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                       <button
                         onClick={() => setSelectedBerkasModal(currentQueue)}
                         className="btn btn-sm flex-fill fw-bold py-1.5 rounded-pill"
-                        style={{ background: 'rgba(56, 189, 248, 0.18)', border: '1px solid rgba(56, 189, 248, 0.4)', color: '#38bdf8' }}
+                        style={{ background: '#ebf5f8', border: '1px solid rgba(14, 116, 144, 0.3)', color: '#0E7490' }}
                       >
                         <i className="bi bi-file-earmark-medical me-1"></i> Berkas
                       </button>
@@ -946,24 +1001,24 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
               {isMultiService ? (
                 <>
                   <div className="col-4">
-                    <button onClick={panggilBerikutnyaA} className="btn w-100 py-2.5 fw-bold text-white shadow-sm rounded-3" style={{ background: 'linear-gradient(135deg, #0284c7, #0369a1)', border: '1px solid rgba(56, 189, 248, 0.4)', fontSize: '0.875rem' }}>
-                      <i className="bi bi-chevron-double-right me-1"></i> Next Legalisasi (A)
+                    <button onClick={panggilBerikutnyaA} className="btn w-100 py-2.5 fw-bold text-white shadow-sm rounded-3 font-hero" style={{ background: 'linear-gradient(135deg, #0E7490, #0891b2)', border: 'none', fontSize: '0.84rem' }}>
+                      <i className="bi bi-chevron-double-right me-1"></i> Next (A)
                     </button>
                   </div>
                   <div className="col-4">
-                    <button onClick={panggilBerikutnyaB} className="btn w-100 py-2.5 fw-bold text-white shadow-sm rounded-3" style={{ background: 'linear-gradient(135deg, #059669, #047857)', border: '1px solid rgba(52, 211, 153, 0.4)', fontSize: '0.875rem' }}>
-                      <i className="bi bi-chevron-double-right me-1"></i> Next Kependudukan (B)
+                    <button onClick={panggilBerikutnyaB} className="btn w-100 py-2.5 fw-bold text-white shadow-sm rounded-3 font-hero" style={{ background: 'linear-gradient(135deg, #0369a1, #0284c7)', border: 'none', fontSize: '0.84rem' }}>
+                      <i className="bi bi-chevron-double-right me-1"></i> Next (B)
                     </button>
                   </div>
                   <div className="col-4">
-                    <button onClick={panggilBerikutnyaC} className="btn w-100 py-2.5 fw-bold text-white shadow-sm rounded-3" style={{ background: 'linear-gradient(135deg, #d97706, #b45309)', border: '1px solid rgba(251, 191, 36, 0.4)', fontSize: '0.875rem' }}>
-                      <i className="bi bi-chevron-double-right me-1"></i> Next E-KTP (C)
+                    <button onClick={panggilBerikutnyaC} className="btn w-100 py-2.5 fw-bold text-white shadow-sm rounded-3 font-hero" style={{ background: 'linear-gradient(135deg, #061E2B, #0f3a4f)', border: 'none', fontSize: '0.84rem' }}>
+                      <i className="bi bi-chevron-double-right me-1"></i> Next (C)
                     </button>
                   </div>
                 </>
               ) : (
                 <div className="col-12">
-                  <button onClick={panggilBerikutnya} className="btn w-100 py-3 fw-bold text-white shadow-lg rounded-pill" style={{ background: 'linear-gradient(135deg, #0284c7, #2563eb)', border: '1px solid rgba(56, 189, 248, 0.4)', fontSize: '1.15rem' }}>
+                  <button onClick={panggilBerikutnya} className="btn w-100 py-3 fw-bold text-white shadow rounded-pill font-hero" style={{ background: 'linear-gradient(135deg, #0E7490, #061E2B)', border: 'none', fontSize: '1.08rem' }}>
                     <i className="bi bi-chevron-double-right me-1.5"></i> Panggil Antrian Berikutnya
                   </button>
                 </div>
@@ -972,17 +1027,17 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
               {currentQueue && (
                 <>
                   <div className="col-4">
-                    <button onClick={panggilUlang} className="btn w-100 py-2.5 fw-bold rounded-pill shadow-sm" style={{ background: 'linear-gradient(135deg, #fbbf24, #f59e0b)', color: '#0f172a', border: '1px solid #fef08a' }}>
+                    <button onClick={panggilUlang} className="btn w-100 py-2.5 fw-bold rounded-pill shadow-sm font-hero" style={{ background: '#ebf5f8', color: '#0E7490', border: '1.5px solid rgba(14, 116, 144, 0.35)' }}>
                       <i className="bi bi-volume-up-fill me-1"></i> Ulang
                     </button>
                   </div>
                   <div className="col-4">
-                    <button onClick={lewatkan} className="btn w-100 py-2.5 fw-bold text-white rounded-pill shadow-sm" style={{ backdropFilter: 'blur(8px)', background: 'rgba(255, 255, 255, 0.08)', border: '1px solid rgba(255, 255, 255, 0.25)' }}>
+                    <button onClick={lewatkan} className="btn w-100 py-2.5 fw-bold rounded-pill shadow-sm font-hero" style={{ background: '#f1f5f9', color: '#475569', border: '1px solid #cbd5e1' }}>
                       <i className="bi bi-x-circle me-1"></i> Lewat
                     </button>
                   </div>
                   <div className="col-4">
-                    <button onClick={selesaikan} className="btn w-100 py-2.5 fw-bold text-white rounded-pill shadow-sm" style={{ background: 'linear-gradient(135deg, #10b981, #059669)', border: '1px solid rgba(52, 211, 153, 0.5)' }}>
+                    <button onClick={selesaikan} className="btn w-100 py-2.5 fw-bold text-white rounded-pill shadow-sm font-hero" style={{ background: 'linear-gradient(135deg, #059669, #10b981)', border: 'none' }}>
                       <i className="bi bi-check-circle-fill me-1"></i> Selesai
                     </button>
                   </div>
@@ -994,106 +1049,92 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
 
         {/* Right Column (Queue List & Stats) */}
         <div className="col-lg-6 d-flex flex-column h-100">
-          <div className="w-100 h-100 rounded-4 p-3.5 d-flex flex-column justify-content-start shadow-lg antrian-glass" style={{
-            background: 'rgba(255, 255, 255, 0.05)',
-            backdropFilter: 'blur(16px)',
-            WebkitBackdropFilter: 'blur(16px)',
-            border: '1px solid rgba(255, 255, 255, 0.15)',
-            boxShadow: '0 12px 40px rgba(0, 0, 0, 0.4)'
+          <div className="w-100 h-100 rounded-4 p-3.5 d-flex flex-column justify-content-start" style={{
+            background: '#ffffff',
+            border: '1.5px solid rgba(14, 116, 144, 0.18)',
+            boxShadow: '0 14px 36px rgba(6, 30, 43, 0.08)'
           }}>
             {/* Horizontal Stats & Service Filter Row */}
-            <div className="d-flex align-items-center justify-content-between gap-1.5 mb-2.5 pb-2 border-bottom border-white border-opacity-15">
-              <button
-                onClick={() => setActiveTab('semua')}
-                className={`px-2 py-1.5 rounded-3 text-center flex-fill btn border-0 transition ${activeTab === 'semua' ? 'shadow-sm' : 'opacity-75'}`}
-                style={{ background: activeTab === 'semua' ? 'rgba(56, 189, 248, 0.25)' : 'rgba(255, 255, 255, 0.05)', border: activeTab === 'semua' ? '1px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.1)' }}
-              >
-                <span className="small fw-semibold d-block text-white-50" style={{ fontSize: '0.72rem' }}>Semua</span>
-                <span className="fs-5 fw-bold" style={{ color: '#38bdf8' }}>{stats.waiting}</span>
-              </button>
+            <div className="d-flex align-items-center justify-content-between gap-1.5 mb-2.5 pb-2.5" style={{ borderBottom: '1px solid rgba(14, 116, 144, 0.14)' }}>
+              {[
+                { key: 'semua', label: 'Semua', count: stats.waiting },
+                { key: 'pelayanan-A', label: 'Legalisasi (A)', count: stats.waitingA },
+                { key: 'pelayanan-B', label: 'Kependudukan (B)', count: stats.waitingB },
+                { key: 'pelayanan-C', label: 'E-KTP (C)', count: stats.waitingC },
+              ].map((tab) => {
+                const isActive = activeTab === tab.key;
+                return (
+                  <button
+                    key={tab.key}
+                    onClick={() => setActiveTab(tab.key)}
+                    className="px-2 py-1.5 rounded-3 text-center flex-fill btn transition font-hero"
+                    style={{
+                      background: isActive ? 'linear-gradient(135deg, #0E7490, #061E2B)' : '#f8fbfd',
+                      border: isActive ? '1px solid #0E7490' : '1px solid rgba(14, 116, 144, 0.16)',
+                      color: isActive ? '#ffffff' : '#061E2B'
+                    }}
+                  >
+                    <span className="small fw-semibold d-block" style={{ fontSize: '0.7rem', opacity: isActive ? 0.9 : 0.7 }}>{tab.label}</span>
+                    <span className="fs-5 fw-black font-mono">{tab.count}</span>
+                  </button>
+                );
+              })}
 
-              <button
-                onClick={() => setActiveTab('pelayanan-A')}
-                className={`px-2 py-1.5 rounded-3 text-center flex-fill btn border-0 transition ${activeTab === 'pelayanan-A' ? 'shadow-sm' : 'opacity-75'}`}
-                style={{ background: activeTab === 'pelayanan-A' ? 'rgba(56, 189, 248, 0.25)' : 'rgba(255, 255, 255, 0.05)', border: activeTab === 'pelayanan-A' ? '1px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.1)' }}
-              >
-                <span className="small fw-semibold d-block text-white-50" style={{ fontSize: '0.72rem' }}>Legalisasi (A)</span>
-                <span className="fs-5 fw-bold text-white">{stats.waitingA}</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab('pelayanan-B')}
-                className={`px-2 py-1.5 rounded-3 text-center flex-fill btn border-0 transition ${activeTab === 'pelayanan-B' ? 'shadow-sm' : 'opacity-75'}`}
-                style={{ background: activeTab === 'pelayanan-B' ? 'rgba(52, 211, 153, 0.25)' : 'rgba(255, 255, 255, 0.05)', border: activeTab === 'pelayanan-B' ? '1px solid #34d399' : '1px solid rgba(255, 255, 255, 0.1)' }}
-              >
-                <span className="small fw-semibold d-block text-white-50" style={{ fontSize: '0.72rem' }}>Kependudukan (B)</span>
-                <span className="fs-5 fw-bold" style={{ color: '#34d399' }}>{stats.waitingB}</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab('pelayanan-C')}
-                className={`px-2 py-1.5 rounded-3 text-center flex-fill btn border-0 transition ${activeTab === 'pelayanan-C' ? 'shadow-sm' : 'opacity-75'}`}
-                style={{ background: activeTab === 'pelayanan-C' ? 'rgba(251, 191, 36, 0.25)' : 'rgba(255, 255, 255, 0.05)', border: activeTab === 'pelayanan-C' ? '1px solid #fbbf24' : '1px solid rgba(255, 255, 255, 0.1)' }}
-              >
-                <span className="small fw-semibold d-block text-white-50" style={{ fontSize: '0.72rem' }}>E-KTP (C)</span>
-                <span className="fs-5 fw-bold" style={{ color: '#fbbf24' }}>{stats.waitingC}</span>
-              </button>
-
-              <div className="px-2 py-1.5 rounded-3 text-center flex-fill" style={{ background: 'rgba(129, 140, 248, 0.15)', border: '1px solid rgba(129, 140, 248, 0.35)' }}>
-                <span className="small fw-semibold d-block text-white-50" style={{ fontSize: '0.72rem' }}>Selesai</span>
-                <span className="fs-5 fw-bold" style={{ color: '#818cf8' }}>{stats.served}</span>
+              <div className="px-2 py-1.5 rounded-3 text-center flex-fill" style={{ background: '#ecfdf5', border: '1px solid #a7f3d0', color: '#059669' }}>
+                <span className="small fw-semibold d-block" style={{ fontSize: '0.7rem' }}>Selesai</span>
+                <span className="fs-5 fw-black font-mono">{stats.served}</span>
               </div>
             </div>
 
             {/* Waiting Queue List Container */}
             <div className="flex-grow-1 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 210px)' }}>
               <div className="table-responsive">
-                <table className="table table-dark table-hover align-middle mb-0" style={{ background: 'transparent' }}>
+                <table className="table table-hover align-middle mb-0">
                   <thead>
-                    <tr style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.15)' }}>
-                      <th className="text-white-50 small fw-bold">Nomor</th>
-                      <th className="text-white-50 small fw-bold">Layanan</th>
-                      <th className="text-white-50 small fw-bold">Warga</th>
-                      <th className="text-white-50 small fw-bold text-end">Aksi</th>
+                    <tr style={{ background: '#ebf5f8', borderBottom: '1.5px solid rgba(14, 116, 144, 0.2)' }}>
+                      <th className="small fw-bold font-hero" style={{ color: '#061E2B' }}>Nomor</th>
+                      <th className="small fw-bold font-hero" style={{ color: '#061E2B' }}>Layanan</th>
+                      <th className="small fw-bold font-hero" style={{ color: '#061E2B' }}>Warga</th>
+                      <th className="small fw-bold text-end font-hero" style={{ color: '#061E2B' }}>Aksi</th>
                     </tr>
                   </thead>
                   <tbody>
                     {getDisplayQueueList().map(q => (
-                      <tr key={q.id} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.06)' }}>
+                      <tr key={q.id} style={{ borderBottom: '1px solid #e2e8f0' }}>
                         <td>
                           <span
-                            className="badge fs-6 fw-bold shadow-sm me-1.5"
+                            className="badge fs-6 fw-bold font-mono me-1.5"
                             style={{
-                              background: q.kode === 'A' ? 'rgba(56, 189, 248, 0.2)' : q.kode === 'B' ? 'rgba(52, 211, 153, 0.2)' : 'rgba(251, 191, 36, 0.2)',
-                              border: q.kode === 'A' ? '1px solid #38bdf8' : q.kode === 'B' ? '1px solid #34d399' : '1px solid #fbbf24',
-                              color: q.kode === 'A' ? '#38bdf8' : q.kode === 'B' ? '#34d399' : '#fbbf24'
+                              background: '#ebf5f8',
+                              border: '1px solid rgba(14, 116, 144, 0.3)',
+                              color: '#0E7490'
                             }}
                           >
                             {q.nomor_lengkap}
                           </span>
-                          {q.tipe === 'online' && <span className="badge rounded-pill" style={{ background: 'rgba(251, 191, 36, 0.2)', color: '#fbbf24', fontSize: '0.65rem' }}>ONLINE</span>}
+                          {q.tipe === 'online' && <span className="badge rounded-pill" style={{ background: '#061E2B', color: '#ffffff', fontSize: '0.65rem' }}>ONLINE</span>}
                         </td>
                         <td>
-                          <span className="badge rounded-pill small" style={{ background: 'rgba(255, 255, 255, 0.1)', color: '#ffffff' }}>
+                          <span className="badge rounded-pill small" style={{ background: '#f1f5f9', color: '#334155', border: '1px solid #cbd5e1' }}>
                             {q.layanan_nama || `Layanan ${q.kode}`}
                           </span>
                         </td>
                         <td>
                           {q.warga_nama ? (
                             <div>
-                              <strong className="text-white d-block small">{q.warga_nama}</strong>
-                              <span className="text-white-50 small" style={{ fontSize: '0.75rem' }}>{q.warga_alamat}</span>
+                              <strong className="d-block small" style={{ color: '#061E2B' }}>{q.warga_nama}</strong>
+                              <span className="small" style={{ fontSize: '0.75rem', color: '#64748b' }}>{q.warga_alamat}</span>
                             </div>
                           ) : (
-                            <span className="text-white-50 small">-</span>
+                            <span className="small text-muted">-</span>
                           )}
                         </td>
                         <td className="text-end">
                           <div className="d-inline-flex gap-1">
                             <button
                               onClick={() => layaniSekarang(q)}
-                              className="btn btn-sm fw-bold py-1 px-2.5 rounded-pill"
-                              style={{ background: 'rgba(56, 189, 248, 0.18)', border: '1px solid rgba(56, 189, 248, 0.4)', color: '#38bdf8', fontSize: '0.75rem' }}
+                              className="btn btn-sm fw-bold py-1 px-3 rounded-pill text-white font-hero"
+                              style={{ background: 'linear-gradient(135deg, #0E7490, #061E2B)', border: 'none', fontSize: '0.75rem' }}
                             >
                               Panggil
                             </button>
@@ -1101,7 +1142,7 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                               <button
                                 onClick={() => setSelectedBerkasModal(q)}
                                 className="btn btn-sm fw-bold py-1 px-2 rounded-pill"
-                                style={{ background: 'rgba(251, 191, 36, 0.2)', border: '1px solid rgba(251, 191, 36, 0.4)', color: '#fbbf24', fontSize: '0.75rem' }}
+                                style={{ background: '#ebf5f8', border: '1px solid rgba(14, 116, 144, 0.3)', color: '#0E7490', fontSize: '0.75rem' }}
                                 title="Lihat Berkas"
                               >
                                 <i className="bi bi-file-earmark-image"></i>
@@ -1113,7 +1154,7 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                     ))}
                     {getDisplayQueueList().length === 0 && (
                       <tr>
-                        <td colSpan="4" className="text-center text-white-50 py-4 small">
+                        <td colSpan="4" className="text-center py-5 small" style={{ color: '#64748b' }}>
                           <i className="bi bi-inbox me-1"></i> Tidak ada antrian yang menunggu saat ini.
                         </td>
                       </tr>
@@ -1127,61 +1168,61 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
 
       </div>
 
-      {/* Modal Switch Loket Tanpa Logout */}
+      {/* Modal Switch Loket Tanpa Logout (Clean Blue & White) */}
       {showSwitchLoketModal && (
-        <div className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center px-3" style={{ background: 'rgba(10, 15, 29, 0.85)', backdropFilter: 'blur(8px)', zIndex: 2000 }}>
-          <div className="card text-white p-4 border-0 w-100 shadow-lg antrian-glass" style={{ maxWidth: '480px', background: 'rgba(15, 23, 42, 0.96)', border: '1px solid rgba(255, 255, 255, 0.18)', borderRadius: '24px' }}>
-            <div className="d-flex justify-content-between align-items-center border-bottom border-white border-opacity-15 pb-3 mb-3">
-              <h5 className="fw-bold m-0 text-white d-flex align-items-center gap-2">
-                <i className="bi bi-arrow-repeat" style={{ color: '#fbbf24' }}></i> Ganti Loket / Layanan
+        <div className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center px-3" style={{ background: 'rgba(6, 30, 43, 0.65)', backdropFilter: 'blur(8px)', zIndex: 2000 }}>
+          <div className="card p-4 border-0 w-100 shadow-lg" style={{ maxWidth: '480px', background: '#ffffff', border: '1.5px solid rgba(14, 116, 144, 0.22)', borderRadius: '24px', color: '#061E2B' }}>
+            <div className="d-flex justify-content-between align-items-center pb-3 mb-3" style={{ borderBottom: '1px solid #e2e8f0' }}>
+              <h5 className="fw-extrabold m-0 font-hero d-flex align-items-center gap-2" style={{ color: '#061E2B' }}>
+                <i className="bi bi-arrow-repeat" style={{ color: '#0E7490' }}></i> Ganti Loket / Layanan
               </h5>
-              <button onClick={() => setShowSwitchLoketModal(false)} className="btn-close btn-close-white"></button>
+              <button onClick={() => setShowSwitchLoketModal(false)} className="btn-close"></button>
             </div>
 
             <div className="mb-3">
-              <label className="form-label text-white-50 small fw-bold">Pilih Loket Tugas Baru</label>
+              <label className="form-label small fw-bold font-hero" style={{ color: '#061E2B' }}>Pilih Loket Tugas Baru</label>
               <select
-                className="form-select text-white fw-medium"
+                className="form-select fw-medium"
                 value={tempLoket}
                 onChange={(e) => setTempLoket(e.target.value)}
-                style={{ background: 'rgba(10, 15, 29, 0.85)', border: '1px solid rgba(255, 255, 255, 0.2)', borderRadius: '12px' }}
+                style={{ background: '#f8fbfd', border: '1.5px solid rgba(14, 116, 144, 0.22)', borderRadius: '12px', color: '#061E2B' }}
               >
                 {loketList.map(l => (
-                  <option key={l} value={l} className="bg-dark text-white">{l}</option>
+                  <option key={l} value={l}>{l}</option>
                 ))}
               </select>
             </div>
 
             <div className="mb-3">
-              <label className="form-label text-white-50 small fw-bold">Pilih Layanan</label>
+              <label className="form-label small fw-bold font-hero" style={{ color: '#061E2B' }}>Pilih Layanan</label>
               <select
-                className="form-select text-white fw-medium"
+                className="form-select fw-medium"
                 value={tempLayanan}
                 onChange={(e) => setTempLayanan(e.target.value)}
-                style={{ background: 'rgba(10, 15, 29, 0.85)', border: '1px solid rgba(255, 255, 255, 0.2)', borderRadius: '12px' }}
+                style={{ background: '#f8fbfd', border: '1.5px solid rgba(14, 116, 144, 0.22)', borderRadius: '12px', color: '#061E2B' }}
               >
-                <option value="semua" className="bg-dark text-white">Semua Layanan (Multi-Layanan)</option>
+                <option value="semua">Semua Layanan (Multi-Layanan)</option>
                 {pelayananList.map(p => (
-                  <option key={p.id} value={p.id} className="bg-dark text-white">{p.nama} ({p.kode})</option>
+                  <option key={p.id} value={p.id}>{p.nama} ({p.kode})</option>
                 ))}
               </select>
             </div>
 
             <div className="mb-4">
-              <label className="form-label text-white-50 small fw-bold">Pilih Nama Operator / Petugas Terdaftar</label>
+              <label className="form-label small fw-bold font-hero" style={{ color: '#061E2B' }}>Pilih Nama Operator / Petugas Terdaftar</label>
               <select
-                className="form-select text-white fw-medium"
+                className="form-select fw-medium"
                 value={tempOperator}
                 onChange={(e) => setTempOperator(e.target.value)}
-                style={{ background: 'rgba(10, 15, 29, 0.85)', border: '1px solid rgba(255, 255, 255, 0.2)', borderRadius: '12px' }}
+                style={{ background: '#f8fbfd', border: '1.5px solid rgba(14, 116, 144, 0.22)', borderRadius: '12px', color: '#061E2B' }}
               >
                 {operatorList.map(op => (
-                  <option key={op.id} value={op.nama} className="bg-dark text-white">
+                  <option key={op.id} value={op.nama}>
                     {op.nama} ({op.username})
                   </option>
                 ))}
                 {operatorList.length === 0 && (
-                  <option value={operatorNama || 'Operator Loket'} className="bg-dark text-white">
+                  <option value={operatorNama || 'Operator Loket'}>
                     {operatorNama || 'Operator Loket'}
                   </option>
                 )}
@@ -1189,10 +1230,10 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
             </div>
 
             <div className="d-flex gap-2">
-              <button onClick={() => setShowSwitchLoketModal(false)} className="btn w-50 fw-bold rounded-pill text-white" style={{ background: 'rgba(255, 255, 255, 0.08)', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
+              <button onClick={() => setShowSwitchLoketModal(false)} className="btn w-50 fw-bold rounded-pill font-hero" style={{ background: '#f1f5f9', color: '#475569', border: '1px solid #cbd5e1' }}>
                 Batal
               </button>
-              <button onClick={handleApplySwitchLoket} className="btn w-50 fw-bold rounded-pill shadow" style={{ background: 'linear-gradient(135deg, #fbbf24, #f59e0b)', color: '#0f172a', border: '1px solid #fef08a' }}>
+              <button onClick={handleApplySwitchLoket} className="btn w-50 fw-bold rounded-pill shadow text-white font-hero" style={{ background: 'linear-gradient(135deg, #0E7490, #061E2B)', border: 'none' }}>
                 Simpan Loket Baru
               </button>
             </div>
@@ -1200,69 +1241,67 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
         </div>
       )}
 
-      {/* Modal View Berkas KK / KTP (Dark Frosted Glass) */}
+      {/* Modal View Berkas KK / KTP */}
       {selectedBerkasModal && (
-        <div className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center px-3" style={{ background: 'rgba(10, 15, 29, 0.85)', backdropFilter: 'blur(8px)', zIndex: 2000 }}>
-          <div className="card text-white p-4 border-0 w-100 shadow-lg antrian-glass" style={{ maxWidth: '800px', maxHeight: '90vh', overflowY: 'auto', background: 'rgba(15, 23, 42, 0.96)', border: '1px solid rgba(255, 255, 255, 0.18)', borderRadius: '24px' }}>
-            <div className="d-flex justify-content-between align-items-center border-bottom border-white border-opacity-15 pb-3 mb-3">
+        <div className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center px-3" style={{ background: 'rgba(6, 30, 43, 0.65)', backdropFilter: 'blur(8px)', zIndex: 2000 }}>
+          <div className="card p-4 border-0 w-100 shadow-lg" style={{ maxWidth: '800px', maxHeight: '90vh', overflowY: 'auto', background: '#ffffff', border: '1.5px solid rgba(14, 116, 144, 0.22)', borderRadius: '24px', color: '#061E2B' }}>
+            <div className="d-flex justify-content-between align-items-center pb-3 mb-3" style={{ borderBottom: '1px solid #e2e8f0' }}>
               <div>
-                <span className="badge rounded-pill mb-1 small" style={{ background: 'rgba(56, 189, 248, 0.2)', border: '1px solid #38bdf8', color: '#38bdf8' }}>
+                <span className="badge rounded-pill mb-1 small font-mono" style={{ background: '#ebf5f8', border: '1px solid rgba(14, 116, 144, 0.25)', color: '#0E7490' }}>
                   Pemeriksaan Berkas Antrian
                 </span>
-                <h4 className="fw-bold m-0 text-white" style={{ letterSpacing: '-0.01em' }}>
+                <h4 className="fw-extrabold m-0 font-hero" style={{ color: '#061E2B' }}>
                   {selectedBerkasModal.nomor_lengkap} - {selectedBerkasModal.warga_nama}
                 </h4>
-                <small className="text-white-50">NIK: {selectedBerkasModal.warga_nik || '-'} | KK: {selectedBerkasModal.warga_kk || '-'} | HP: {selectedBerkasModal.warga_hp || '-'}</small>
+                <small style={{ color: '#64748b' }}>NIK: {selectedBerkasModal.warga_nik || '-'} | KK: {selectedBerkasModal.warga_kk || '-'} | HP: {selectedBerkasModal.warga_hp || '-'}</small>
               </div>
-              <button onClick={() => setSelectedBerkasModal(null)} className="btn-close btn-close-white"></button>
+              <button onClick={() => setSelectedBerkasModal(null)} className="btn-close"></button>
             </div>
 
             <div className="row g-4">
-              {/* Berkas KK */}
-              <div className="col-md-6 border-end border-white border-opacity-15">
-                <h6 className="fw-bold text-white mb-2"><i className="bi bi-file-earmark-pdf text-danger me-1"></i> Berkas Kartu Keluarga (KK)</h6>
+              <div className="col-md-6" style={{ borderRight: '1px solid #e2e8f0' }}>
+                <h6 className="fw-bold mb-2 font-hero" style={{ color: '#061E2B' }}><i className="bi bi-file-earmark-pdf text-danger me-1"></i> Berkas Kartu Keluarga (KK)</h6>
                 {selectedBerkasModal.berkas_kk ? (
                   <div>
                     {selectedBerkasModal.berkas_kk.startsWith('data:image') ? (
-                      <img src={selectedBerkasModal.berkas_kk} alt="Berkas KK" className="img-fluid rounded border shadow-sm w-100" style={{ maxHeight: '350px', objectFit: 'contain', background: '#0a0f1d' }} />
+                      <img src={selectedBerkasModal.berkas_kk} alt="Berkas KK" className="img-fluid rounded border shadow-sm w-100" style={{ maxHeight: '350px', objectFit: 'contain', background: '#f8fbfd' }} />
                     ) : (
-                      <a href={selectedBerkasModal.berkas_kk} target="_blank" rel="noreferrer" className="btn btn-outline-info btn-sm w-100 py-3 rounded-3">
+                      <a href={selectedBerkasModal.berkas_kk} target="_blank" rel="noreferrer" className="btn btn-sm w-100 py-3 rounded-3 fw-bold" style={{ background: '#ebf5f8', color: '#0E7490', border: '1px solid rgba(14, 116, 144, 0.25)' }}>
                         <i className="bi bi-download me-1"></i> Buka Dokumen KK ({selectedBerkasModal.berkas_kk_nama || 'File'})
                       </a>
                     )}
                   </div>
                 ) : (
-                  <p className="text-white-50 small">Tidak ada lampiran berkas KK.</p>
+                  <p className="small text-muted">Tidak ada lampiran berkas KK.</p>
                 )}
               </div>
 
-              {/* Berkas KTP */}
               <div className="col-md-6">
-                <h6 className="fw-bold text-white mb-2"><i className="bi bi-person-badge text-info me-1"></i> Berkas KTP Pemohon</h6>
+                <h6 className="fw-bold mb-2 font-hero" style={{ color: '#061E2B' }}><i className="bi bi-person-badge me-1" style={{ color: '#0E7490' }}></i> Berkas KTP Pemohon</h6>
                 {selectedBerkasModal.berkas_ktp ? (
                   <div>
                     {selectedBerkasModal.berkas_ktp.startsWith('data:image') ? (
-                      <img src={selectedBerkasModal.berkas_ktp} alt="Berkas KTP" className="img-fluid rounded border shadow-sm w-100" style={{ maxHeight: '350px', objectFit: 'contain', background: '#0a0f1d' }} />
+                      <img src={selectedBerkasModal.berkas_ktp} alt="Berkas KTP" className="img-fluid rounded border shadow-sm w-100" style={{ maxHeight: '350px', objectFit: 'contain', background: '#f8fbfd' }} />
                     ) : (
-                      <a href={selectedBerkasModal.berkas_ktp} target="_blank" rel="noreferrer" className="btn btn-outline-info btn-sm w-100 py-3 rounded-3">
+                      <a href={selectedBerkasModal.berkas_ktp} target="_blank" rel="noreferrer" className="btn btn-sm w-100 py-3 rounded-3 fw-bold" style={{ background: '#ebf5f8', color: '#0E7490', border: '1px solid rgba(14, 116, 144, 0.25)' }}>
                         <i className="bi bi-download me-1"></i> Buka Dokumen KTP ({selectedBerkasModal.berkas_ktp_nama || 'File'})
                       </a>
                     )}
                   </div>
                 ) : (
-                  <p className="text-white-50 small">Tidak ada lampiran berkas KTP.</p>
+                  <p className="small text-muted">Tidak ada lampiran berkas KTP.</p>
                 )}
               </div>
             </div>
 
             {selectedBerkasModal.catatan && (
-              <div className="alert mt-3 mb-0 small text-white" style={{ background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.15)' }}>
+              <div className="alert mt-3 mb-0 small" style={{ background: '#f8fbfd', border: '1px solid rgba(14, 116, 144, 0.2)', color: '#061E2B' }}>
                 <strong>Catatan Pemohon:</strong> {selectedBerkasModal.catatan}
               </div>
             )}
 
-            <div className="text-end mt-4 pt-3 border-top border-white border-opacity-15">
-              <button onClick={() => setSelectedBerkasModal(null)} className="btn px-4 fw-bold rounded-pill text-white" style={{ background: 'rgba(255, 255, 255, 0.1)', border: '1px solid rgba(255, 255, 255, 0.2)' }}>
+            <div className="text-end mt-4 pt-3" style={{ borderTop: '1px solid #e2e8f0' }}>
+              <button onClick={() => setSelectedBerkasModal(null)} className="btn px-4 fw-bold rounded-pill text-white font-hero" style={{ background: 'linear-gradient(135deg, #0E7490, #061E2B)', border: 'none' }}>
                 Tutup Pemeriksaan
               </button>
             </div>
@@ -1272,60 +1311,53 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
 
       {/* Modal Kirim WA Evaluasi Pelayanan Setelah Selesai */}
       {showWaModal && completedForWa && (
-        <div className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center px-3" style={{ background: 'rgba(10, 15, 29, 0.85)', backdropFilter: 'blur(10px)', zIndex: 2100 }}>
-          <div className="card text-white p-4 border-0 w-100 shadow-2xl antrian-glass" style={{ maxWidth: '540px', background: 'rgba(15, 23, 42, 0.96)', border: '1px solid rgba(255, 255, 255, 0.18)', borderRadius: '24px' }}>
-            <div className="d-flex justify-content-between align-items-center border-bottom border-white border-opacity-15 pb-3 mb-3">
+        <div className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center px-3" style={{ background: 'rgba(6, 30, 43, 0.68)', backdropFilter: 'blur(10px)', zIndex: 2100 }}>
+          <div className="card p-4 border-0 w-100 shadow-2xl" style={{ maxWidth: '540px', background: '#ffffff', border: '1.5px solid rgba(14, 116, 144, 0.22)', borderRadius: '24px', color: '#061E2B' }}>
+            <div className="d-flex justify-content-between align-items-center pb-3 mb-3" style={{ borderBottom: '1px solid #e2e8f0' }}>
               <div className="d-flex align-items-center gap-2.5">
-                <div className="rounded-circle p-2 d-flex align-items-center justify-content-center shadow-sm" style={{ background: 'rgba(16, 185, 129, 0.2)', border: '1px solid rgba(16, 185, 129, 0.4)' }}>
+                <div className="rounded-circle p-2 d-flex align-items-center justify-content-center" style={{ background: '#ecfdf5', border: '1px solid #a7f3d0' }}>
                   <i className="bi bi-check2-circle text-success fs-4"></i>
                 </div>
                 <div>
-                  <h5 className="fw-bold m-0 text-white">Pelayanan Selesai Dilayani</h5>
-                  <small className="text-white-50">Kirim pesan WhatsApp evaluasi kepada warga</small>
+                  <h5 className="fw-extrabold m-0 font-hero" style={{ color: '#061E2B' }}>Pelayanan Selesai Dilayani</h5>
+                  <small style={{ color: '#64748b' }}>Kirim pesan WhatsApp evaluasi + link SKM kepada warga</small>
                 </div>
               </div>
-              <button onClick={() => setShowWaModal(false)} className="btn-close btn-close-white"></button>
+              <button onClick={() => setShowWaModal(false)} className="btn-close"></button>
             </div>
 
-            {/* Detail Antrian Warga */}
-            <div className="p-3 rounded-4 mb-3" style={{ background: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
-              <div className="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom border-white border-opacity-10">
-                <span className="badge px-3 py-1 rounded-pill fw-bold fs-6" style={{ background: 'rgba(251, 191, 36, 0.2)', border: '1px solid #fbbf24', color: '#fbbf24' }}>
+            <div className="p-3 rounded-4 mb-3" style={{ background: '#f8fbfd', border: '1px solid rgba(14, 116, 144, 0.18)' }}>
+              <div className="d-flex justify-content-between align-items-center mb-2 pb-2" style={{ borderBottom: '1px solid #e2e8f0' }}>
+                <span className="badge px-3 py-1 rounded-pill fw-bold fs-6 font-mono text-white" style={{ background: 'linear-gradient(135deg, #0E7490, #061E2B)' }}>
                   {completedForWa.nomor_lengkap}
                 </span>
-                <span className="small text-white-50 fw-semibold">
+                <span className="small fw-bold" style={{ color: '#0E7490' }}>
                   {completedForWa.pelayanan_nama || (pelayananList.find(p => p.id === completedForWa.pelayanan_id)?.nama || 'Pelayanan Publik')}
                 </span>
               </div>
               <div className="row g-1 text-start small">
-                <div className="col-4 text-white-50">Nama Warga</div>
-                <div className="col-8 fw-bold text-white">: {completedForWa.warga_nama || '-'}</div>
-                <div className="col-4 text-white-50">No. WhatsApp</div>
-                <div className="col-8 fw-bold text-info">: {completedForWa.warga_hp || '-'}</div>
-                <div className="col-4 text-white-50">Alamat</div>
-                <div className="col-8 text-white-50">: {completedForWa.warga_alamat || '-'}</div>
-                <div className="col-4 text-white-50">Operator</div>
-                <div className="col-8 text-white-50">: {completedForWa.operator_nama || getCurrentOperatorName()}</div>
+                <div className="col-4 text-muted">Nama Warga</div>
+                <div className="col-8 fw-bold" style={{ color: '#061E2B' }}>: {completedForWa.warga_nama || '-'}</div>
+                <div className="col-4 text-muted">No. WhatsApp</div>
+                <div className="col-8 fw-bold" style={{ color: '#0E7490' }}>: {completedForWa.warga_hp || '-'}</div>
+                <div className="col-4 text-muted">Alamat</div>
+                <div className="col-8 text-muted">: {completedForWa.warga_alamat || '-'}</div>
+                <div className="col-4 text-muted">Operator</div>
+                <div className="col-8 text-muted">: {completedForWa.operator_nama || getCurrentOperatorName()}</div>
               </div>
             </div>
 
-            {/* Tombol Kirim WA / Status Terkirim */}
             <div className="mb-3 text-center">
               {completedForWa.warga_hp && completedForWa.warga_hp.trim() !== '' && completedForWa.warga_hp !== '-' ? (
                 completedForWa.wa_evaluasi_sent ? (
                   <button
                     type="button"
                     onClick={() => handleSendWaEvaluasi(completedForWa)}
-                    className="btn w-100 py-3 fw-bold rounded-pill shadow-lg d-inline-flex align-items-center justify-content-center gap-2 border"
-                    style={{
-                      fontSize: '1rem',
-                      background: '#0d6838',
-                      borderColor: '#198754',
-                      color: '#ffffff'
-                    }}
+                    className="btn w-100 py-3 fw-bold rounded-pill shadow d-inline-flex align-items-center justify-content-center gap-2 font-hero"
+                    style={{ fontSize: '1rem', background: '#059669', border: 'none', color: '#ffffff' }}
                     title="Sudah terkirim. Klik jika ingin mengirim ulang."
                   >
-                    <i className="bi bi-check-circle-fill fs-5" style={{ color: '#4ddb86' }}></i>
+                    <i className="bi bi-check-circle-fill fs-5"></i>
                     <span>Status: Terkirim (Kirim Ulang)</span>
                     <i className="bi bi-whatsapp opacity-75 ms-1"></i>
                   </button>
@@ -1333,15 +1365,11 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
                   <button
                     type="button"
                     onClick={() => handleSendWaEvaluasi(completedForWa)}
-                    className="btn w-100 py-3 fw-bold text-white rounded-pill shadow-lg d-inline-flex align-items-center justify-content-center gap-2"
-                    style={{
-                      fontSize: '1rem',
-                      background: '#25D366',
-                      borderColor: '#22bf5b'
-                    }}
+                    className="btn w-100 py-3 fw-bold text-white rounded-pill shadow d-inline-flex align-items-center justify-content-center gap-2 font-hero"
+                    style={{ fontSize: '1rem', background: '#25D366', border: 'none' }}
                   >
                     <i className="bi bi-whatsapp fs-5"></i>
-                    <span>Kirim WA Evaluasi Pelayanan</span>
+                    <span>Kirim WA Evaluasi + Link SKM</span>
                   </button>
                 )
               ) : (
@@ -1351,14 +1379,14 @@ Petugas Pelayanan Kecamatan Gandrungmangu`;
               )}
             </div>
 
-            <div className="d-flex justify-content-end gap-2 pt-2 border-top border-white border-opacity-15">
+            <div className="d-flex justify-content-end gap-2 pt-2" style={{ borderTop: '1px solid #e2e8f0' }}>
               <button
                 type="button"
                 onClick={() => setShowWaModal(false)}
-                className="btn px-4 py-2 rounded-pill fw-semibold text-white"
-                style={{ background: 'rgba(255, 255, 255, 0.1)', border: '1px solid rgba(255, 255, 255, 0.2)' }}
+                className="btn px-4 py-2 rounded-pill fw-bold font-hero"
+                style={{ background: '#f1f5f9', color: '#475569', border: '1px solid #cbd5e1' }}
               >
-                Tutup & Lanjut
+                Tutup &amp; Lanjut
               </button>
             </div>
           </div>
