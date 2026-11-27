@@ -18,6 +18,7 @@ import {
   Star,
   Loader2,
   Sparkles,
+  RefreshCw,
 } from 'lucide-react';
 import { useUser, useFirestore } from '@/firebase';
 import { Button } from '@/components/ui/button';
@@ -141,7 +142,8 @@ export default function AdminLandingPage() {
   const navLinks = [
     { href: '/', label: 'Portal Warga' },
     { href: '/Antrian/', label: 'Sistem Pelayanan' },
-    { href: '/kunjungan-tamu/?channel=front_office', label: 'Kunjungan Tamu' },
+    { href: '/file-converter/', label: 'Konverter Berkas' },
+    { href: '/kunjungan-tamu/?channel=front_office', label: 'Register Kunjungan' },
     { href: '/agenda/', label: 'Agenda' },
   ];
 
@@ -551,15 +553,30 @@ export default function AdminLandingPage() {
                   </motion.button>
                 </div>
 
-                {/* Akses Sekunder: Portal Warga */}
-                <div className="mt-5">
+                {/* Akses Sekunder: Portal Warga & Konverter Berkas (Filee) */}
+                <div className="mt-5 w-full max-w-3xl flex flex-wrap items-center justify-center gap-3">
                   <Link
                     href="/"
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#041E17]/70 hover:bg-[#065F46] text-white border border-white/25 backdrop-blur-md font-hero font-bold text-[11px] uppercase tracking-[0.14em] transition-all duration-300"
+                    className="group inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-[#041E17]/75 hover:bg-[#065F46] text-white border border-white/25 hover:border-[#E5C882]/70 backdrop-blur-md font-hero font-bold text-[11px] uppercase tracking-[0.14em] transition-all duration-300 shadow-md"
                   >
                     <FileText className="h-3.5 w-3.5 text-[#E5C882]" />
                     <span>Portal Warga</span>
+                    <ArrowUpRight className="h-3.5 w-3.5 opacity-75 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                   </Link>
+
+                  <motion.div whileHover={{ y: -2, scale: 1.02 }} whileTap={{ scale: 0.97 }}>
+                    <Link
+                      href="/file-converter/"
+                      className="group inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-gradient-to-r from-[#064E3B]/90 to-[#041E17]/90 hover:from-[#C8A253] hover:to-[#9A742B] text-white hover:text-[#041E17] border border-[#C8A253]/55 hover:border-white backdrop-blur-md font-hero font-bold text-[11px] uppercase tracking-[0.14em] transition-all duration-300 shadow-[0_10px_25px_rgba(4,30,23,0.4)]"
+                    >
+                      <RefreshCw className="h-3.5 w-3.5 text-[#E5C882] group-hover:text-[#041E17] group-hover:rotate-180 transition-transform duration-500" />
+                      <span>Konverter Berkas</span>
+                      <span className="px-2 py-0.5 rounded-full bg-[#C8A253]/25 group-hover:bg-[#041E17]/15 text-[#E5C882] group-hover:text-[#041E17] font-mono text-[9px] font-extrabold tracking-widest">
+                        FILEE
+                      </span>
+                      <ArrowUpRight className="h-3.5 w-3.5 opacity-80 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                    </Link>
+                  </motion.div>
                 </div>
               </div>
             </div>

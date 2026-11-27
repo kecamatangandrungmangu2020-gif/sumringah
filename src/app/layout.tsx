@@ -118,6 +118,10 @@ export default function RootLayout({
     pathname === '/kunjungan-tamu' ||
     pathname === '/kunjungan-tamu/' ||
     pathname?.startsWith('/kunjungan-tamu/');
+  const isFileConverter =
+    pathname === '/file-converter' ||
+    pathname === '/file-converter/' ||
+    pathname?.startsWith('/file-converter/');
 
   const isPublicPage =
     pathname === '/' ||
@@ -132,7 +136,8 @@ export default function RootLayout({
     isInputPage ||
     isDesaPage ||
     isInformasiPage ||
-    isKunjunganTamu;
+    isKunjunganTamu ||
+    isFileConverter;
 
   return (
     <html lang="id" suppressHydrationWarning>
