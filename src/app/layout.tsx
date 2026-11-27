@@ -122,6 +122,14 @@ export default function RootLayout({
     pathname === '/file-converter' ||
     pathname === '/file-converter/' ||
     pathname?.startsWith('/file-converter/');
+  const isAgendaKecamatan =
+    pathname === '/agenda-kecamatan' ||
+    pathname === '/agenda-kecamatan/' ||
+    pathname?.startsWith('/agenda-kecamatan/');
+  const isPengaduanPublic =
+    pathname === '/pengaduan' ||
+    pathname === '/pengaduan/' ||
+    pathname?.startsWith('/pengaduan/');
 
   const isPublicPage =
     pathname === '/' ||
@@ -137,7 +145,9 @@ export default function RootLayout({
     isDesaPage ||
     isInformasiPage ||
     isKunjunganTamu ||
-    isFileConverter;
+    isFileConverter ||
+    isAgendaKecamatan ||
+    isPengaduanPublic;
 
   return (
     <html lang="id" suppressHydrationWarning>

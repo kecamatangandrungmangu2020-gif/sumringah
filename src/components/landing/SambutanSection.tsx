@@ -64,12 +64,12 @@ export function SambutanSection() {
       sectionNumber="01"
       deckLabel="Visi & Semringah"
     >
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-6 sm:mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2.5 mb-4 sm:mb-8">
         <div>
-          <h2 className="font-hero font-bold text-2xl sm:text-3xl lg:text-[34px] tracking-tight text-[#041E17] dark:text-white leading-tight">
+          <h2 className="font-hero font-bold text-xl sm:text-3xl lg:text-[34px] tracking-tight text-[#041E17] dark:text-white leading-tight">
             Semangat Pelayanan <span className="text-[#065F46] dark:text-[#E5C882]">Semringah</span>
           </h2>
-          <p className="mt-1 font-hero text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+          <p className="mt-0.5 sm:mt-1 font-hero text-[11.5px] sm:text-sm text-slate-500 dark:text-slate-400">
             Pemerintah Kecamatan Gandrungmangu • Kabupaten Cilacap, Jawa Tengah
           </p>
         </div>
@@ -137,13 +137,13 @@ export function SambutanSection() {
             </Link>
           </div>
 
-          {/* 3. 4 Clean Soft-Tinted Value Tiles */}
+          {/* 3. 4 Clean Soft-Tinted Value Tiles (2x2 on Mobile, 4 on Desktop) */}
           <motion.div
             variants={staggerContainer(0.07, 0.05)}
             initial="hidden"
             whileInView="visible"
             viewport={VIEWPORT_ONCE}
-            className="grid grid-cols-2 sm:grid-cols-4 gap-3"
+            className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3"
           >
             {coreValues.map((val) => {
               const Icon = val.icon;
@@ -153,15 +153,15 @@ export function SambutanSection() {
                   variants={cardFadeUp}
                   whileHover={{ y: -4 }}
                   transition={SPRING_TACTILE}
-                  className="rounded-2xl bg-[#F2F6F8] dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/10 p-3.5 flex flex-col items-center text-center gap-1.5"
+                  className="rounded-xl sm:rounded-2xl bg-[#F2F6F8] dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/10 p-2.5 sm:p-3.5 flex flex-col items-center text-center gap-1 sm:gap-1.5"
                 >
-                  <div className="h-8 w-8 rounded-full bg-white dark:bg-[#064E3B]/60 shadow-xs flex items-center justify-center text-[#065F46] dark:text-[#E5C882]">
-                    <Icon className="h-4 w-4" />
+                  <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-white dark:bg-[#064E3B]/60 shadow-xs flex items-center justify-center text-[#065F46] dark:text-[#E5C882]">
+                    <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                   </div>
-                  <span className="font-hero text-xs font-bold text-[#041E17] dark:text-white leading-tight">
+                  <span className="font-hero text-[11px] sm:text-xs font-bold text-[#041E17] dark:text-white leading-tight">
                     {val.label}
                   </span>
-                  <span className="font-hero text-[10.5px] text-slate-500 dark:text-slate-400 leading-snug">
+                  <span className="font-hero text-[9.5px] sm:text-[10.5px] text-slate-500 dark:text-slate-400 leading-snug">
                     {val.sub}
                   </span>
                 </motion.div>
@@ -170,17 +170,17 @@ export function SambutanSection() {
           </motion.div>
         </div>
 
-        {/* KOLOM KANAN (5 cols): Soft Ice-Cyan Mission Card */}
+        {/* KOLOM KANAN (5 cols): Soft Mission Card (2x2 on Mobile, 1-col on Desktop) */}
         <motion.div
           variants={staggerContainer(0.08, 0.06)}
           initial="hidden"
           whileInView="visible"
           viewport={VIEWPORT_ONCE}
-          className="lg:col-span-5 rounded-[22px] bg-[#F3EFE6] dark:bg-[#0f2230] border border-[#E5C882]/60 dark:border-cyan-800/30 p-5 sm:p-6 flex flex-col justify-between gap-4"
+          className="lg:col-span-5 rounded-[20px] sm:rounded-[22px] bg-[#F3EFE6] dark:bg-[#0f2230] border border-[#E5C882]/60 dark:border-cyan-800/30 p-3.5 sm:p-6 flex flex-col justify-between gap-3 sm:gap-4"
         >
-          <div className="space-y-4">
-            <div className="flex items-center justify-between px-4 py-2.5 rounded-full bg-[#065F46] text-white shadow-sm">
-              <span className="font-hero text-xs font-bold uppercase tracking-[0.12em]">
+          <div className="space-y-3 sm:space-y-4">
+            <div className="flex items-center justify-between px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-full bg-[#065F46] text-white shadow-sm">
+              <span className="font-hero text-[11px] sm:text-xs font-bold uppercase tracking-[0.12em]">
                 Pilar &amp; Prioritas Layanan
               </span>
               <span className="h-5 w-5 rounded-full bg-white/20 flex items-center justify-center font-mono text-[10px] font-bold">
@@ -188,28 +188,33 @@ export function SambutanSection() {
               </span>
             </div>
 
-            <div className="space-y-3">
+            <div className="grid grid-cols-2 lg:grid-cols-1 gap-2 sm:gap-3">
               {missions.map((item) => {
                 const Icon = item.icon;
                 return (
                   <motion.div
                     key={item.num}
                     variants={listItemStagger}
-                    className="flex items-start gap-3 p-3 rounded-2xl bg-white/85 dark:bg-[#0a1824]/80 border border-white dark:border-white/10 shadow-xs"
+                    className="flex flex-col lg:flex-row items-start gap-2 lg:gap-3 p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-white/85 dark:bg-[#0a1824]/80 border border-white dark:border-white/10 shadow-xs"
                   >
-                    <div className="h-9 w-9 rounded-full bg-[#F3EFE6] dark:bg-[#064E3B]/70 text-[#065F46] dark:text-[#E5C882] flex items-center justify-center shrink-0">
-                      <Icon className="h-4 w-4" />
+                    <div className="flex items-center justify-between w-full lg:w-auto">
+                      <div className="h-7 w-7 sm:h-9 sm:w-9 rounded-full bg-[#F3EFE6] dark:bg-[#064E3B]/70 text-[#065F46] dark:text-[#E5C882] flex items-center justify-center shrink-0">
+                        <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                      </div>
+                      <span className="lg:hidden font-mono text-[9.5px] font-bold text-[#065F46] dark:text-[#E5C882]">
+                        {item.num}
+                      </span>
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5">
-                        <span className="font-mono text-[10px] font-bold text-[#065F46] dark:text-[#E5C882]">
+                        <span className="hidden lg:inline font-mono text-[10px] font-bold text-[#065F46] dark:text-[#E5C882]">
                           {item.num}
                         </span>
-                        <h4 className="font-hero text-xs sm:text-[13px] font-bold text-[#041E17] dark:text-white leading-tight">
+                        <h4 className="font-hero text-[11.5px] sm:text-[13px] font-bold text-[#041E17] dark:text-white leading-tight line-clamp-2">
                           {item.title}
                         </h4>
                       </div>
-                      <p className="mt-0.5 font-hero text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
+                      <p className="mt-0.5 font-hero text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-300 leading-snug sm:leading-relaxed line-clamp-2 lg:line-clamp-none">
                         {item.desc}
                       </p>
                     </div>

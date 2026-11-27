@@ -71,7 +71,7 @@ export function PengaduanSection() {
       deckLabel="Partisipasi & Siaga"
     >
       {/* Top Ocean Panoramic Banner */}
-      <div className="relative overflow-hidden rounded-[22px] bg-gradient-to-r from-[#041E17] via-[#064E3B] to-[#065F46] text-white p-6 sm:p-8 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="relative overflow-hidden rounded-[18px] sm:rounded-[22px] bg-gradient-to-r from-[#041E17] via-[#064E3B] to-[#065F46] text-white p-4 sm:p-8 mb-4 sm:mb-6 flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
         <CardSilhouetteOverlay pattern="waves" />
         <div className="relative z-10 space-y-1.5 max-w-2xl">
           <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-white/15 font-mono text-[10px] uppercase tracking-[0.18em] text-[#C8A253]">
@@ -86,13 +86,13 @@ export function PengaduanSection() {
           </p>
         </div>
         <a
-          href="https://wa.me/6208950881484?text=Halo,%20saya%20ingin%20menyampaikan%20pengaduan%20kepada%20Kecamatan%20Gandrungmangu."
+          href="https://wa.me/6289508811484?text=Halo,%20saya%20ingin%20menyampaikan%20pengaduan%20kepada%20Kecamatan%20Gandrungmangu."
           target="_blank"
           rel="noopener noreferrer"
           className="relative z-10 inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-[#C8A253] hover:bg-white text-[#041E17] font-hero text-xs font-bold uppercase tracking-wider shrink-0 transition-all"
         >
           <PhoneCall className="h-4 w-4" />
-          <span>WhatsApp 0895-0881-1484</span>
+          <span>WhatsApp 6289508811484</span>
         </a>
       </div>
 
@@ -115,20 +115,20 @@ export function PengaduanSection() {
               </span>
             </div>
 
-            <div className="space-y-3">
+            <div className="grid grid-cols-3 lg:grid-cols-1 gap-2 lg:gap-0 lg:space-y-3">
               {slaItems.map((item) => (
                 <motion.div
                   key={item.code}
                   variants={listItemStagger}
-                  className="flex items-center gap-3 pb-2.5 border-b border-dashed border-slate-300/80 dark:border-white/15 last:border-0 last:pb-0"
+                  className="flex flex-col lg:flex-row lg:items-center gap-1.5 lg:gap-3 p-2.5 lg:p-0 lg:pb-2.5 rounded-xl lg:rounded-none bg-white dark:bg-[#0A1F1A] lg:bg-transparent lg:dark:bg-transparent border border-slate-200/70 dark:border-white/10 lg:border-0 lg:border-b lg:border-dashed lg:border-slate-300/80 lg:dark:border-white/15 lg:last:border-0 lg:last:pb-0"
                 >
-                  <span className="h-7 w-7 rounded-full bg-[#041E17] dark:bg-[#065F46] text-white flex items-center justify-center shrink-0">
-                    <Clock className="h-3.5 w-3.5" />
+                  <span className="h-6 w-6 lg:h-7 lg:w-7 rounded-full bg-[#041E17] dark:bg-[#065F46] text-white flex items-center justify-center shrink-0">
+                    <Clock className="h-3 w-3 lg:h-3.5 lg:w-3.5" />
                   </span>
-                  <span className="font-hero text-xs font-semibold text-slate-700 dark:text-slate-200 flex-1">
+                  <span className="font-hero text-[10px] lg:text-xs font-semibold text-slate-700 dark:text-slate-200 flex-1 leading-tight">
                     {item.label}
                   </span>
-                  <span className="font-mono text-xs font-bold text-[#065F46] dark:text-[#C8A253] shrink-0">
+                  <span className="font-mono text-[10.5px] lg:text-xs font-bold text-[#065F46] dark:text-[#C8A253] shrink-0">
                     {item.time}
                   </span>
                 </motion.div>
@@ -182,11 +182,10 @@ export function PengaduanSection() {
                     key={tab.value}
                     type="button"
                     onClick={() => setJenis(tab.value)}
-                    className={`flex-1 py-2.5 rounded-full font-hero text-xs font-bold transition-all duration-200 cursor-pointer ${
-                      jenis === tab.value
-                        ? 'bg-[#041E17] dark:bg-[#065F46] text-white shadow-sm'
-                        : 'text-slate-600 dark:text-slate-400 hover:text-[#041E17] dark:hover:text-white'
-                    }`}
+                    className={`flex-1 py-2.5 rounded-full font-hero text-xs font-bold transition-all duration-200 cursor-pointer ${jenis === tab.value
+                      ? 'bg-[#041E17] dark:bg-[#065F46] text-white shadow-sm'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-[#041E17] dark:hover:text-white'
+                      }`}
                   >
                     {tab.label}
                   </button>

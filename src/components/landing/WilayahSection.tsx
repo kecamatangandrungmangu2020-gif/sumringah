@@ -77,16 +77,16 @@ export function WilayahSection({ wilayahData, desaList, onSelectDesa }: WilayahS
           </div>
 
           {/* 3 Metric Chips */}
-          <div className="grid grid-cols-3 gap-2.5 pt-1">
+          <div className="grid grid-cols-3 gap-2 pt-1">
             {stats.map((st) => (
               <div
                 key={st.label}
-                className="rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 p-3"
+                className="rounded-xl sm:rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 p-2.5 sm:p-3"
               >
-                <span className="font-mono text-[9.5px] uppercase tracking-wider text-[#E5C882]/80 block">
+                <span className="font-mono text-[8.5px] sm:text-[9.5px] uppercase tracking-wider text-[#E5C882]/80 block truncate">
                   {st.label}
                 </span>
-                <span className="font-hero text-xs sm:text-sm font-bold text-white mt-0.5 block truncate">
+                <span className="font-hero text-[11.5px] sm:text-sm font-bold text-white mt-0.5 block truncate">
                   {st.value}
                 </span>
               </div>
@@ -193,22 +193,22 @@ export function WilayahSection({ wilayahData, desaList, onSelectDesa }: WilayahS
             </span>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2">
+          <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-7 gap-1.5 sm:gap-2">
             {desaList.map((desa, idx) => (
               <motion.button
                 key={desa.id}
                 type="button"
                 variants={cardFadeUp}
                 onClick={() => onSelectDesa(desa)}
-                className="group flex items-center justify-between gap-1.5 px-3 py-2.5 rounded-xl bg-white/10 hover:bg-white text-white hover:text-[#041E17] border border-white/15 transition-all duration-200 text-left cursor-pointer"
+                className="group flex items-center justify-between gap-1 px-2 py-2 sm:px-3 sm:py-2.5 rounded-xl bg-white/10 hover:bg-white text-white hover:text-[#041E17] border border-white/15 transition-all duration-200 text-left cursor-pointer"
               >
-                <div className="flex items-center gap-1.5 min-w-0">
-                  <span className="font-mono text-[9.5px] font-bold text-[#C8A253] group-hover:text-[#065F46] shrink-0">
+                <div className="flex items-center gap-1 sm:gap-1.5 min-w-0">
+                  <span className="font-mono text-[8.5px] sm:text-[9.5px] font-bold text-[#C8A253] group-hover:text-[#065F46] shrink-0">
                     {String(idx + 1).padStart(2, '0')}
                   </span>
-                  <span className="font-hero text-xs font-semibold truncate">{desa.name}</span>
+                  <span className="font-hero text-[10.5px] sm:text-xs font-semibold truncate">{desa.name}</span>
                 </div>
-                <ArrowRight className="h-3 w-3 opacity-60 group-hover:opacity-100 shrink-0" />
+                <ArrowRight className="hidden sm:block h-3 w-3 opacity-60 group-hover:opacity-100 shrink-0" />
               </motion.button>
             ))}
           </div>

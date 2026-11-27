@@ -34,7 +34,7 @@ export function Footer({ logoImage, configData, heroImage, wilayahBgImage }: Foo
       ? heroImage
       : 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1000&auto=format&fit=crop',
     wilayahBgImage ||
-      'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?q=80&w=1000&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?q=80&w=1000&auto=format&fit=crop',
     'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?q=80&w=1000&auto=format&fit=crop',
   ];
 
@@ -86,7 +86,7 @@ export function Footer({ logoImage, configData, heroImage, wilayahBgImage }: Foo
           </p>
           <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
             <a
-              href="https://wa.me/6208950881484?text=Halo,%20saya%20membutuhkan%20informasi%20layanan%20Kecamatan%20Gandrungmangu."
+              href="https://wa.me/6289508811484?text=Halo,%20saya%20membutuhkan%20informasi%20layanan%20Kecamatan%20Gandrungmangu."
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#041E17] hover:bg-[#065F46] dark:bg-[#C8A253] dark:hover:bg-white text-white dark:text-[#041E17] font-hero text-xs font-bold uppercase tracking-wider transition-all"
@@ -232,7 +232,7 @@ export function Footer({ logoImage, configData, heroImage, wilayahBgImage }: Foo
               </p>
               <p className="flex gap-2">
                 <Phone className="h-4 w-4 text-[#C8A253] shrink-0 mt-0.5" />
-                <span>{configData?.phone || '0895-0881-1484'}</span>
+                <span>{configData?.phone || '6289508811484'}</span>
               </p>
               <p className="flex gap-2">
                 <Mail className="h-4 w-4 text-[#C8A253] shrink-0 mt-0.5" />

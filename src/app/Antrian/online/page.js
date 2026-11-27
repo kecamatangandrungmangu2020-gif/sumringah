@@ -1,9 +1,35 @@
-"use client";
+'use client';
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  ArrowLeft,
+  Ticket,
+  User,
+  CreditCard,
+  Phone,
+  MapPin,
+  Briefcase,
+  Clock,
+  DoorOpen,
+  Download,
+  Printer,
+  RotateCcw,
+  Star,
+  ExternalLink,
+  CheckCircle2,
+  AlertCircle,
+  Loader2,
+  Sparkles,
+  ShieldCheck,
+  Users,
+  PlusCircle,
+} from 'lucide-react';
 import { db } from '../../lib/firebase';
 import { collection, getDocs, query, where, addDoc, Timestamp, doc, onSnapshot } from 'firebase/firestore';
+import { BackgroundPattern } from '@/components/landing/BackgroundPattern';
+import { NightModeSwitch } from '@/components/ui/NightModeSwitch';
 
 const DEFAULT_PELAYANAN = [
   { id: 'layanan-a', kode: 'A', nama: 'Legalisasi Dokumen', deskripsi: 'Legalisasi berkas, surat keterangan, rekomendasi umum', loket_nama: 'Loket 1', estimasi_waktu: 15 },
@@ -11,34 +37,11 @@ const DEFAULT_PELAYANAN = [
   { id: 'layanan-c', kode: 'C', nama: 'Perekaman KTP-el', deskripsi: 'Perekaman biometrik KTP pemula, rekam ulang, foto iris & sidik jari', loket_nama: 'Ruang Perekaman', estimasi_waktu: 20 },
 ];
 
-const formatHeroImage = (raw) => {
-  if (!raw || typeof raw !== 'string') return '/hero-Kecamatan.jpg';
-  if (raw.startsWith('http://') || raw.startsWith('https://') || raw.startsWith('data:') || raw.startsWith('/')) {
-    return raw;
-  }
-  return `data:image/jpeg;base64,${raw}`;
-};
-
 export default function AntrianOnline() {
   const [instansiNama, setInstansiNama] = useState('Kecamatan Gandrungmangu');
   const [instansiAlamat, setInstansiAlamat] = useState('Jalan Pertiwi Nomor 01 Gandrungmangu, Cilacap');
   const [pelayananList, setPelayananList] = useState(DEFAULT_PELAYANAN);
   const [loadingData, setLoadingData] = useState(true);
-
-  // Dynamic Hero Photo from /settings/ (settings/village)
-  const [heroBg, setHeroBg] = useState(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const cached = localStorage.getItem('village_profile_cache');
-        if (cached) {
-          const parsed = JSON.parse(cached);
-          const raw = parsed.heroPhotoUrl || parsed.heroPhotoBase64;
-          if (raw) return formatHeroImage(raw);
-        }
-      } catch (e) { }
-    }
-    return '/hero-Kecamatan.jpg';
-  });
 
   const [logoTambahan, setLogoTambahan] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -49,18 +52,17 @@ export default function AntrianOnline() {
           const raw = parsed.logoTambahanUrl || parsed.logoTambahanBase64;
           if (raw) return raw;
         }
-      } catch (e) { }
+      } catch {}
     }
-    return '/img/logo-tambahan.png';
+    return '';
   });
 
-  // Form State: NIK, Nama, No tlp, Alamat, Keperluan
   const [formData, setFormData] = useState({
     nik: '',
     nama: '',
     no_tlp: '',
     alamat: '',
-    keperluanId: ''
+    keperluanId: DEFAULT_PELAYANAN[0].id,
   });
 
   const [formError, setFormError] = useState('');
@@ -70,39 +72,33 @@ export default function AntrianOnline() {
 
   const ticketCardRef = useRef(null);
 
-  // Load Hero Background & Logos from /settings/ (settings/village & /api/village-profile/)
+  // Load Logos from /api/village-profile/ & Firestore settings/village
   useEffect(() => {
-    // 1. Fetch cepat dari API /api/village-profile/
     fetch('/api/village-profile/?t=' + Date.now(), { cache: 'no-store' })
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         if (data && !data.error) {
-          const raw = data.heroPhotoUrl || data.heroPhotoBase64;
-          if (raw) setHeroBg(formatHeroImage(raw));
-          if (data.logoUrl || data.logoKecamatanUrl) setLogoKecamatan(data.logoUrl || data.logoKecamatanUrl);
           if (data.logoTambahanUrl) setLogoTambahan(data.logoTambahanUrl);
         }
       })
-      .catch(() => { });
+      .catch(() => {});
 
-    // 2. Real-time snapshot dari Firestore settings/village
     if (db) {
-      const unsubVillage = onSnapshot(doc(db, 'settings', 'village'), (snap) => {
-        if (snap.exists()) {
-          const d = snap.data();
-          const raw = d.heroPhotoUrl || d.heroPhotoBase64;
-          if (raw) setHeroBg(formatHeroImage(raw));
-          if (d.logoUrl || d.logoKecamatanUrl) setLogoKecamatan(d.logoUrl || d.logoKecamatanUrl);
-          if (d.logoTambahanUrl) setLogoTambahan(d.logoTambahanUrl);
-        }
-      }, (err) => {
-        console.warn("Gagal memuat snapshot settings/village:", err);
-      });
+      const unsubVillage = onSnapshot(
+        doc(db, 'settings', 'village'),
+        (snap) => {
+          if (snap.exists()) {
+            const d = snap.data();
+            if (d.logoTambahanUrl) setLogoTambahan(d.logoTambahanUrl);
+          }
+        },
+        () => {}
+      );
       return () => unsubVillage();
     }
   }, []);
 
-  // Load active ticket from localStorage on mount (if available)
+  // Load active ticket from localStorage on mount (today only)
   useEffect(() => {
     if (typeof window !== 'undefined') {
       try {
@@ -121,9 +117,7 @@ export default function AntrianOnline() {
             localStorage.removeItem('antrian_online_ticket');
           }
         }
-      } catch (err) {
-        console.warn('Error reading saved ticket:', err);
-      }
+      } catch {}
     }
   }, []);
 
@@ -146,16 +140,13 @@ export default function AntrianOnline() {
             });
             list.sort((a, b) => (a.kode || '').localeCompare(b.kode || ''));
             setPelayananList(list);
-            if (list.length > 0 && !formData.keperluanId) {
-              setFormData(prev => ({ ...prev, keperluanId: list[0].id }));
+            if (list.length > 0) {
+              setFormData((prev) => ({ ...prev, keperluanId: list[0].id }));
             }
-          } else {
-            setFormData(prev => ({ ...prev, keperluanId: DEFAULT_PELAYANAN[0].id }));
           }
         }
-      } catch (err) {
-        console.warn('Error fetching antrian data:', err);
-        setFormData(prev => ({ ...prev, keperluanId: DEFAULT_PELAYANAN[0].id }));
+      } catch {
+        setFormData((prev) => ({ ...prev, keperluanId: DEFAULT_PELAYANAN[0].id }));
       } finally {
         setLoadingData(false);
       }
@@ -164,22 +155,20 @@ export default function AntrianOnline() {
     fetchData();
   }, []);
 
-  // Handle Form Change
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name === 'nik') {
       const cleanVal = value.replace(/\D/g, '').slice(0, 16);
-      setFormData(prev => ({ ...prev, nik: cleanVal }));
+      setFormData((prev) => ({ ...prev, nik: cleanVal }));
     } else if (name === 'no_tlp') {
       const cleanVal = value.replace(/[^\d+ -]/g, '').slice(0, 18);
-      setFormData(prev => ({ ...prev, no_tlp: cleanVal }));
+      setFormData((prev) => ({ ...prev, no_tlp: cleanVal }));
     } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
+      setFormData((prev) => ({ ...prev, [name]: value }));
     }
     setFormError('');
   };
 
-  // Submit Ambil Antrian
   const handleAmbilAntrian = async (e) => {
     e.preventDefault();
     setFormError('');
@@ -205,7 +194,10 @@ export default function AntrianOnline() {
       return;
     }
 
-    const selectedLayanan = pelayananList.find(p => p.id === formData.keperluanId) || pelayananList[0] || DEFAULT_PELAYANAN[0];
+    const selectedLayanan =
+      pelayananList.find((p) => p.id === formData.keperluanId) ||
+      pelayananList[0] ||
+      DEFAULT_PELAYANAN[0];
     if (!selectedLayanan) {
       setFormError('Silakan pilih jenis keperluan pelayanan.');
       return;
@@ -223,34 +215,37 @@ export default function AntrianOnline() {
 
       if (db) {
         try {
-          const q = query(
-            collection(db, 'antrian'),
-            where('created_at', '>=', startOfDay)
-          );
+          const q = query(collection(db, 'antrian'), where('created_at', '>=', startOfDay));
           const antrianSnap = await getDocs(q);
 
           const todayQueues = antrianSnap.docs
-            .map(d => ({ id: d.id, ...d.data() }))
-            .filter(item =>
-              item.pelayanan_id === selectedLayanan.id ||
-              item.kode === selectedLayanan.kode ||
-              item.pelayanan_nama === selectedLayanan.nama
+            .map((d) => ({ id: d.id, ...d.data() }))
+            .filter(
+              (item) =>
+                item.pelayanan_id === selectedLayanan.id ||
+                item.kode === selectedLayanan.kode ||
+                item.pelayanan_nama === selectedLayanan.nama
             );
 
           if (todayQueues.length > 0) {
-            const numbers = todayQueues.map(item => item.nomor || 0);
+            const numbers = todayQueues.map((item) => item.nomor || 0);
             nextNumber = Math.max(...numbers, 0) + 1;
           }
 
-          sisaAntrian = todayQueues.filter(item => item.status === 'menunggu').length;
+          sisaAntrian = todayQueues.filter((item) => item.status === 'menunggu').length;
         } catch (queryErr) {
           console.warn('Gagal membaca antrian sebelumnya:', queryErr);
         }
       }
 
       const nomorLengkap = `${selectedLayanan.kode}-${nextNumber}`;
-      const isKodeC = selectedLayanan.kode?.toUpperCase() === 'C' || selectedLayanan.nama?.toLowerCase().includes('perekaman');
-      const isKodeA = selectedLayanan.kode?.toUpperCase() === 'A' || selectedLayanan.loket_nama?.toLowerCase().includes('loket a') || selectedLayanan.loket_nama?.toLowerCase().includes('loket 1');
+      const isKodeC =
+        selectedLayanan.kode?.toUpperCase() === 'C' ||
+        selectedLayanan.nama?.toLowerCase().includes('perekaman');
+      const isKodeA =
+        selectedLayanan.kode?.toUpperCase() === 'A' ||
+        selectedLayanan.loket_nama?.toLowerCase().includes('loket a') ||
+        selectedLayanan.loket_nama?.toLowerCase().includes('loket 1');
 
       const waktuFormatted = new Date().toLocaleString('id-ID', {
         weekday: 'long',
@@ -258,7 +253,7 @@ export default function AntrianOnline() {
         month: 'long',
         day: 'numeric',
         hour: '2-digit',
-        minute: '2-digit'
+        minute: '2-digit',
       });
 
       const ticketPayload = {
@@ -270,7 +265,7 @@ export default function AntrianOnline() {
         keperluan: selectedLayanan.nama,
         status: 'menunggu',
         tipe: 'online',
-        loket: (isKodeC || isKodeA) ? null : (selectedLayanan.loket_nama || null),
+        loket: isKodeC || isKodeA ? null : selectedLayanan.loket_nama || null,
         panggil_at: null,
         panggil_ulang: 0,
         selesai_at: null,
@@ -281,7 +276,7 @@ export default function AntrianOnline() {
         warga_alamat: formData.alamat.trim(),
         sisa_antrian: sisaAntrian,
         waktu_str: waktuFormatted,
-        created_at_str: new Date().toISOString()
+        created_at_str: new Date().toISOString(),
       };
 
       let savedId = `online-${Date.now()}`;
@@ -301,7 +296,7 @@ export default function AntrianOnline() {
         localStorage.setItem('antrian_online_ticket', JSON.stringify(completeTicket));
       }
 
-      window.scrollTo({ top: 100, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
       console.error('Error saat mengambil antrian:', err);
       setFormError('Terjadi kesalahan saat memproses antrian. Silakan coba kembali.');
@@ -310,7 +305,7 @@ export default function AntrianOnline() {
     }
   };
 
-  // Unduh Tiket Gambar (Fallback Canvas Renderer)
+  // Unduh Tiket Gambar (Fallback Canvas Renderer — Sovereign Deep Emerald + Champagne Gold)
   const downloadWithCanvasFallback = (ticket) => {
     try {
       const canvas = document.createElement('canvas');
@@ -320,139 +315,106 @@ export default function AntrianOnline() {
       canvas.width = width;
       canvas.height = height;
 
-      // Background Navy Gradient
       const grad = ctx.createLinearGradient(0, 0, 0, height);
-      grad.addColorStop(0, '#0a0f1d');
-      grad.addColorStop(1, '#1e293b');
+      grad.addColorStop(0, '#041E17');
+      grad.addColorStop(0.5, '#065F46');
+      grad.addColorStop(1, '#041E17');
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, width, height);
 
-      // Gold border
-      ctx.strokeStyle = '#fbbf24';
+      ctx.strokeStyle = '#C8A253';
       ctx.lineWidth = 6;
       ctx.strokeRect(16, 16, width - 32, height - 32);
 
-      // Header Banner
-      ctx.fillStyle = '#f59e0b';
+      ctx.fillStyle = '#C8A253';
       ctx.fillRect(30, 30, width - 60, 60);
-      ctx.fillStyle = '#0f172a';
+      ctx.fillStyle = '#041E17';
       ctx.font = 'bold 22px system-ui, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('TIKET ANTRIAN ONLINE', width / 2, 68);
 
-      // Instansi
       ctx.fillStyle = '#ffffff';
       ctx.font = 'bold 20px system-ui, sans-serif';
       ctx.fillText(instansiNama.toUpperCase(), width / 2, 130);
-      ctx.fillStyle = '#94a3b8';
+      ctx.fillStyle = '#F5E9CC';
       ctx.font = '14px system-ui, sans-serif';
       ctx.fillText(instansiAlamat, width / 2, 155);
 
-      // Divider Line
-      ctx.strokeStyle = '#334155';
+      ctx.strokeStyle = 'rgba(200, 162, 83, 0.35)';
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.moveTo(40, 180);
       ctx.lineTo(width - 40, 180);
       ctx.stroke();
 
-      // Label Nomor Antrian
-      ctx.fillStyle = '#fbbf24';
+      ctx.fillStyle = '#E5C882';
       ctx.font = 'bold 16px system-ui, sans-serif';
       ctx.fillText('NOMOR ANTRIAN ANDA', width / 2, 220);
 
-      // Nomor Antrian Besar
-      ctx.fillStyle = '#fef08a';
-      ctx.font = 'bold 84px system-ui, sans-serif';
-      ctx.fillText(ticket.nomor_lengkap, width / 2, 310);
+      ctx.fillStyle = '#FAF8F5';
+      ctx.font = 'bold 88px system-ui, sans-serif';
+      ctx.fillText(ticket.nomor_lengkap, width / 2, 312);
 
-      // Keperluan & Loket
       ctx.fillStyle = '#E5C882';
       ctx.font = 'bold 22px system-ui, sans-serif';
       ctx.fillText(ticket.pelayanan_nama, width / 2, 360);
 
       if (ticket.loket) {
-        ctx.fillStyle = '#fbbf24';
+        ctx.fillStyle = '#F5E9CC';
         ctx.font = 'bold 18px system-ui, sans-serif';
         ctx.fillText(`MENUJU: ${ticket.loket.toUpperCase()}`, width / 2, 395);
       }
 
-      // Perforated Divider (Dashed)
       ctx.setLineDash([8, 6]);
-      ctx.strokeStyle = '#475569';
+      ctx.strokeStyle = 'rgba(229, 200, 130, 0.45)';
       ctx.beginPath();
       ctx.moveTo(40, 430);
       ctx.lineTo(width - 40, 430);
       ctx.stroke();
       ctx.setLineDash([]);
 
-      // Detail Data Pemohon Box
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+      ctx.fillStyle = 'rgba(4, 30, 23, 0.55)';
       ctx.fillRect(45, 450, width - 90, 240);
-      ctx.strokeStyle = 'rgba(251, 191, 36, 0.3)';
+      ctx.strokeStyle = 'rgba(200, 162, 83, 0.4)';
       ctx.strokeRect(45, 450, width - 90, 240);
 
       ctx.textAlign = 'left';
-      ctx.font = '15px system-ui, sans-serif';
-
       const leftMargin = 65;
       let y = 490;
 
-      ctx.fillStyle = '#94a3b8';
-      ctx.fillText('Nama Pemohon', leftMargin, y);
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 16px system-ui, sans-serif';
-      ctx.fillText(`: ${ticket.warga_nama}`, leftMargin + 140, y);
+      const drawRow = (label, val, valColor = '#ffffff') => {
+        ctx.font = '15px system-ui, sans-serif';
+        ctx.fillStyle = '#E5C882';
+        ctx.fillText(label, leftMargin, y);
+        ctx.fillStyle = valColor;
+        ctx.font = 'bold 15px system-ui, sans-serif';
+        ctx.fillText(`: ${val}`, leftMargin + 140, y);
+        y += 38;
+      };
 
-      y += 38;
-      ctx.font = '15px system-ui, sans-serif';
-      ctx.fillStyle = '#94a3b8';
-      ctx.fillText('NIK Pemohon', leftMargin, y);
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 16px system-ui, sans-serif';
-      ctx.fillText(`: ${ticket.warga_nik}`, leftMargin + 140, y);
+      drawRow('Nama Pemohon', ticket.warga_nama);
+      drawRow('NIK Pemohon', ticket.warga_nik);
+      drawRow('No. Telepon/WA', ticket.warga_hp);
+      const alamatCut =
+        ticket.warga_alamat.length > 36
+          ? ticket.warga_alamat.substring(0, 34) + '...'
+          : ticket.warga_alamat;
+      drawRow('Alamat', alamatCut);
+      drawRow('Waktu Daftar', ticket.waktu_str, '#F5E9CC');
 
-      y += 38;
-      ctx.font = '15px system-ui, sans-serif';
-      ctx.fillStyle = '#94a3b8';
-      ctx.fillText('No. Telepon/WA', leftMargin, y);
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 16px system-ui, sans-serif';
-      ctx.fillText(`: ${ticket.warga_hp}`, leftMargin + 140, y);
-
-      y += 38;
-      ctx.font = '15px system-ui, sans-serif';
-      ctx.fillStyle = '#94a3b8';
-      ctx.fillText('Alamat', leftMargin, y);
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '15px system-ui, sans-serif';
-      const alamatCut = ticket.warga_alamat.length > 36 ? ticket.warga_alamat.substring(0, 34) + '...' : ticket.warga_alamat;
-      ctx.fillText(`: ${alamatCut}`, leftMargin + 140, y);
-
-      y += 38;
-      ctx.fillStyle = '#94a3b8';
-      ctx.fillText('Waktu Daftar', leftMargin, y);
-      ctx.fillStyle = '#fcd34d';
-      ctx.font = 'bold 14px system-ui, sans-serif';
-      ctx.fillText(`: ${ticket.waktu_str}`, leftMargin + 140, y);
-
-      // Info Sisa Antrian
       ctx.textAlign = 'center';
-      ctx.fillStyle = '#f59e0b';
+      ctx.fillStyle = '#E5C882';
       ctx.font = 'bold 16px system-ui, sans-serif';
       ctx.fillText(`Sisa Antrian Menunggu Sebelum Anda: ${ticket.sisa_antrian || 0} Orang`, width / 2, 730);
 
-      // Notice footer
-      ctx.fillStyle = '#94a3b8';
+      ctx.fillStyle = '#F5E9CC';
       ctx.font = 'italic 13px system-ui, sans-serif';
       ctx.fillText('*Tunjukkan tiket digital ini saat tiba di loket pelayanan.', width / 2, 780);
       ctx.fillText('"SEMAngat memberIkan pelayanan NGgawe bungAH"', width / 2, 810);
 
-      ctx.fillStyle = '#334155';
-      ctx.fillRect(width / 2 - 140, 835, 280, 16);
-      ctx.fillStyle = '#64748b';
+      ctx.fillStyle = 'rgba(200, 162, 83, 0.45)';
       ctx.font = '11px monospace';
-      ctx.fillText(`VERIFIKASI ID: ${ticket.id || 'ONLINE-VALID'}`, width / 2, 870);
+      ctx.fillText(`VERIFIKASI ID: ${ticket.id || 'ONLINE-VALID'}`, width / 2, 862);
 
       const dataUrl = canvas.toDataURL('image/png');
       const link = document.createElement('a');
@@ -465,25 +427,22 @@ export default function AntrianOnline() {
     }
   };
 
-  // Download Action Handler
   const handleDownloadImage = async () => {
     if (!ticketResult) return;
     setIsDownloading(true);
-
     try {
       if (ticketCardRef.current) {
         const { toPng } = await import('html-to-image');
         const dataUrl = await toPng(ticketCardRef.current, {
           quality: 1.0,
           pixelRatio: 2,
-          backgroundColor: '#0a0f1d',
+          backgroundColor: '#041E17',
           cacheBust: true,
           style: {
             transform: 'none',
-            borderRadius: '24px'
-          }
+            borderRadius: '24px',
+          },
         });
-
         const link = document.createElement('a');
         link.download = `Tiket-Antrian-${ticketResult.nomor_lengkap}.png`;
         link.href = dataUrl;
@@ -491,595 +450,586 @@ export default function AntrianOnline() {
       } else {
         downloadWithCanvasFallback(ticketResult);
       }
-    } catch (err) {
-      console.warn('html-to-image issue, switching to direct canvas drawing:', err);
+    } catch {
       downloadWithCanvasFallback(ticketResult);
     } finally {
       setIsDownloading(false);
     }
   };
 
-  // Reset form untuk ambil antrian baru
   const handleAmbilBaru = () => {
     if (confirm('Apakah Anda ingin mengambil antrian baru? Data tiket sebelumnya di layar ini akan digantikan.')) {
       setTicketResult(null);
       if (typeof window !== 'undefined') {
         localStorage.removeItem('antrian_online_ticket');
       }
-      setFormData(prev => ({
-        ...prev,
+      setFormData({
         nik: '',
         nama: '',
         no_tlp: '',
         alamat: '',
-        keperluanId: pelayananList[0]?.id || DEFAULT_PELAYANAN[0].id
-      }));
+        keperluanId: pelayananList[0]?.id || DEFAULT_PELAYANAN[0].id,
+      });
       setFormError('');
-      window.scrollTo({ top: 100, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
-  const selectedLayananObj = pelayananList.find(p => p.id === formData.keperluanId) || pelayananList[0] || DEFAULT_PELAYANAN[0];
+  const selectedLayananObj =
+    pelayananList.find((p) => p.id === formData.keperluanId) ||
+    pelayananList[0] ||
+    DEFAULT_PELAYANAN[0];
+
+  const nikValid = formData.nik.length === 16;
 
   return (
-    <div
-      style={{
-        backgroundImage: `linear-gradient(rgba(10, 15, 29, 0.82), rgba(10, 15, 29, 0.94)), url('${heroBg}')`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        backgroundAttachment: 'fixed',
-        minHeight: '100vh',
-        padding: '24px 14px 48px',
-        color: '#ffffff',
-        fontFamily: 'var(--font-outfit), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
-      }}
-    >
-      <div className="container" style={{ maxWidth: '640px' }}>
+    <div className="relative min-h-screen bg-[#FAF8F5] dark:bg-[#05110E] text-[#041E17] dark:text-[#FAF8F5] flex flex-col transition-colors duration-300 overflow-x-clip">
+      <BackgroundPattern />
 
-        {/* Navigation Bar: HANYA Tombol Beranda Menuju ke Landing Page */}
-        <div className="d-flex justify-content-between align-items-center mb-4">
-          <Link
-            href="/"
-            className="btn btn-sm rounded-pill px-3.5 py-2 text-white d-inline-flex align-items-center gap-2 shadow-sm"
-            style={{
-              backdropFilter: 'blur(10px)',
-              background: 'rgba(255, 255, 255, 0.08)',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
-              transition: 'all 0.25s ease'
-            }}
-          >
-            <i className="bi bi-house-door-fill text-warning"></i>
-            <span className="small fw-semibold">Beranda Utama</span>
-          </Link>
-
-          <span className="badge rounded-pill px-3 py-1.5 small fw-bold font-monospace" style={{ background: 'rgba(251, 191, 36, 0.15)', border: '1px solid rgba(251, 191, 36, 0.35)', color: '#fbbf24' }}>
-            <i className="bi bi-broadcast me-1"></i> SISTEM ONLINE
-          </span>
-        </div>
-
-        {/* Header Branding Card */}
-        <div
-          className="text-center mb-4 p-4 rounded-4 shadow-lg position-relative overflow-hidden"
-          style={{
-            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(251, 191, 36, 0.06), rgba(10, 15, 29, 0.75))',
-            backdropFilter: 'blur(16px)',
-            WebkitBackdropFilter: 'blur(16px)',
-            border: '2px solid rgba(251, 191, 36, 0.45)',
-            boxShadow: '0 20px 45px rgba(0,0,0,0.6)'
-          }}
-        >
-          {/* Logo Instansi: Cukup Tampilkan Logo Tambahan dari /settings/ */}
-          {logoTambahan && (
-            <div className="d-flex align-items-center justify-content-center mb-3">
-              <img
-                src={logoTambahan}
-                alt="Logo Instansi"
-                style={{
-                  maxHeight: '75px',
-                  maxWidth: '92%',
-                  objectFit: 'contain',
-                  filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.5))'
-                }}
-              />
-            </div>
-          )}
-
-          {/* Slogan Badge */}
-          <div className="mb-2">
-            <span
-              className="badge px-3 py-1.5 rounded-pill fw-bold shadow-sm"
-              style={{
-                background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
-                color: '#0f172a',
-                fontSize: '0.8rem',
-                letterSpacing: '0.3px',
-                border: '1px solid #fef08a'
-              }}
+      {/* Top Floating Porcelain Capsule Header */}
+      <header className="sticky top-0 z-40 px-3 sm:px-6 pt-2.5 pb-1.5 print:hidden">
+        <div className="mx-auto max-w-6xl flex items-center justify-between gap-3 px-4 h-13 sm:h-14 rounded-full bg-white/95 dark:bg-[#0A1F1A]/95 backdrop-blur-xl border border-[#E6E0D3] dark:border-[#C8A253]/20 shadow-[0_8px_24px_rgba(4,30,23,0.08)]">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#065F46] hover:bg-[#041E17] text-white font-hero text-xs font-bold transition-all shadow-sm shrink-0"
             >
-              <i className="bi bi-stars me-1"></i> "SEMAngat memberIkan pelayanan NGgawe bungAH"
-            </span>
-          </div>
-
-          <h2 className="fw-black mb-1 text-white" style={{ fontSize: '1.85rem', letterSpacing: '-0.5px' }}>
-            ANTRIAN ONLINE WARGA
-          </h2>
-          <h5 className="fw-bold mb-1" style={{ color: '#fbbf24' }}>
-            {instansiNama}
-          </h5>
-          <p className="small text-white-50 m-0">{instansiAlamat}</p>
-        </div>
-
-        {/* ========================================================================= */}
-        {/* TAMPILAN 1: HASIL NOMOR ANTRIAN SETELAH SUBMIT / TIKET AKTIF */}
-        {/* ========================================================================= */}
-        {ticketResult ? (
-          <div>
-            <div className="d-flex align-items-center justify-content-between mb-3">
-              <span className="badge bg-success bg-opacity-90 px-3 py-2 rounded-pill small fw-bold d-inline-flex align-items-center gap-1.5 shadow-sm">
-                <i className="bi bi-check-circle-fill"></i> Antrian Berhasil Diambil
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Beranda</span>
+            </Link>
+            <div className="hidden sm:flex flex-col min-w-0">
+              <span className="font-hero font-extrabold text-sm text-[#041E17] dark:text-white leading-none truncate">
+                Antrian Online Warga
               </span>
-              <button
-                onClick={handleAmbilBaru}
-                className="btn btn-sm btn-outline-warning rounded-pill px-3 py-1.5 text-warning fw-bold d-inline-flex align-items-center gap-1.5 shadow-sm"
-                style={{ backdropFilter: 'blur(6px)', background: 'rgba(251, 191, 36, 0.1)' }}
-              >
-                <i className="bi bi-plus-circle"></i> Ambil Antrian Baru
-              </button>
-            </div>
-
-            {/* Kartu Tiket Digital */}
-            <div
-              ref={ticketCardRef}
-              className="rounded-4 shadow-2xl position-relative overflow-hidden p-4 mb-4"
-              style={{
-                background: 'linear-gradient(145deg, #0a0f1d 0%, #1e293b 50%, #0a0f1d 100%)',
-                border: '2px solid #fbbf24',
-                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.85), 0 0 25px rgba(251, 191, 36, 0.25)',
-                color: '#ffffff'
-              }}
-            >
-              {/* Header Tiket */}
-              <div className="d-flex align-items-center justify-content-between border-bottom border-white border-opacity-15 pb-3 mb-3">
-                <div className="d-flex align-items-center gap-2.5">
-                  {logoTambahan && (
-                    <img src={logoTambahan} alt="Logo" style={{ maxHeight: '38px', maxWidth: '180px', objectFit: 'contain' }} />
-                  )}
-                  <div>
-                    <div className="fw-bold small text-white" style={{ letterSpacing: '0.5px' }}>PEMERINTAH KABUPATEN CILACAP</div>
-                    <div className="small fw-bold text-warning" style={{ fontSize: '0.8rem' }}>{instansiNama.toUpperCase()}</div>
-                  </div>
-                </div>
-                <span
-                  className="badge px-3 py-1.5 rounded-pill fw-bold font-monospace"
-                  style={{ background: 'linear-gradient(135deg, #fbbf24, #f59e0b)', color: '#0f172a', fontSize: '0.75rem' }}
-                >
-                  ONLINE
-                </span>
-              </div>
-
-              {/* Label & Nomor Antrian Utama */}
-              <div className="text-center py-2">
-                <span className="small text-uppercase fw-bold text-white-50" style={{ letterSpacing: '2px', fontSize: '0.8rem' }}>
-                  NOMOR ANTRIAN ANDA
-                </span>
-
-                <div
-                  className="fw-black text-warning my-2"
-                  style={{
-                    fontSize: '4.8rem',
-                    lineHeight: 1,
-                    letterSpacing: '-1px',
-                    textShadow: '0 4px 20px rgba(251, 191, 36, 0.45), 0 2px 4px rgba(0,0,0,0.9)'
-                  }}
-                >
-                  {ticketResult.nomor_lengkap}
-                </div>
-
-                <div className="d-inline-block px-3.5 py-1.5 rounded-pill mb-2 shadow-sm" style={{ background: 'rgba(200, 162, 83, 0.15)', border: '1px solid #E5C882' }}>
-                  <span className="fw-bold" style={{ color: '#E5C882', fontSize: '0.98rem' }}>
-                    {ticketResult.pelayanan_nama}
-                  </span>
-                </div>
-
-                {ticketResult.loket && (
-                  <div className="small fw-bold text-white-50 mt-1">
-                    Menuju: <span className="text-warning fw-bold">{ticketResult.loket}</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Garis Perforasi / Tiket Notch */}
-              <div className="position-relative my-3 py-1">
-                <div style={{ borderTop: '2px dashed rgba(255, 255, 255, 0.25)' }}></div>
-                <div
-                  style={{
-                    position: 'absolute',
-                    left: '-28px',
-                    top: '-11px',
-                    width: '24px',
-                    height: '24px',
-                    borderRadius: '50%',
-                    background: '#070b14'
-                  }}
-                ></div>
-                <div
-                  style={{
-                    position: 'absolute',
-                    right: '-28px',
-                    top: '-11px',
-                    width: '24px',
-                    height: '24px',
-                    borderRadius: '50%',
-                    background: '#070b14'
-                  }}
-                ></div>
-              </div>
-
-              {/* Data Warga Pemohon */}
-              <div
-                className="p-3.5 rounded-3 mb-3"
-                style={{
-                  background: 'rgba(255, 255, 255, 0.05)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)'
-                }}
-              >
-                <div className="row g-2.5 small">
-                  <div className="col-12 border-bottom border-white border-opacity-10 pb-2 mb-1">
-                    <span className="text-white-50 d-block" style={{ fontSize: '0.72rem' }}>Nama Pemohon</span>
-                    <strong className="text-white fs-6">{ticketResult.warga_nama}</strong>
-                  </div>
-                  <div className="col-6">
-                    <span className="text-white-50 d-block" style={{ fontSize: '0.72rem' }}>NIK KTP</span>
-                    <strong className="text-white font-monospace">{ticketResult.warga_nik}</strong>
-                  </div>
-                  <div className="col-6">
-                    <span className="text-white-50 d-block" style={{ fontSize: '0.72rem' }}>No. Telepon / WA</span>
-                    <strong className="text-white">{ticketResult.warga_hp}</strong>
-                  </div>
-                  <div className="col-12 pt-1 border-top border-white border-opacity-10">
-                    <span className="text-white-50 d-block" style={{ fontSize: '0.72rem' }}>Alamat Pemohon</span>
-                    <span className="text-white fw-semibold">{ticketResult.warga_alamat}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Status & Estimasi Menunggu */}
-              <div className="d-flex align-items-center justify-content-between p-2.5 rounded-3 mb-3" style={{ background: 'rgba(251, 191, 36, 0.12)', border: '1px solid rgba(251, 191, 36, 0.35)' }}>
-                <div className="small">
-                  <span className="text-white-50 d-block" style={{ fontSize: '0.72rem' }}>Sisa Antrian Menunggu</span>
-                  <span className="fw-bold text-warning fs-6">{ticketResult.sisa_antrian || 0} Antrian</span>
-                </div>
-                <div className="text-end small">
-                  <span className="text-white-50 d-block" style={{ fontSize: '0.72rem' }}>Status Saat Ini</span>
-                  <span className="badge bg-warning text-dark fw-bold text-uppercase px-2.5 py-1">
-                    {ticketResult.status || 'MENUNGGU'}
-                  </span>
-                </div>
-              </div>
-
-              {/* Waktu & Footer Tiket */}
-              <div className="text-center pt-1 border-top border-white border-opacity-15">
-                <div className="small text-white-50 d-flex align-items-center justify-content-center gap-1.5 mb-1" style={{ fontSize: '0.76rem' }}>
-                  <i className="bi bi-clock-history text-warning"></i>
-                  <span>Daftar: {ticketResult.waktu_str}</span>
-                </div>
-                <div className="text-white-50 fst-italic" style={{ fontSize: '0.72rem' }}>
-                  Tunjukkan tiket nomor ini kepada petugas loket saat nomor dipanggil.
-                </div>
-              </div>
-            </div>
-
-            {/* ACTION BUTTONS: DOWNLOAD GAMBAR & CETAK */}
-            <div className="d-flex flex-column gap-2 mb-4">
-              <button
-                type="button"
-                onClick={handleDownloadImage}
-                disabled={isDownloading}
-                className="btn w-100 py-3 fw-bold rounded-pill shadow-lg d-flex align-items-center justify-content-center gap-2"
-                style={{
-                  background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
-                  color: '#0f172a',
-                  border: 'none',
-                  fontSize: '1.05rem',
-                  boxShadow: '0 8px 25px rgba(245, 158, 11, 0.45)'
-                }}
-              >
-                {isDownloading ? (
-                  <>
-                    <span className="spinner-border spinner-border-sm" role="status"></span>
-                    <span>Menyiapkan Gambar Tiket...</span>
-                  </>
-                ) : (
-                  <>
-                    <i className="bi bi-download fs-5"></i>
-                    <span>Download Gambar Nomor Antrian (PNG)</span>
-                  </>
-                )}
-              </button>
-
-              <div className="d-flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => window.print()}
-                  className="btn btn-outline-light w-50 py-2.5 rounded-pill small fw-bold d-flex align-items-center justify-content-center gap-1.5"
-                  style={{ backdropFilter: 'blur(5px)', background: 'rgba(255,255,255,0.06)' }}
-                >
-                  <i className="bi bi-printer"></i>
-                  <span>Cetak Tiket</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={handleAmbilBaru}
-                  className="btn btn-outline-secondary w-50 py-2.5 rounded-pill small fw-bold text-white-50 hover-text-white d-flex align-items-center justify-content-center gap-1.5"
-                  style={{ backdropFilter: 'blur(5px)', background: 'rgba(255,255,255,0.04)' }}
-                >
-                  <i className="bi bi-arrow-repeat"></i>
-                  <span>Ambil Baru</span>
-                </button>
-              </div>
-
-              {/* Tombol Bantu Nilai Kami (SiSukma) */}
-              <div className="pt-1">
-                <a
-                  href="https://sisukma.cilacapkab.go.id/Home/pelayanan/4012001"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-outline-warning w-100 py-2.5 rounded-pill small fw-bold d-flex align-items-center justify-content-center gap-2 shadow-sm"
-                  style={{ backdropFilter: 'blur(8px)', background: 'rgba(251, 191, 36, 0.08)' }}
-                >
-                  <i className="bi bi-star-fill text-warning"></i>
-                  <span>Bantu Nilai Kami (SiSukma Cilacap)</span>
-                  <i className="bi bi-box-arrow-up-right small"></i>
-                </a>
-              </div>
+              <span className="font-mono text-[9.5px] uppercase tracking-[0.14em] text-[#065F46] dark:text-[#E5C882] mt-0.5">
+                {instansiNama} • Layanan Digital
+              </span>
             </div>
           </div>
-        ) : (
-          /* ========================================================================= */
-          /* TAMPILAN 2: FORM RESTRUKTUR INPUT WARGA (NIK, NAMA, NO TLP, ALAMAT, KEPERLUAN) */
-          /* ========================================================================= */
+
+          <div className="flex items-center gap-2 shrink-0">
+            <Link
+              href="/kunjungan-tamu/"
+              className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#F3EFE6] hover:bg-[#C8A253] text-[#041E17] dark:bg-white/10 dark:text-[#E5C882] dark:hover:bg-[#C8A253] dark:hover:text-[#041E17] border border-[#C8A253]/30 font-hero text-[11px] font-bold transition-all"
+            >
+              <Users className="w-3.5 h-3.5" />
+              <span>Register Kunjungan</span>
+            </Link>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#065F46]/10 dark:bg-[#C8A253]/15 border border-[#065F46]/20 dark:border-[#C8A253]/30 font-mono text-[10px] font-bold text-[#065F46] dark:text-[#E5C882]">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              ONLINE
+            </span>
+            <NightModeSwitch size="sm" />
+          </div>
+        </div>
+      </header>
+
+      <main className="relative z-10 mx-auto w-full max-w-6xl px-3 sm:px-6 py-3.5 sm:py-5 flex-1 space-y-4">
+        {/* Sovereign Deep Emerald Compact Hero Banner */}
+        <motion.section
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35 }}
+          className="relative overflow-hidden rounded-[24px] px-5 py-4 sm:px-7 sm:py-5 bg-gradient-to-br from-[#065F46] via-[#064E3B] to-[#041E17] text-white border border-[#C8A253]/30 shadow-[0_18px_45px_rgba(4,30,23,0.2)] print:hidden"
+        >
           <div
-            className="card text-white p-4 p-md-4 shadow-2xl mb-4"
-            style={{
-              background: 'linear-gradient(135deg, rgba(10, 15, 29, 0.95), rgba(26, 36, 56, 0.95))',
-              backdropFilter: 'blur(16px)',
-              WebkitBackdropFilter: 'blur(16px)',
-              border: '2px solid rgba(251, 191, 36, 0.45)',
-              borderRadius: '24px',
-              boxShadow: '0 20px 45px rgba(0,0,0,0.65)'
-            }}
-          >
-            <div className="border-bottom border-white border-opacity-15 pb-3 mb-3">
-              <h4 className="fw-bold m-0 text-warning d-flex align-items-center gap-2">
-                <i className="bi bi-card-checklist"></i> Formulir Pengambilan Antrian
-              </h4>
-              <p className="text-white-50 small m-0 mt-1">
-                Silakan isi data identitas Anda dan pilih keperluan pelayanan di bawah ini.
+            aria-hidden="true"
+            className="pointer-events-none absolute right-3 bottom-0 w-28 h-32 opacity-[0.18] bg-no-repeat bg-contain bg-right-bottom"
+            style={{ backgroundImage: "url('/images/tugu-gandrungmangu-silhouette.webp')" }}
+          />
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="space-y-1.5 min-w-0">
+              <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#C8A253] text-[#041E17] font-hero text-[10px] font-extrabold tracking-wide shadow-sm">
+                <Sparkles className="w-3 h-3" />
+                <span>&ldquo;SEMAngat memberIkan pelayanan NGgawe bungAH&rdquo;</span>
+              </div>
+              <h1 className="font-hero font-black text-2xl sm:text-3xl tracking-tight leading-tight">
+                Ambil Nomor <span className="text-[#E5C882]">Antrian Online</span>
+              </h1>
+              <p className="font-hero text-xs sm:text-sm text-[#F5E9CC]/85 flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-[#E5C882] shrink-0" />
+                <span className="truncate">{instansiNama} — {instansiAlamat}</span>
               </p>
             </div>
 
-            {formError && (
-              <div className="alert alert-danger bg-danger border-0 text-white p-3 mb-3 rounded-3 small fw-semibold d-flex align-items-center gap-2 shadow-sm">
-                <i className="bi bi-exclamation-triangle-fill fs-5 shrink-0"></i>
-                <span>{formError}</span>
+            {logoTambahan && (
+              <div className="hidden md:flex items-center justify-center px-4 py-2 rounded-2xl bg-white/10 border border-white/15 backdrop-blur-sm shrink-0">
+                <img
+                  src={logoTambahan}
+                  alt="Logo Instansi"
+                  className="max-h-12 max-w-[160px] object-contain drop-shadow"
+                />
+              </div>
+            )}
+          </div>
+        </motion.section>
+
+        {/* Main 2-Column Workspace */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+          {/* LEFT (7 Cols): Ticket Result OR Form */}
+          <div className="lg:col-span-7">
+            <AnimatePresence mode="wait">
+              {ticketResult ? (
+                <motion.div
+                  key="ticket-view"
+                  initial={{ opacity: 0, y: 14 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="space-y-4"
+                >
+                  {/* Status Bar */}
+                  <div className="flex items-center justify-between gap-2 print:hidden">
+                    <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-600 text-white font-hero text-xs font-bold shadow-sm">
+                      <CheckCircle2 className="w-4 h-4" />
+                      Antrian Berhasil Diambil
+                    </span>
+                    <button
+                      type="button"
+                      onClick={handleAmbilBaru}
+                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#F3EFE6] hover:bg-[#C8A253] text-[#041E17] dark:bg-white/10 dark:text-[#E5C882] border border-[#C8A253]/35 font-hero text-xs font-bold transition-all cursor-pointer"
+                    >
+                      <PlusCircle className="w-3.5 h-3.5" />
+                      Ambil Antrian Baru
+                    </button>
+                  </div>
+
+                  {/* Digital Boarding-Pass Ticket Card */}
+                  <div
+                    ref={ticketCardRef}
+                    className="relative overflow-hidden rounded-[26px] bg-gradient-to-br from-[#041E17] via-[#064E3B] to-[#041E17] text-white border-2 border-[#C8A253]/70 p-5 sm:p-6 shadow-[0_24px_60px_rgba(4,30,23,0.35)]"
+                  >
+                    <div
+                      aria-hidden="true"
+                      className="pointer-events-none absolute right-2 bottom-2 w-36 h-40 opacity-[0.14] bg-no-repeat bg-contain bg-right-bottom"
+                      style={{ backgroundImage: "url('/images/tugu-gandrungmangu-silhouette.webp')" }}
+                    />
+
+                    {/* Ticket Top Header */}
+                    <div className="relative z-10 flex items-center justify-between gap-3 pb-4 border-b border-white/15">
+                      <div>
+                        <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#E5C882]">
+                          Pemerintah Kabupaten Cilacap
+                        </p>
+                        <h2 className="font-hero text-sm sm:text-base font-extrabold text-white">
+                          {instansiNama.toUpperCase()}
+                        </h2>
+                      </div>
+                      <span className="px-3 py-1 rounded-full bg-gradient-to-r from-[#C8A253] to-[#E5C882] text-[#041E17] font-mono text-[10.5px] font-black tracking-wider">
+                        TIKET ONLINE
+                      </span>
+                    </div>
+
+                    {/* Giant Queue Number */}
+                    <div className="relative z-10 text-center py-5">
+                      <span className="font-mono text-[10.5px] font-bold uppercase tracking-[0.22em] text-[#F5E9CC]/80">
+                        Nomor Antrian Anda
+                      </span>
+                      <div className="font-hero font-black text-6xl sm:text-7xl tracking-tight text-[#E5C882] my-2 drop-shadow-[0_6px_22px_rgba(200,162,83,0.4)]">
+                        {ticketResult.nomor_lengkap}
+                      </div>
+                      <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white/10 border border-[#E5C882]/45 text-[#F5E9CC] font-hero text-sm font-bold">
+                        <Briefcase className="w-3.5 h-3.5 text-[#E5C882]" />
+                        <span>{ticketResult.pelayanan_nama}</span>
+                      </div>
+                      {ticketResult.loket && (
+                        <p className="mt-2 font-hero text-xs text-[#F5E9CC]/80">
+                          Menuju: <strong className="text-[#E5C882]">{ticketResult.loket}</strong>
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Perforated Divider */}
+                    <div className="relative my-3 border-t-2 border-dashed border-[#C8A253]/40">
+                      <span className="absolute -left-8 -top-3 w-6 h-6 rounded-full bg-[#FAF8F5] dark:bg-[#05110E]" />
+                      <span className="absolute -right-8 -top-3 w-6 h-6 rounded-full bg-[#FAF8F5] dark:bg-[#05110E]" />
+                    </div>
+
+                    {/* Applicant Details */}
+                    <div className="relative z-10 rounded-2xl bg-[#041E17]/60 border border-white/10 p-4 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                      <div className="sm:col-span-2 pb-2 border-b border-white/10">
+                        <span className="text-[10px] font-mono uppercase tracking-wider text-[#E5C882] block">
+                          Nama Pemohon
+                        </span>
+                        <strong className="font-hero text-sm text-white">{ticketResult.warga_nama}</strong>
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-mono uppercase tracking-wider text-[#E5C882] block">
+                          NIK KTP
+                        </span>
+                        <strong className="font-mono text-white">{ticketResult.warga_nik}</strong>
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-mono uppercase tracking-wider text-[#E5C882] block">
+                          No. Telepon / WA
+                        </span>
+                        <strong className="font-mono text-white">{ticketResult.warga_hp}</strong>
+                      </div>
+                      <div className="sm:col-span-2 pt-2 border-t border-white/10">
+                        <span className="text-[10px] font-mono uppercase tracking-wider text-[#E5C882] block">
+                          Alamat
+                        </span>
+                        <span className="font-hero text-white/95">{ticketResult.warga_alamat}</span>
+                      </div>
+                    </div>
+
+                    {/* Remaining Queue & Status */}
+                    <div className="relative z-10 mt-3.5 flex items-center justify-between gap-3 px-4 py-3 rounded-2xl bg-[#C8A253]/15 border border-[#C8A253]/40">
+                      <div>
+                        <span className="font-mono text-[10px] uppercase text-[#F5E9CC]/80 block">
+                          Sisa Antrian Menunggu
+                        </span>
+                        <strong className="font-hero text-base text-[#E5C882]">
+                          {ticketResult.sisa_antrian || 0} Antrian
+                        </strong>
+                      </div>
+                      <span className="px-3 py-1 rounded-full bg-[#C8A253] text-[#041E17] font-mono text-[10.5px] font-black uppercase">
+                        {ticketResult.status || 'MENUNGGU'}
+                      </span>
+                    </div>
+
+                    {/* Timestamp Footer */}
+                    <div className="relative z-10 mt-4 pt-3 border-t border-white/10 text-center space-y-1">
+                      <p className="font-mono text-[10.5px] text-[#F5E9CC]/85 flex items-center justify-center gap-1.5">
+                        <Clock className="w-3.5 h-3.5 text-[#E5C882]" />
+                        <span>Daftar: {ticketResult.waktu_str}</span>
+                      </p>
+                      <p className="font-hero text-[11px] italic text-white/65">
+                        Tunjukkan tiket nomor ini kepada petugas loket saat nomor dipanggil.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Ticket Actions */}
+                  <div className="space-y-2.5 print:hidden">
+                    <button
+                      type="button"
+                      onClick={handleDownloadImage}
+                      disabled={isDownloading}
+                      className="w-full py-3.5 px-5 rounded-full bg-gradient-to-r from-[#C8A253] via-[#D8B464] to-[#B8903D] hover:brightness-105 text-[#041E17] font-hero font-extrabold text-sm shadow-lg flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-60"
+                    >
+                      {isDownloading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <span>Menyiapkan Gambar Tiket...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Download className="w-4 h-4" />
+                          <span>Download Gambar Nomor Antrian (PNG)</span>
+                        </>
+                      )}
+                    </button>
+
+                    <div className="grid grid-cols-2 gap-2.5">
+                      <button
+                        type="button"
+                        onClick={() => window.print()}
+                        className="py-2.5 px-4 rounded-full bg-white dark:bg-[#0A1F1A] border border-[#E6E0D3] dark:border-[#C8A253]/25 hover:border-[#065F46] text-[#041E17] dark:text-white font-hero text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                      >
+                        <Printer className="w-3.5 h-3.5 text-[#065F46] dark:text-[#E5C882]" />
+                        <span>Cetak Tiket</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleAmbilBaru}
+                        className="py-2.5 px-4 rounded-full bg-white dark:bg-[#0A1F1A] border border-[#E6E0D3] dark:border-[#C8A253]/25 hover:border-[#C8A253] text-[#041E17] dark:text-white font-hero text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                      >
+                        <RotateCcw className="w-3.5 h-3.5 text-[#C8A253]" />
+                        <span>Ambil Baru</span>
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="form-view"
+                  initial={{ opacity: 0, y: 14 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="rounded-[26px] bg-white/95 dark:bg-[#0A1F1A]/95 border border-[#E6E0D3] dark:border-[#C8A253]/25 p-5 sm:p-6 shadow-[0_14px_40px_rgba(4,30,23,0.08)] space-y-5"
+                >
+                  <div className="flex items-center justify-between gap-2 pb-3.5 border-b border-[#E6E0D3] dark:border-white/10">
+                    <div>
+                      <span className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-[#C8A253]">
+                        Formulir Resmi Pemohon
+                      </span>
+                      <h2 className="font-hero text-lg sm:text-xl font-extrabold text-[#041E17] dark:text-white leading-tight">
+                        Pendaftaran Nomor Antrian
+                      </h2>
+                    </div>
+                    <span className="h-10 w-10 rounded-2xl bg-[#F3EFE6] dark:bg-[#064E3B] text-[#065F46] dark:text-[#E5C882] flex items-center justify-center shrink-0">
+                      <Ticket className="w-5 h-5" />
+                    </span>
+                  </div>
+
+                  {formError && (
+                    <div className="flex items-center gap-2.5 p-3.5 rounded-2xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 font-hero text-xs font-semibold">
+                      <AlertCircle className="w-4 h-4 shrink-0" />
+                      <span>{formError}</span>
+                    </div>
+                  )}
+
+                  <form onSubmit={handleAmbilAntrian} className="space-y-4">
+                    {/* 1. Pilih Layanan Visual Cards */}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <label className="font-hero text-[11px] font-extrabold uppercase tracking-wider text-[#041E17] dark:text-slate-200 flex items-center gap-1.5">
+                          <Briefcase className="w-3.5 h-3.5 text-[#065F46] dark:text-[#E5C882]" />
+                          <span>Pilih Keperluan Pelayanan</span>
+                          <span className="text-rose-500">*</span>
+                        </label>
+                        <span className="font-mono text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#F3EFE6] dark:bg-[#064E3B] text-[#065F46] dark:text-[#E5C882]">
+                          Kode {selectedLayananObj?.kode || 'A'}
+                        </span>
+                      </div>
+
+                      {loadingData ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                          {[1, 2, 3].map((n) => (
+                            <div key={n} className="h-20 rounded-2xl bg-[#F3EFE6] dark:bg-white/10 animate-pulse" />
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                          {pelayananList.map((p) => {
+                            const active = formData.keperluanId === p.id;
+                            return (
+                              <button
+                                key={p.id}
+                                type="button"
+                                onClick={() => setFormData((prev) => ({ ...prev, keperluanId: p.id }))}
+                                className={`p-3.5 rounded-2xl text-left border transition-all cursor-pointer flex flex-col justify-between gap-2 ${
+                                  active
+                                    ? 'bg-gradient-to-br from-[#065F46] to-[#041E17] text-white border-[#C8A253] shadow-md scale-[1.01]'
+                                    : 'bg-[#FAF8F5] dark:bg-[#05110E] hover:border-[#065F46]/60 border-[#E6E0D3] dark:border-white/10 text-[#041E17] dark:text-slate-200'
+                                }`}
+                              >
+                                <div className="flex items-center justify-between gap-1.5">
+                                  <span
+                                    className={`h-7 w-7 rounded-lg font-mono text-xs font-black flex items-center justify-center ${
+                                      active
+                                        ? 'bg-[#C8A253] text-[#041E17]'
+                                        : 'bg-[#F3EFE6] dark:bg-[#064E3B] text-[#065F46] dark:text-[#E5C882]'
+                                    }`}
+                                  >
+                                    {p.kode}
+                                  </span>
+                                  <span className={`font-mono text-[9.5px] font-semibold ${active ? 'text-[#E5C882]' : 'text-slate-500 dark:text-slate-400'}`}>
+                                    ~{p.estimasi_waktu || 15} mnt
+                                  </span>
+                                </div>
+                                <div>
+                                  <p className="font-hero text-xs font-extrabold leading-snug line-clamp-2">
+                                    {p.nama}
+                                  </p>
+                                  <p className={`font-mono text-[9.5px] mt-0.5 truncate ${active ? 'text-[#F5E9CC]/80' : 'text-slate-500 dark:text-slate-400'}`}>
+                                    {p.loket_nama || 'Loket Pelayanan'}
+                                  </p>
+                                </div>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* 2. Identitas Pemohon Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
+                      {/* NIK */}
+                      <div className="sm:col-span-2">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <label className="font-hero text-[11px] font-extrabold uppercase tracking-wider text-[#041E17] dark:text-slate-200 flex items-center gap-1.5">
+                            <CreditCard className="w-3.5 h-3.5 text-[#065F46] dark:text-[#E5C882]" />
+                            <span>NIK (16 Digit e-KTP / KK)</span>
+                            <span className="text-rose-500">*</span>
+                          </label>
+                          <span
+                            className={`font-mono text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                              nikValid
+                                ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'
+                                : 'bg-[#F3EFE6] text-slate-600 dark:bg-white/10 dark:text-slate-400'
+                            }`}
+                          >
+                            {formData.nik.length} / 16 Digit
+                          </span>
+                        </div>
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          name="nik"
+                          placeholder="Contoh: 3301xxxxxxxxxxxx"
+                          maxLength={16}
+                          required
+                          value={formData.nik}
+                          onChange={handleChange}
+                          autoComplete="off"
+                          className="w-full px-4 py-2.5 rounded-xl bg-[#FAF8F5] dark:bg-[#05110E] border border-[#E6E0D3] dark:border-white/15 text-[#041E17] dark:text-white placeholder-slate-400 font-mono text-sm tracking-wider focus:outline-none focus:border-[#065F46] focus:ring-2 focus:ring-[#065F46]/20 transition-all"
+                        />
+                      </div>
+
+                      {/* Nama Lengkap */}
+                      <div className="sm:col-span-2">
+                        <label className="font-hero text-[11px] font-extrabold uppercase tracking-wider text-[#041E17] dark:text-slate-200 flex items-center gap-1.5 mb-1.5">
+                          <User className="w-3.5 h-3.5 text-[#065F46] dark:text-[#E5C882]" />
+                          <span>Nama Lengkap Pemohon</span>
+                          <span className="text-rose-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          name="nama"
+                          placeholder="Nama lengkap sesuai e-KTP"
+                          required
+                          value={formData.nama}
+                          onChange={handleChange}
+                          className="w-full px-4 py-2.5 rounded-xl bg-[#FAF8F5] dark:bg-[#05110E] border border-[#E6E0D3] dark:border-white/15 text-[#041E17] dark:text-white placeholder-slate-400 text-sm focus:outline-none focus:border-[#065F46] focus:ring-2 focus:ring-[#065F46]/20 transition-all"
+                        />
+                      </div>
+
+                      {/* No. Telepon / WA */}
+                      <div>
+                        <label className="font-hero text-[11px] font-extrabold uppercase tracking-wider text-[#041E17] dark:text-slate-200 flex items-center gap-1.5 mb-1.5">
+                          <Phone className="w-3.5 h-3.5 text-[#065F46] dark:text-[#E5C882]" />
+                          <span>No. Telepon / WA</span>
+                          <span className="text-rose-500">*</span>
+                        </label>
+                        <input
+                          type="tel"
+                          name="no_tlp"
+                          placeholder="08xx-xxxx-xxxx"
+                          required
+                          value={formData.no_tlp}
+                          onChange={handleChange}
+                          className="w-full px-4 py-2.5 rounded-xl bg-[#FAF8F5] dark:bg-[#05110E] border border-[#E6E0D3] dark:border-white/15 text-[#041E17] dark:text-white placeholder-slate-400 text-sm focus:outline-none focus:border-[#065F46] focus:ring-2 focus:ring-[#065F46]/20 transition-all"
+                        />
+                      </div>
+
+                      {/* Alamat */}
+                      <div>
+                        <label className="font-hero text-[11px] font-extrabold uppercase tracking-wider text-[#041E17] dark:text-slate-200 flex items-center gap-1.5 mb-1.5">
+                          <MapPin className="w-3.5 h-3.5 text-[#065F46] dark:text-[#E5C882]" />
+                          <span>Alamat / Desa</span>
+                          <span className="text-rose-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          name="alamat"
+                          placeholder="RT 02/03 Desa Gandrungmangu"
+                          required
+                          value={formData.alamat}
+                          onChange={handleChange}
+                          className="w-full px-4 py-2.5 rounded-xl bg-[#FAF8F5] dark:bg-[#05110E] border border-[#E6E0D3] dark:border-white/15 text-[#041E17] dark:text-white placeholder-slate-400 text-sm focus:outline-none focus:border-[#065F46] focus:ring-2 focus:ring-[#065F46]/20 transition-all"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Submit CTA */}
+                    <button
+                      type="submit"
+                      disabled={submitting}
+                      className="w-full py-3.5 px-6 rounded-full neu-btn-primary font-hero font-extrabold text-sm uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                    >
+                      {submitting ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <span>Memproses Nomor Antrian...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Ticket className="w-4 h-4 text-[#E5C882]" />
+                          <span>Ambil Nomor Antrian Sekarang</span>
+                        </>
+                      )}
+                    </button>
+                  </form>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* RIGHT (5 Cols): Selected Service Info + 4-Step Guide + SiSukma */}
+          <div className="lg:col-span-5 space-y-4 print:hidden">
+            {/* Ringkasan Layanan Terpilih */}
+            {selectedLayananObj && (
+              <div className="card-Kecamatan p-5 space-y-3">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-[#C8A253]">
+                    Layanan Terpilih
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-full bg-[#065F46] text-white font-mono text-[10px] font-bold">
+                    KODE {selectedLayananObj.kode}
+                  </span>
+                </div>
+                <h3 className="font-hero text-base sm:text-lg font-extrabold text-[#041E17] dark:text-white leading-snug">
+                  {selectedLayananObj.nama}
+                </h3>
+                <p className="font-hero text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                  {selectedLayananObj.deskripsi || 'Pelayanan administrasi resmi Kecamatan Gandrungmangu.'}
+                </p>
+                <div className="pt-2.5 border-t border-[#E6E0D3] dark:border-white/10 flex flex-wrap items-center gap-3 text-xs font-semibold text-[#065F46] dark:text-[#E5C882]">
+                  <span className="inline-flex items-center gap-1.5">
+                    <DoorOpen className="w-3.5 h-3.5" />
+                    {selectedLayananObj.loket_nama || 'Loket Pelayanan'}
+                  </span>
+                  <span className="inline-flex items-center gap-1.5">
+                    <Clock className="w-3.5 h-3.5" />
+                    Estimasi ~{selectedLayananObj.estimasi_waktu || 15} Menit
+                  </span>
+                </div>
               </div>
             )}
 
-            <form onSubmit={handleAmbilAntrian}>
-              <div className="row g-3">
-                {/* 1. NIK */}
-                <div className="col-12">
-                  <label className="form-label small fw-bold text-white d-flex justify-content-between align-items-center">
-                    <span>
-                      <i className="bi bi-person-vcard text-warning me-1.5"></i>
-                      NIK (Nomor Induk Kependudukan) <span className="text-danger">*</span>
-                    </span>
-                    <span className="small text-white-50 font-monospace" style={{ fontSize: '0.75rem' }}>
-                      {formData.nik.length} / 16 Digit
-                    </span>
-                  </label>
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    name="nik"
-                    className="form-control bg-dark text-white border-secondary py-2.5 rounded-3 font-monospace"
-                    style={{ background: 'rgba(15, 23, 42, 0.9)', borderColor: 'rgba(255, 255, 255, 0.2)' }}
-                    placeholder="Contoh: 3301xxxxxxxxxxxx"
-                    maxLength={16}
-                    required
-                    value={formData.nik}
-                    onChange={handleChange}
-                    autoComplete="off"
-                  />
-                  <div className="text-white-50 mt-1" style={{ fontSize: '0.72rem' }}>
-                    Masukkan 16 digit NIK sesuai e-KTP atau Kartu Keluarga Anda.
-                  </div>
-                </div>
-
-                {/* 2. Nama Lengkap */}
-                <div className="col-12">
-                  <label className="form-label small fw-bold text-white">
-                    <i className="bi bi-person text-warning me-1.5"></i>
-                    Nama Lengkap Pemohon <span className="text-danger">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="nama"
-                    className="form-control bg-dark text-white border-secondary py-2.5 rounded-3"
-                    style={{ background: 'rgba(15, 23, 42, 0.9)', borderColor: 'rgba(255, 255, 255, 0.2)' }}
-                    placeholder="Nama lengkap sesuai e-KTP"
-                    required
-                    value={formData.nama}
-                    onChange={handleChange}
-                  />
-                </div>
-
-                {/* 3. No Telepon / WhatsApp */}
-                <div className="col-12 col-md-6">
-                  <label className="form-label small fw-bold text-white">
-                    <i className="bi bi-telephone text-warning me-1.5"></i>
-                    No. Telepon / WhatsApp <span className="text-danger">*</span>
-                  </label>
-                  <input
-                    type="tel"
-                    name="no_tlp"
-                    className="form-control bg-dark text-white border-secondary py-2.5 rounded-3"
-                    style={{ background: 'rgba(15, 23, 42, 0.9)', borderColor: 'rgba(255, 255, 255, 0.2)' }}
-                    placeholder="Contoh: 081234567890"
-                    required
-                    value={formData.no_tlp}
-                    onChange={handleChange}
-                  />
-                  <div className="text-white-50 mt-1" style={{ fontSize: '0.72rem' }}>
-                    Nomor aktif untuk konfirmasi antrian.
-                  </div>
-                </div>
-
-                {/* 4. Alamat */}
-                <div className="col-12 col-md-6">
-                  <label className="form-label small fw-bold text-white">
-                    <i className="bi bi-geo-alt text-warning me-1.5"></i>
-                    Alamat Pemohon <span className="text-danger">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="alamat"
-                    className="form-control bg-dark text-white border-secondary py-2.5 rounded-3"
-                    style={{ background: 'rgba(15, 23, 42, 0.9)', borderColor: 'rgba(255, 255, 255, 0.2)' }}
-                    placeholder="Contoh: RT 02/03 Desa Gandrungmangu"
-                    required
-                    value={formData.alamat}
-                    onChange={handleChange}
-                  />
-                </div>
-
-                {/* 5. Keperluan (Sistem Antrian) */}
-                <div className="col-12">
-                  <label className="form-label small fw-bold text-white d-flex justify-content-between align-items-center">
-                    <span>
-                      <i className="bi bi-briefcase text-warning me-1.5"></i>
-                      Keperluan Pelayanan <span className="text-danger">*</span>
-                    </span>
-                    <span className="badge bg-warning text-dark font-monospace" style={{ fontSize: '0.7rem' }}>
-                      KATEGORI: {selectedLayananObj?.kode || 'A'}
-                    </span>
-                  </label>
-
-                  {/* Dropdown Select Keperluan */}
-                  <select
-                    name="keperluanId"
-                    value={formData.keperluanId}
-                    onChange={handleChange}
-                    className="form-select bg-dark text-white border-secondary py-2.5 rounded-3 mb-2"
-                    style={{ background: 'rgba(15, 23, 42, 0.95)', borderColor: 'rgba(255, 255, 255, 0.25)' }}
-                    required
-                  >
-                    {pelayananList.map((p) => (
-                      <option key={p.id} value={p.id} className="bg-dark text-white">
-                        [{p.kode}] {p.nama} {p.loket_nama ? `(${p.loket_nama})` : ''}
-                      </option>
-                    ))}
-                  </select>
-
-                  {/* Visual Category Card Preview */}
-                  {selectedLayananObj && (
-                    <div
-                      className="p-3 rounded-3 mt-2"
-                      style={{
-                        background: 'rgba(251, 191, 36, 0.08)',
-                        border: '1px solid rgba(251, 191, 36, 0.35)'
-                      }}
-                    >
-                      <div className="d-flex align-items-center justify-content-between mb-1">
-                        <strong className="text-warning">
-                          <i className="bi bi-info-circle me-1"></i> {selectedLayananObj.nama}
-                        </strong>
-                        <span className="badge bg-dark text-warning border border-warning font-monospace">
-                          Kode {selectedLayananObj.kode}
-                        </span>
-                      </div>
-                      <p className="small text-white-50 m-0 mb-1">
-                        {selectedLayananObj.deskripsi || 'Pelayanan administrasi umum Kecamatan Gandrungmangu.'}
-                      </p>
-                      <div className="small text-white-50 d-flex gap-3 mt-1">
-                        <span><i className="bi bi-door-open text-warning me-1"></i> {selectedLayananObj.loket_nama || 'Loket Pelayanan'}</span>
-                        <span><i className="bi bi-stopwatch text-warning me-1"></i> Estimasi ~{selectedLayananObj.estimasi_waktu || 15} Menit</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
+            {/* Panduan 4 Langkah */}
+            <div className="rounded-[22px] bg-white/95 dark:bg-[#0A1F1A]/95 border border-[#E6E0D3] dark:border-[#C8A253]/20 p-5 shadow-sm space-y-3">
+              <div className="flex items-center gap-2 text-[#065F46] dark:text-[#E5C882]">
+                <ShieldCheck className="w-4 h-4" />
+                <h3 className="font-hero text-xs font-extrabold uppercase tracking-wider">
+                  Petunjuk Antrian Online
+                </h3>
               </div>
+              <ol className="space-y-2.5">
+                {[
+                  'Pilih jenis keperluan layanan (Legalisasi, Kependudukan, atau Perekaman KTP-el).',
+                  'Isi 16 digit NIK, Nama Lengkap, No. WA aktif, dan Alamat sesuai e-KTP.',
+                  'Klik Ambil Nomor Antrian lalu simpan tiket PNG ke galeri HP Anda.',
+                  'Datang ke Kantor Kecamatan & tunjukkan tiket saat nomor dipanggil petugas.',
+                ].map((step, idx) => (
+                  <li key={idx} className="flex items-start gap-2.5 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                    <span className="h-5 w-5 rounded-full bg-[#F3EFE6] dark:bg-[#064E3B] text-[#065F46] dark:text-[#E5C882] font-mono text-[10px] font-black flex items-center justify-center shrink-0 mt-0.5">
+                      {idx + 1}
+                    </span>
+                    <span>{step}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
 
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={submitting}
-                className="btn w-100 py-3 fw-bold rounded-pill shadow-lg mt-4 fs-5"
-                style={{
-                  background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
-                  color: '#0f172a',
-                  border: 'none',
-                  letterSpacing: '0.3px',
-                  boxShadow: '0 10px 25px rgba(245, 158, 11, 0.45)'
-                }}
-              >
-                {submitting ? (
-                  <>
-                    <span className="spinner-border spinner-border-sm me-2" role="status"></span>
-                    Memproses Nomor Antrian...
-                  </>
-                ) : (
-                  <>
-                    <i className="bi bi-ticket-perforated-fill me-2"></i> Ambil Antrian Sekarang
-                  </>
-                )}
-              </button>
-            </form>
+            {/* SiSukma Rating Card */}
+            <a
+              href="https://sisukma.cilacapkab.go.id/Home/pelayanan/4012001"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group block rounded-[22px] p-4 bg-gradient-to-r from-[#C8A253] via-[#D8B464] to-[#B8903D] text-[#041E17] shadow-md hover:shadow-lg transition-all"
+            >
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <span className="h-10 w-10 rounded-xl bg-[#041E17] text-[#E5C882] flex items-center justify-center shrink-0">
+                    <Star className="w-5 h-5 fill-[#E5C882]" />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="font-hero text-xs sm:text-sm font-black leading-tight">
+                      Bantu Nilai Pelayanan Kami
+                    </p>
+                    <p className="font-hero text-[11px] font-semibold text-[#041E17]/80 truncate">
+                      Survei Kepuasan Masyarakat (SiSukma Cilacap)
+                    </p>
+                  </div>
+                </div>
+                <ExternalLink className="w-4 h-4 shrink-0 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              </div>
+            </a>
           </div>
-        )}
-
-        {/* Info Petunjuk Pelayanan */}
-        <div
-          className="p-3.5 rounded-4 text-white-50 small shadow-sm"
-          style={{
-            background: 'rgba(10, 15, 29, 0.75)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255, 255, 255, 0.1)'
-          }}
-        >
-          <div className="d-flex align-items-center gap-2 mb-2 text-warning fw-bold">
-            <i className="bi bi-lightbulb-fill"></i>
-            <span>Petunjuk Mengambil Antrian Online</span>
-          </div>
-          <ol className="m-0 ps-3 space-y-1">
-            <li>Cukup masukkan <strong>NIK</strong>, <strong>Nama Lengkap</strong>, <strong>No Telepon/WA</strong>, <strong>Alamat</strong>, dan pilih <strong>Keperluan</strong>.</li>
-            <li>Klik tombol <strong>Ambil Antrian Sekarang</strong> untuk memperoleh nomor antrian resmi dari sistem.</li>
-            <li>Setelah nomor antrian muncul, klik tombol <strong>Download Gambar Nomor Antrian</strong> untuk menyimpan tiket ke galeri HP Anda.</li>
-            <li>Datanglah ke Kantor Kecamatan Gandrungmangu sesuai jam pelayanan dan tunjukkan tiket nomor antrian digital kepada petugas loket.</li>
-          </ol>
         </div>
-
-        {/* Banner Bantu Nilai Kami (SiSukma Cilacap) */}
-        <div className="text-center mt-3">
-          <a
-            href="https://sisukma.cilacapkab.go.id/Home/pelayanan/4012001"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn btn-sm rounded-pill px-4 py-2 text-warning d-inline-flex align-items-center gap-2 shadow-sm"
-            style={{ backdropFilter: 'blur(10px)', background: 'rgba(251, 191, 36, 0.12)', border: '1px solid rgba(251, 191, 36, 0.35)' }}
-          >
-            <i className="bi bi-star-fill text-warning"></i>
-            <span className="fw-bold">Bantu Nilai Pelayanan Kami di SiSukma</span>
-            <i className="bi bi-box-arrow-up-right small"></i>
-          </a>
-        </div>
-
-        {/* Footer info */}
-        <div className="text-center text-white-50 small mt-4">
-          &copy; {new Date().getFullYear()} Sistem Antrian Online • {instansiNama}
-        </div>
-      </div>
+      </main>
     </div>
   );
 }

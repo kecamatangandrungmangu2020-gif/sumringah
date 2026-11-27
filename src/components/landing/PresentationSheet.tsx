@@ -125,7 +125,7 @@ export function PresentationSheet({
     <section
       id={id}
       className={cn(
-        'relative mx-auto max-w-7xl px-3 sm:px-5 lg:px-8 py-3.5 sm:py-5 scroll-mt-20 sm:scroll-mt-24 snap-section',
+        'relative mx-auto max-w-7xl px-2.5 sm:px-5 lg:px-8 py-2.5 sm:py-5 scroll-mt-16 sm:scroll-mt-24 snap-section',
         className
       )}
     >
@@ -135,11 +135,11 @@ export function PresentationSheet({
         viewport={VIEWPORT_ONCE}
         transition={{ duration: 0.45, ease: EASE_OUT_EXPO }}
         className={cn(
-          'relative overflow-hidden rounded-[24px] sm:rounded-[32px] transition-colors duration-300',
+          'relative overflow-hidden rounded-[20px] sm:rounded-[32px] transition-colors duration-300',
           isOcean
             ? 'bg-gradient-to-br from-[#064E3B] via-[#065F46] to-[#04231B] text-white border border-[#C8A253]/20 shadow-[0_22px_60px_rgba(4,30,23,0.2)]'
             : 'bg-white dark:bg-[#0A1F1A] text-[#041E17] dark:text-slate-100 border border-slate-200/90 dark:border-white/10 shadow-[0_12px_40px_rgba(4,30,23,0.06)] dark:shadow-[0_20px_55px_rgba(0,0,0,0.48)]',
-          !noPadding && 'p-5 sm:p-8 lg:p-10',
+          !noPadding && 'p-3.5 sm:p-8 lg:p-10',
           innerClassName
         )}
       >
@@ -161,8 +161,8 @@ export function PresentationSheet({
         {/* Running Deck Header Bar */}
         <div
           className={cn(
-            'relative z-10 flex items-center justify-between gap-3 pb-4 mb-5 sm:mb-7 border-b',
-            noPadding && 'px-5 sm:px-8 lg:px-10 pt-5 sm:pt-7',
+            'relative z-10 flex items-center justify-between gap-2 pb-2.5 mb-3.5 sm:pb-4 sm:mb-7 border-b',
+            noPadding && 'px-3.5 sm:px-8 lg:px-10 pt-3.5 sm:pt-7',
             isOcean
               ? 'border-white/15'
               : 'border-slate-200/80 dark:border-white/10'

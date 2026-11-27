@@ -358,7 +358,7 @@ export default function PengaduanAdminPage() {
                         <div className="flex gap-2 shrink-0">
                           {/* Hubungi via WA */}
                           <a
-                            href={`https://wa.me/62${item.nohp.replace(/^0/, '').replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Halo ${item.nama}, kami merespons pengaduan Anda: "${item.subjek}".`)}`}
+                            href={`https://wa.me/${item.nohp.replace(/\D/g, '').replace(/^0/, '62').replace(/^(?!62)/, '62')}?text=${encodeURIComponent(`Halo ${item.nama}, kami merespons pengaduan Anda: "${item.subjek}".`)}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold transition-colors"

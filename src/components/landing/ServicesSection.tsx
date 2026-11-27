@@ -101,18 +101,18 @@ export function ServicesSection() {
       variant="ocean"
       silhouette="waves"
     >
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-6 sm:mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2.5 mb-4 sm:mb-8">
         <div>
-          <h2 className="font-hero font-bold text-2xl sm:text-3xl lg:text-[34px] tracking-tight text-white leading-tight">
+          <h2 className="font-hero font-bold text-xl sm:text-3xl lg:text-[34px] tracking-tight text-white leading-tight">
             Layanan Digital Terpadu
           </h2>
-          <p className="mt-1 font-hero text-xs sm:text-sm text-[#F5E9CC]/85 max-w-2xl">
+          <p className="mt-0.5 sm:mt-1 font-hero text-[11.5px] sm:text-sm text-[#F5E9CC]/85 max-w-2xl">
             Akses cepat antrian online, layanan surat, agenda kedinasan, laporan kegiatan, dan data geospasial Kecamatan Gandrungmangu
           </p>
         </div>
         <Link
           href="/Antrian/online/"
-          className="inline-flex items-center gap-2 self-start sm:self-auto px-4 py-2 rounded-full bg-white/15 hover:bg-[#C8A253] text-white hover:text-[#041E17] border border-white/25 font-hero text-xs font-semibold transition-all duration-200"
+          className="inline-flex items-center gap-2 self-start sm:self-auto px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full bg-white/15 hover:bg-[#C8A253] text-white hover:text-[#041E17] border border-white/25 font-hero text-[11px] sm:text-xs font-semibold transition-all duration-200"
         >
           <span>Mulai Layanan</span>
           <ArrowRight className="h-3.5 w-3.5" />
@@ -124,34 +124,34 @@ export function ServicesSection() {
         initial="hidden"
         whileInView="visible"
         viewport={VIEWPORT_ONCE}
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+        className="grid grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-4"
       >
         {SERVICE_CARDS.map((item) => {
           const Icon = item.icon;
           const cardContent = (
-            <div className="group flex flex-col justify-between h-full rounded-[22px] bg-white dark:bg-[#0d1c2b] text-[#041E17] dark:text-white p-4 sm:p-5 shadow-[0_14px_34px_rgba(3,20,30,0.28)] border border-white/80 dark:border-white/10 transition-all duration-300">
+            <div className="group flex flex-col justify-between h-full rounded-[16px] sm:rounded-[22px] bg-white dark:bg-[#0d1c2b] text-[#041E17] dark:text-white p-3 sm:p-5 shadow-[0_14px_34px_rgba(3,20,30,0.28)] border border-white/80 dark:border-white/10 transition-all duration-300">
               {/* Header Kartu: Kategori, Judul & Tombol Panah */}
-              <div className="flex items-center justify-between gap-2 pb-3 mb-3 border-b border-slate-100 dark:border-white/10">
+              <div className="flex items-start justify-between gap-1.5 pb-2 mb-2 sm:pb-3 sm:mb-3 border-b border-slate-100 dark:border-white/10">
                 <div className="min-w-0">
-                  <span className="font-mono text-[9.5px] font-bold uppercase tracking-[0.14em] text-[#065F46] dark:text-[#E5C882] block truncate">
+                  <span className="font-mono text-[8.5px] sm:text-[9.5px] font-bold uppercase tracking-[0.1em] sm:tracking-[0.14em] text-[#065F46] dark:text-[#E5C882] block truncate">
                     {item.category}
                   </span>
-                  <h3 className="font-hero font-bold text-sm sm:text-[15.5px] text-[#041E17] dark:text-white group-hover:text-[#065F46] dark:group-hover:text-[#E5C882] transition-colors line-clamp-1 mt-0.5">
+                  <h3 className="font-hero font-bold text-[12.5px] sm:text-[15.5px] text-[#041E17] dark:text-white group-hover:text-[#065F46] dark:group-hover:text-[#E5C882] transition-colors line-clamp-1 mt-0.5">
                     {item.title}
                   </h3>
                 </div>
-                <span className="h-8 w-8 rounded-full bg-[#F3EFE6] group-hover:bg-[#065F46] text-[#065F46] group-hover:text-white dark:bg-white/10 dark:text-[#E5C882] flex items-center justify-center shrink-0 transition-all duration-200">
+                <span className="h-6 w-6 sm:h-8 sm:w-8 rounded-full bg-[#F3EFE6] group-hover:bg-[#065F46] text-[#065F46] group-hover:text-white dark:bg-white/10 dark:text-[#E5C882] flex items-center justify-center shrink-0 transition-all duration-200">
                   {item.external ? (
-                    <ExternalLink className="h-3.5 w-3.5" />
+                    <ExternalLink className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                   ) : (
-                    <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                    <ArrowRight className="h-3 w-3 sm:h-3.5 sm:w-3.5 transition-transform group-hover:translate-x-0.5" />
                   )}
                 </span>
               </div>
 
               {/* Visual Icon Banner */}
               <div
-                className={`relative w-full h-24 rounded-2xl overflow-hidden bg-gradient-to-br ${item.accentBg} mb-3.5 flex items-center justify-between px-5 text-white`}
+                className={`relative w-full h-14 sm:h-24 rounded-xl sm:rounded-2xl overflow-hidden bg-gradient-to-br ${item.accentBg} mb-2 sm:mb-3.5 flex items-center justify-between px-3 sm:px-5 text-white`}
               >
                 <div
                   className="absolute inset-0 opacity-15"
@@ -160,22 +160,22 @@ export function ServicesSection() {
                     backgroundSize: '16px 16px',
                   }}
                 />
-                <div className="relative z-10 h-12 w-12 rounded-2xl bg-white/15 backdrop-blur-md border border-white/25 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                  <Icon className="h-6 w-6 text-[#E5C882]" />
+                <div className="relative z-10 h-8 w-8 sm:h-12 sm:w-12 rounded-xl sm:rounded-2xl bg-white/15 backdrop-blur-md border border-white/25 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <Icon className="h-4 w-4 sm:h-6 sm:w-6 text-[#E5C882]" />
                 </div>
-                <span className="relative z-10 font-mono text-[10px] uppercase tracking-[0.2em] text-[#F5E9CC]/80">
+                <span className="relative z-10 hidden sm:inline font-mono text-[10px] uppercase tracking-[0.2em] text-[#F5E9CC]/80">
                   SEMRINGAH
                 </span>
               </div>
 
               {/* Deskripsi & Bottom Tag */}
-              <div className="flex-1 flex flex-col justify-between gap-3">
-                <p className="font-hero text-xs text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed">
+              <div className="flex-1 flex flex-col justify-between gap-2 sm:gap-3">
+                <p className="font-hero text-[10.5px] sm:text-xs text-slate-600 dark:text-slate-300 line-clamp-2 leading-snug sm:leading-relaxed">
                   {item.subtitle}
                 </p>
-                <div className="flex items-center justify-between gap-2 pt-1">
+                <div className="flex items-center justify-between gap-1.5 pt-0.5 sm:pt-1">
                   <span
-                    className={`inline-flex items-center px-3 py-1 rounded-full font-hero text-[10px] font-bold uppercase tracking-wider ${
+                    className={`inline-flex items-center px-2 py-0.5 sm:px-3 sm:py-1 rounded-full font-hero text-[8.5px] sm:text-[10px] font-bold uppercase tracking-wider truncate ${
                       item.priority
                         ? 'bg-[#041E17] text-[#C8A253] dark:bg-[#C8A253] dark:text-[#041E17]'
                         : 'bg-[#F3EFE6] text-[#065F46] dark:bg-[#064E3B]/60 dark:text-[#E5C882]'
@@ -183,7 +183,7 @@ export function ServicesSection() {
                   >
                     {item.badge}
                   </span>
-                  <span className="font-hero text-[11px] font-bold text-[#065F46] dark:text-[#E5C882] group-hover:underline">
+                  <span className="font-hero text-[10px] sm:text-[11px] font-bold text-[#065F46] dark:text-[#E5C882] group-hover:underline shrink-0">
                     Akses →
                   </span>
                 </div>

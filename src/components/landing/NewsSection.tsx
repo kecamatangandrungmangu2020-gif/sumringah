@@ -47,12 +47,12 @@ export function NewsSection({ newsList, formatNewsDate, onSelectNews }: NewsSect
       sectionNumber="03"
       deckLabel="Warta & Publikasi"
     >
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6 sm:mb-7">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-2.5 mb-4 sm:mb-7">
         <div>
-          <h2 className="font-hero font-bold text-2xl sm:text-3xl lg:text-[34px] tracking-tight text-[#041E17] dark:text-white leading-tight">
+          <h2 className="font-hero font-bold text-xl sm:text-3xl lg:text-[34px] tracking-tight text-[#041E17] dark:text-white leading-tight">
             Informasi &amp; Warta <span className="text-[#065F46] dark:text-[#E5C882]">Gandrungmangu</span>
           </h2>
-          <p className="mt-1 font-hero text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+          <p className="mt-0.5 sm:mt-1 font-hero text-[11.5px] sm:text-sm text-slate-500 dark:text-slate-400">
             Publikasi resmi kegiatan pemerintahan, pelayanan publik, dan kabar masyarakat Kecamatan
           </p>
         </div>
@@ -88,7 +88,7 @@ export function NewsSection({ newsList, formatNewsDate, onSelectNews }: NewsSect
                 initial="hidden"
                 whileInView="visible"
                 viewport={VIEWPORT_ONCE}
-                className="grid grid-cols-1 sm:grid-cols-2 gap-3.5"
+                className="grid grid-cols-2 gap-2.5 sm:gap-3.5"
               >
                 {secondaryNews.map((art, idx) => (
                   <motion.div
@@ -100,28 +100,28 @@ export function NewsSection({ newsList, formatNewsDate, onSelectNews }: NewsSect
                     <button
                       type="button"
                       onClick={() => onSelectNews(art)}
-                      className="w-full text-left group flex flex-col justify-between h-full rounded-2xl bg-[#F2F7F9] dark:bg-white/[0.04] hover:bg-[#E7F2F6] dark:hover:bg-white/[0.08] border border-slate-200/70 dark:border-white/10 p-4 transition-all duration-200 cursor-pointer"
+                      className="w-full text-left group flex flex-col justify-between h-full rounded-xl sm:rounded-2xl bg-[#F2F7F9] dark:bg-white/[0.04] hover:bg-[#E7F2F6] dark:hover:bg-white/[0.08] border border-slate-200/70 dark:border-white/10 p-3 sm:p-4 transition-all duration-200 cursor-pointer"
                     >
-                      <div className="space-y-2 w-full">
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#065F46] text-white font-hero text-[9.5px] font-bold uppercase tracking-wider truncate max-w-[60%]">
+                      <div className="space-y-1.5 sm:space-y-2 w-full">
+                        <div className="flex items-center justify-between gap-1">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#065F46] text-white font-hero text-[8.5px] sm:text-[9.5px] font-bold uppercase tracking-wider truncate max-w-[65%]">
                             {art.youtubeVideoId && <Video className="h-2.5 w-2.5 shrink-0" />}
                             {art.category || 'INFORMASI'}
                           </span>
-                          <span className="font-mono text-[10px] text-slate-500 dark:text-slate-400 shrink-0">
+                          <span className="hidden sm:inline font-mono text-[10px] text-slate-500 dark:text-slate-400 shrink-0">
                             {formatNewsDate(art.date)}
                           </span>
                         </div>
-                        <h3 className="font-hero font-bold text-sm text-[#041E17] dark:text-white group-hover:text-[#065F46] dark:group-hover:text-[#E5C882] transition-colors line-clamp-2 leading-snug">
+                        <h3 className="font-hero font-bold text-[12px] sm:text-sm text-[#041E17] dark:text-white group-hover:text-[#065F46] dark:group-hover:text-[#E5C882] transition-colors line-clamp-2 leading-snug">
                           {art.title}
                         </h3>
-                        <p className="font-hero text-xs text-slate-600 dark:text-slate-400 line-clamp-2 leading-relaxed">
+                        <p className="font-hero text-[10.5px] sm:text-xs text-slate-600 dark:text-slate-400 line-clamp-2 leading-snug sm:leading-relaxed">
                           {art.excerpt || art.content}
                         </p>
                       </div>
-                      <div className="pt-3 mt-2 w-full flex items-center justify-between text-[11px] font-hero font-semibold text-[#065F46] dark:text-[#E5C882]">
+                      <div className="pt-2 sm:pt-3 mt-1.5 sm:mt-2 w-full flex items-center justify-between text-[10px] sm:text-[11px] font-hero font-semibold text-[#065F46] dark:text-[#E5C882]">
                         <span className="truncate text-slate-500 dark:text-slate-400 font-normal">
-                          {art.author || 'Redaksi Kecamatan'}
+                          {formatNewsDate(art.date)}
                         </span>
                         <span className="shrink-0 group-hover:translate-x-0.5 transition-transform">
                           Baca →
@@ -192,7 +192,7 @@ export function NewsSection({ newsList, formatNewsDate, onSelectNews }: NewsSect
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') onSelectNews(featuredNews);
               }}
-              className="group relative flex flex-col justify-end h-full min-h-[360px] lg:min-h-[430px] rounded-[24px] overflow-hidden bg-[#041E17] p-6 text-white shadow-[0_16px_42px_rgba(4,30,23,0.18)] cursor-pointer"
+              className="group relative flex flex-col justify-end h-full min-h-[250px] sm:min-h-[360px] lg:min-h-[430px] rounded-[20px] sm:rounded-[24px] overflow-hidden bg-[#041E17] p-4 sm:p-6 text-white shadow-[0_16px_42px_rgba(4,30,23,0.18)] cursor-pointer"
             >
               <div className="absolute inset-0">
                 {featuredNews.imageUrl || (featuredNews.images && featuredNews.images.length > 0) || featuredNews.youtubeVideoId ? (

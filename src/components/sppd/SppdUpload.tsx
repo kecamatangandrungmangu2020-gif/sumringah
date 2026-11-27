@@ -370,14 +370,14 @@ export function SppdUpload({ onSuccess, initialData }: SppdUploadProps) {
       )}
 
       <TabsContent value="agenda" className="mt-0 space-y-4">
-        <div className="flex items-end gap-2 p-4 border rounded-2xl bg-accent/5 shadow-inner border-accent/10">
+        <div className="flex items-end gap-2 p-4 border rounded-2xl bg-[#F3EFE6]/60 dark:bg-white/5 shadow-inner border-[#065F46]/15 dark:border-[#C8A253]/20">
           <div className="flex-1">
-            <label className="text-[10px] font-black uppercase text-accent mb-1 block">Pilih Tanggal Agenda</label>
+            <label className="text-[10px] font-black uppercase text-[#065F46] dark:text-[#E5C882] mb-1 block">Pilih Tanggal Agenda</label>
             <Input
               type="date"
               value={selectedCalendarDate}
               onChange={(e) => setSelectedCalendarDate(e.target.value)}
-              className="h-12 font-black border-accent/20 bg-white"
+              className="h-12 font-black border-[#065F46]/25 bg-white dark:bg-[#05110E]"
             />
           </div>
           <Button
@@ -386,16 +386,16 @@ export function SppdUpload({ onSuccess, initialData }: SppdUploadProps) {
             size="icon"
             onClick={() => handleSync(selectedCalendarDate)}
             disabled={isSyncing}
-            className="h-12 w-12 shrink-0 border-accent/20 bg-white shadow-sm"
+            className="h-12 w-12 shrink-0 border-[#065F46]/25 bg-white dark:bg-[#05110E] hover:bg-[#065F46]/10 shadow-sm"
           >
-            <RefreshCw className={cn("h-5 w-5 text-accent", isSyncing && "animate-spin")} />
+            <RefreshCw className={cn("h-5 w-5 text-[#065F46] dark:text-[#E5C882]", isSyncing && "animate-spin")} />
           </Button>
         </div>
 
         <ScrollArea className="h-[300px] border rounded-2xl p-2 bg-muted/20">
           {isSyncing ? (
             <div className="flex flex-col items-center justify-center py-16 gap-3">
-              <Loader2 className="h-8 w-8 animate-spin text-accent/40" />
+              <Loader2 className="h-8 w-8 animate-spin text-[#065F46] dark:text-[#E5C882]" />
               <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Menyambungkan Kalender...</p>
             </div>
           ) : agendas.length > 0 ? (
@@ -405,21 +405,21 @@ export function SppdUpload({ onSuccess, initialData }: SppdUploadProps) {
                   key={agenda.id}
                   type="button"
                   onClick={() => handleSelectAgenda(agenda)}
-                  className="w-full text-left p-4 rounded-xl border bg-card hover:bg-accent/5 transition-all flex items-start justify-between gap-3 group shadow-sm border-accent/10"
+                  className="w-full text-left p-4 rounded-xl border bg-card hover:bg-[#065F46]/5 transition-all flex items-start justify-between gap-3 group shadow-sm border-[#065F46]/15"
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-[7px] font-black uppercase px-1.5 py-0.5 rounded border bg-sky-100 border-sky-200 text-sky-700">
+                      <span className="text-[7px] font-black uppercase px-1.5 py-0.5 rounded border bg-emerald-100 border-emerald-200 text-emerald-800 dark:bg-emerald-950/60 dark:border-emerald-800 dark:text-emerald-300">
                         EKSTERNAL
                       </span>
                     </div>
-                    <p className="text-sm font-black group-hover:text-accent leading-tight whitespace-normal">{agenda.summary}</p>
+                    <p className="text-sm font-black group-hover:text-[#065F46] dark:group-hover:text-[#E5C882] leading-tight whitespace-normal">{agenda.summary}</p>
                     <div className="flex items-center gap-2 mt-2">
-                      <MapPin className="h-3 w-3 text-accent/50" />
+                      <MapPin className="h-3 w-3 text-[#065F46] dark:text-[#E5C882]" />
                       <p className="text-[10px] text-muted-foreground truncate font-bold uppercase">{agenda.location || "Luar Kecamatan"}</p>
                     </div>
                   </div>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-accent shrink-0 mt-1" />
+                  <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-[#065F46] dark:group-hover:text-[#E5C882] shrink-0 mt-1" />
                 </button>
               ))}
             </div>
@@ -538,12 +538,12 @@ export function SppdUpload({ onSuccess, initialData }: SppdUploadProps) {
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex items-center justify-between">
-                      <FormLabel className="text-[9px] font-black uppercase text-accent">No. SPPD</FormLabel>
+                      <FormLabel className="text-[9px] font-black uppercase text-[#065F46] dark:text-[#E5C882]">No. SPPD</FormLabel>
                       <button
                         type="button"
                         onClick={handlePullSppdNumber}
                         disabled={isFetchingSppdNumber}
-                        className="text-[8px] font-black text-accent uppercase flex items-center gap-1 hover:opacity-70 disabled:opacity-50"
+                        className="text-[8px] font-black text-[#065F46] dark:text-[#E5C882] uppercase flex items-center gap-1 hover:opacity-70 disabled:opacity-50"
                       >
                         {isFetchingSppdNumber ? <Loader2 className="h-2.5 w-2.5 animate-spin" /> : <Sparkles className="h-2.5 w-2.5" />}
                         Tarik Nomor
@@ -551,8 +551,8 @@ export function SppdUpload({ onSuccess, initialData }: SppdUploadProps) {
                     </div>
                     <FormControl>
                       <div className="relative">
-                        <Hash className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-accent/40" />
-                        <Input placeholder="000.1.2.3 / XXX / 49 / 2026" className="h-10 pl-9 border-accent/20 font-mono text-[11px] font-bold bg-white" {...field} />
+                        <Hash className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#065F46]/60 dark:text-[#E5C882]/60" />
+                        <Input placeholder="000.1.2.3 / XXX / 49 / 2026" className="h-10 pl-9 border-[#065F46]/25 font-mono text-[11px] font-bold bg-white dark:bg-[#05110E]" {...field} />
                       </div>
                     </FormControl>
                     <FormMessage />
@@ -733,13 +733,13 @@ export function SppdUpload({ onSuccess, initialData }: SppdUploadProps) {
                 <FormItem>
                   <FormLabel className="text-[10px] font-black uppercase text-muted-foreground">Estimasi Biaya (Rp)</FormLabel>
                   <FormControl>
-                    <Input type="number" placeholder="500000" className="h-11 border-accent/20 font-black text-accent" {...field} />
+                    <Input type="number" placeholder="500000" className="h-11 border-[#065F46]/25 font-black text-[#065F46] dark:text-[#E5C882]" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full h-14 text-base font-black uppercase shadow-lg bg-accent hover:bg-accent/90 rounded-2xl transition-all active:scale-[0.98]" disabled={isUploading}>
+            <Button type="submit" className="w-full h-14 text-base font-black uppercase shadow-lg bg-[#065F46] hover:bg-[#041E17] text-white rounded-2xl transition-all active:scale-[0.98]" disabled={isUploading}>
               {isUploading ? <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> MENGIRIM...</> : initialData ? <><Save className="mr-2 h-5 w-5" /> SIMPAN PERUBAHAN</> : <><Plane className="mr-2 h-5 w-5" /> AJUKAN SEKARANG</>}
             </Button>
           </form>

@@ -268,7 +268,7 @@ export function SppdCetakForm() {
 
                   <Button 
                     onClick={() => handlePrintSPPD(selectedSppd)}
-                    className="h-14 justify-start gap-4 text-sm font-black uppercase bg-accent hover:bg-accent/90 rounded-2xl shadow-lg"
+                    className="h-14 justify-start gap-4 text-sm font-black uppercase bg-[#065F46] hover:bg-[#041E17] text-white rounded-2xl shadow-lg"
                     disabled={isGeneratingSPPD}
                   >
                     <div className="h-8 w-8 rounded-lg bg-white/20 flex items-center justify-center">

@@ -45,13 +45,19 @@ interface HeaderProps {
   isAuthenticated?: boolean;
 }
 
-const primaryNavItems = [
+const primaryNavItems: Array<{
+  href: string;
+  label: string;
+  isHome?: boolean;
+  external?: boolean;
+}> = [
   { href: '#hero-roto-section', label: 'Beranda', isHome: true },
-  { href: '#layanan', label: 'Pelayanan' },
-  { href: '#informasi', label: 'Informasi' },
-  { href: '#agenda', label: 'Agenda' },
-  { href: '#wilayah', label: 'Wilayah' },
-  { href: '#pengaduan', label: 'Pengaduan' },
+  { href: '/Antrian/online/', label: 'Pelayanan' },
+  { href: '/informasi/', label: 'Informasi' },
+  { href: '/agenda-kecamatan/', label: 'Agenda' },
+  { href: 'https://solid.gandrungmangu.id/', label: 'Wilayah', external: true },
+  { href: '/pengaduan/', label: 'Pengaduan' },
+  { href: 'https://gandrungmangu.cilacapkab.go.id/', label: 'Berita Desa', external: true },
 ];
 
 export function Header({ logoImage, desaList, isAuthenticated }: HeaderProps) {
@@ -206,17 +212,31 @@ export function Header({ logoImage, desaList, isAuthenticated }: HeaderProps) {
             </div>
 
             <div className="space-y-1.5">
-              {primaryNavItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setMobileSheetOpen(false)}
-                  className="px-4 py-2.5 rounded-2xl text-xs font-hero font-bold uppercase tracking-wider flex items-center justify-between transition-all duration-200 neu-btn text-[#041E17] dark:text-slate-200 hover:text-[#065F46]"
-                >
-                  <span>{item.label}</span>
-                  <ChevronRight className="h-3.5 w-3.5 opacity-40 shrink-0" />
-                </Link>
-              ))}
+              {primaryNavItems.map((item) =>
+                item.external ? (
+                  <a
+                    key={item.href}
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => setMobileSheetOpen(false)}
+                    className="px-4 py-2.5 rounded-2xl text-xs font-hero font-bold uppercase tracking-wider flex items-center justify-between transition-all duration-200 neu-btn text-[#041E17] dark:text-slate-200 hover:text-[#065F46]"
+                  >
+                    <span>{item.label}</span>
+                    <ExternalLink className="h-3.5 w-3.5 opacity-55 shrink-0" />
+                  </a>
+                ) : (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setMobileSheetOpen(false)}
+                    className="px-4 py-2.5 rounded-2xl text-xs font-hero font-bold uppercase tracking-wider flex items-center justify-between transition-all duration-200 neu-btn text-[#041E17] dark:text-slate-200 hover:text-[#065F46]"
+                  >
+                    <span>{item.label}</span>
+                    <ChevronRight className="h-3.5 w-3.5 opacity-40 shrink-0" />
+                  </Link>
+                )
+              )}
               <Link
                 href="/input/"
                 onClick={() => setMobileSheetOpen(false)}
@@ -334,33 +354,36 @@ export function Header({ logoImage, desaList, isAuthenticated }: HeaderProps) {
             aria-label="Navigasi Utama"
             className="hidden lg:flex flex-1 items-center justify-center h-[68px] pt-2.5 px-3 xl:px-6 pointer-events-auto"
           >
-            <div className="flex items-center gap-3 xl:gap-5 2xl:gap-6">
-              {primaryNavItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={cn(
-                    'relative font-hero text-[12.5px] xl:text-[13.5px] tracking-[0.01em] transition-all duration-200 whitespace-nowrap py-1 drop-shadow-[0_2px_8px_rgba(3,20,30,0.65)]',
-                    item.isHome
-                      ? 'text-white font-bold after:content-[""] after:absolute after:left-0 after:right-0 after:-bottom-0.5 after:h-[2px] after:bg-[#E5C882] after:rounded-full'
-                      : 'text-white/90 hover:text-white font-medium'
-                  )}
-                >
-                  {item.label}
-                </Link>
-              ))}
+            <div className="flex items-center gap-2.5 xl:gap-4 2xl:gap-5">
+              {primaryNavItems.map((item) =>
+                item.external ? (
+                  <a
+                    key={item.href}
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 font-hero text-[12px] xl:text-[13px] font-medium text-white/90 hover:text-white tracking-[0.01em] transition-all duration-200 whitespace-nowrap py-1 drop-shadow-[0_2px_8px_rgba(3,20,30,0.65)]"
+                  >
+                    <span>{item.label}</span>
+                    <ExternalLink className="h-3 w-3 opacity-80" />
+                  </a>
+                ) : (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={cn(
+                      'relative font-hero text-[12px] xl:text-[13px] tracking-[0.01em] transition-all duration-200 whitespace-nowrap py-1 drop-shadow-[0_2px_8px_rgba(3,20,30,0.65)]',
+                      item.isHome
+                        ? 'text-white font-bold after:content-[""] after:absolute after:left-0 after:right-0 after:-bottom-0.5 after:h-[2px] after:bg-[#E5C882] after:rounded-full'
+                        : 'text-white/90 hover:text-white font-medium'
+                    )}
+                  >
+                    {item.label}
+                  </Link>
+                )
+              )}
 
               {desaDropdownMenu(false)}
-
-              <a
-                href="https://gandrungmangu.cilacapkab.go.id/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hidden 2xl:inline-flex items-center gap-1 font-hero text-[13px] font-medium text-white/90 hover:text-white transition-all py-1 drop-shadow-[0_2px_8px_rgba(3,20,30,0.65)] whitespace-nowrap"
-              >
-                <span>Web Resmi</span>
-                <ExternalLink className="h-3 w-3 opacity-80" />
-              </a>
             </div>
           </nav>
 
@@ -435,21 +458,34 @@ export function Header({ logoImage, desaList, isAuthenticated }: HeaderProps) {
       <div className="mx-auto flex items-center justify-between h-14 sm:h-[62px] max-w-7xl px-3 sm:px-4 lg:px-5 xl:px-6 rounded-full bg-white/95 dark:bg-[#05110E]/95 backdrop-blur-2xl border border-slate-200/80 dark:border-white/10 shadow-[0_12px_36px_rgba(15,23,42,0.08),0_2px_6px_rgba(15,23,42,0.03)] dark:shadow-[0_16px_48px_rgba(0,0,0,0.75)] pointer-events-auto transition-all duration-300">
         <div className="mr-2 xl:mr-4 shrink-0">{brandBlock}</div>
 
-        <nav className="hidden lg:flex items-center gap-1 xl:gap-1.5 shrink-0">
-          {primaryNavItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                'font-hero text-[12px] xl:text-[13px] tracking-[0.01em] transition-all px-3 py-1.5 rounded-full relative whitespace-nowrap',
-                item.isHome
-                  ? 'bg-[#065F46] text-white font-semibold shadow-xs'
-                  : 'text-slate-700 dark:text-slate-300 hover:text-[#065F46] dark:hover:text-[#E5C882] hover:bg-[#F3EFE6] dark:hover:bg-white/5 font-medium'
-              )}
-            >
-              {item.label}
-            </Link>
-          ))}
+        <nav className="hidden lg:flex items-center gap-0.5 xl:gap-1 shrink-0">
+          {primaryNavItems.map((item) =>
+            item.external ? (
+              <a
+                key={item.href}
+                href={item.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 font-hero text-[11.5px] xl:text-[12.5px] tracking-[0.01em] transition-all px-2.5 py-1.5 rounded-full relative whitespace-nowrap text-slate-700 dark:text-slate-300 hover:text-[#065F46] dark:hover:text-[#E5C882] hover:bg-[#F3EFE6] dark:hover:bg-white/5 font-medium"
+              >
+                <span>{item.label}</span>
+                <ExternalLink className="h-3 w-3 opacity-70" />
+              </a>
+            ) : (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  'font-hero text-[11.5px] xl:text-[12.5px] tracking-[0.01em] transition-all px-2.5 py-1.5 rounded-full relative whitespace-nowrap',
+                  item.isHome
+                    ? 'bg-[#065F46] text-white font-semibold shadow-xs'
+                    : 'text-slate-700 dark:text-slate-300 hover:text-[#065F46] dark:hover:text-[#E5C882] hover:bg-[#F3EFE6] dark:hover:bg-white/5 font-medium'
+                )}
+              >
+                {item.label}
+              </Link>
+            )
+          )}
 
           {desaDropdownMenu(true)}
         </nav>
