@@ -413,11 +413,11 @@ export default function AdminLandingPage() {
                     transition={{ type: 'spring', stiffness: 320, damping: 22 }}
                     className="group relative overflow-hidden rounded-[24px] p-5 sm:p-6 text-left cursor-pointer border border-[#C8A253]/40 bg-gradient-to-br from-[#065F46]/95 via-[#064E3B]/95 to-[#041E17]/95 backdrop-blur-xl shadow-[0_18px_45px_rgba(4,30,23,0.45)] hover:shadow-[0_24px_60px_rgba(6,95,70,0.6)] hover:border-[#E5C882]/80 transition-colors"
                   >
-                    {/* Subtle Semringah Watermark */}
+                    {/* Subtle Tugu Watermark */}
                     <div
                       aria-hidden="true"
-                      className="pointer-events-none absolute -right-4 -bottom-4 w-36 h-36 opacity-[0.14] group-hover:opacity-[0.24] group-hover:scale-110 transition-all duration-500 bg-no-repeat bg-contain bg-right-bottom"
-                      style={{ backgroundImage: "url('/images/gandrungmangu-semringah-silhouette.webp')" }}
+                      className="pointer-events-none absolute right-1 bottom-1 w-32 h-36 opacity-[0.18] group-hover:opacity-[0.28] group-hover:scale-105 transition-all duration-500 bg-no-repeat bg-contain bg-right-bottom"
+                      style={{ backgroundImage: "url('/images/tugu-gandrungmangu-silhouette.webp')" }}
                     />
                     {/* Shimmer Sweep on Hover */}
                     <div className="pointer-events-none absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/15 to-transparent" />
@@ -491,11 +491,11 @@ export default function AdminLandingPage() {
                     transition={{ type: 'spring', stiffness: 320, damping: 22, delay: 0.06 }}
                     className="group relative overflow-hidden rounded-[24px] p-5 sm:p-6 text-left cursor-pointer border border-amber-200/70 bg-gradient-to-br from-[#C8A253] via-[#B8903D] to-[#9A742B] text-[#041E17] shadow-[0_18px_45px_rgba(200,162,83,0.32)] hover:shadow-[0_24px_60px_rgba(200,162,83,0.52)] hover:border-white transition-colors"
                   >
-                    {/* Subtle Semringah Watermark */}
+                    {/* Subtle Tugu Watermark */}
                     <div
                       aria-hidden="true"
-                      className="pointer-events-none absolute -right-4 -bottom-4 w-36 h-36 opacity-[0.12] group-hover:opacity-[0.22] group-hover:scale-110 transition-all duration-500 bg-no-repeat bg-contain bg-right-bottom"
-                      style={{ backgroundImage: "url('/images/gandrungmangu-semringah-silhouette.webp')" }}
+                      className="pointer-events-none absolute right-1 bottom-1 w-32 h-36 opacity-[0.15] group-hover:opacity-[0.25] group-hover:scale-105 transition-all duration-500 bg-no-repeat bg-contain bg-right-bottom"
+                      style={{ backgroundImage: "url('/images/tugu-gandrungmangu-silhouette-dark.webp')" }}
                     />
                     {/* Shimmer Sweep on Hover */}
                     <div className="pointer-events-none absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/35 to-transparent" />

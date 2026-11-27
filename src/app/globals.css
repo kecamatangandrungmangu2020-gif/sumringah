@@ -251,6 +251,13 @@ html {
   }
   .card-Kecamatan {
     @apply rounded-2xl md:rounded-3xl border border-[#E6E0D3]/90 dark:border-[#C8A253]/20 bg-white/95 dark:bg-[#0A1F1A]/95 backdrop-blur-md text-card-foreground shadow-sm transition-all duration-300 hover:shadow-xl hover:border-[#C8A253]/50 hover:-translate-y-1;
+    background-image: url('/images/tugu-gandrungmangu-card-bg-light.webp');
+    background-repeat: no-repeat;
+    background-position: right 14px bottom 8px;
+    background-size: auto 78%;
+  }
+  .dark .card-Kecamatan {
+    background-image: url('/images/tugu-gandrungmangu-card-bg-dark.webp');
   }
   .card-Kecamatan-header {
     @apply p-5 md:p-6 bg-gradient-to-r from-[#F3EFE6]/90 via-[#FAF8F5]/60 to-transparent dark:from-[#064E3B]/50 dark:via-[#064E3B]/15 dark:to-transparent border-b border-[#E6E0D3]/80 dark:border-[#C8A253]/15;

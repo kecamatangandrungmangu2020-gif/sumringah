@@ -172,8 +172,8 @@ export default function FileConverterPage() {
         >
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute right-2 bottom-0 w-28 h-28 opacity-[0.13] bg-no-repeat bg-contain bg-right-bottom"
-            style={{ backgroundImage: "url('/images/gandrungmangu-semringah-silhouette.webp')" }}
+            className="pointer-events-none absolute right-3 bottom-0 w-24 h-28 opacity-[0.18] bg-no-repeat bg-contain bg-right-bottom"
+            style={{ backgroundImage: "url('/images/tugu-gandrungmangu-silhouette.webp')" }}
           />
           <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
             <div className="space-y-1 min-w-0 flex-1">

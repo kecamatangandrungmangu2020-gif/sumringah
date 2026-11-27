@@ -32,11 +32,11 @@ export function CardSilhouetteOverlay({
         }}
       />
 
-      {/* Siluet Logo Gandrungmangu Semringah Utuh (Proporsional Mengikuti Tinggi Kartu, Tidak Terpotong) */}
+      {/* Siluet Tugu Kecamatan Gandrungmangu (Proporsional Mengikuti Tinggi Kartu, Tidak Terpotong) */}
       <div
-        className="absolute inset-x-4 sm:inset-x-6 bottom-3 top-3 sm:bottom-4 sm:top-4 opacity-[0.14] mix-blend-screen bg-no-repeat bg-right-bottom bg-contain"
+        className="absolute inset-x-4 sm:inset-x-6 bottom-2 top-3 sm:bottom-3 sm:top-4 opacity-[0.16] bg-no-repeat bg-right-bottom bg-contain"
         style={{
-          backgroundImage: "url('/images/gandrungmangu-semringah-silhouette.webp')",
+          backgroundImage: "url('/images/tugu-gandrungmangu-silhouette.webp')",
         }}
       />
 
@@ -143,7 +143,20 @@ export function PresentationSheet({
           innerClassName
         )}
       >
-        {isOcean && <CardSilhouetteOverlay pattern={silhouette} />}
+        {isOcean ? (
+          <CardSilhouetteOverlay pattern={silhouette} />
+        ) : (
+          <div className="pointer-events-none absolute inset-0 overflow-hidden select-none" aria-hidden="true">
+            <div
+              className="block dark:hidden absolute inset-x-4 sm:inset-x-6 bottom-2 top-6 opacity-[0.06] bg-no-repeat bg-right-bottom bg-contain"
+              style={{ backgroundImage: "url('/images/tugu-gandrungmangu-silhouette-dark.webp')" }}
+            />
+            <div
+              className="hidden dark:block absolute inset-x-4 sm:inset-x-6 bottom-2 top-6 opacity-[0.08] bg-no-repeat bg-right-bottom bg-contain"
+              style={{ backgroundImage: "url('/images/tugu-gandrungmangu-silhouette.webp')" }}
+            />
+          </div>
+        )}
 
         {/* Running Deck Header Bar */}
         <div
